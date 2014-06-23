@@ -19,10 +19,25 @@ def get(sock):
 def put(sock, message):
     sock.send(si.pack(len(message)) + message.encode('utf-8'))
 
+def run_thread(sc, ser):
+    print 'We have accepted a connection from', sc.getpeername()
+    print 'Socket connects', sc.getsockname(), 'and', sc.getpeername()
+    name = ser.get_hostname()
+    client = get(sc)
+    ser.list_cli.append(ser.get_newid())
+    while True:
+        message = get(sc)
+        if(message == 'leobye'):
+            break
+        print client, '>>>', repr(message)
+    sc.close()
+
 class server:
     def __init__(self, hostname):
         self.port = 8001
         self.hostname = hostname
+        self.list_cli = []
+        self.ids = 6968
 
     def setup(self, host):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -30,6 +45,12 @@ class server:
         self.s.bind((host, self.port))
         self.s.listen(128)
         return self.s
+
+    def get_newid(self):
+        self.ids += 1
+        return self.ids
+    def get_clients(self):
+        return self.list_cli
 
     def get_hostname(self):
         return self.hostname
