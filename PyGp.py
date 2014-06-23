@@ -1,17 +1,11 @@
 #!/usr/bin/env python2
-# Foundations of Python Network Programming - Chapter 3 - 
-# Simple TCP client and server that send and receive 16 octets
 
-import chat, sys
+import chat, sys, threading
 
 HOST = sys.argv.pop() if len(sys.argv) == 4 else '127.0.0.1'
 
-if sys.argv[1:2] == ['server']:
-    ser = chat.server(sys.argv.pop())
-    s = ser.setup(HOST)
-    print 'Listening at', s.getsockname()
-    sc, sockname = s.accept()
-    print 'We have accepted a connection from', sockname 
+def run(sc, ser, server):
+    print 'We have accepted a connection from', sc.getsockname()
     print 'Socket connects', sc.getsockname(), 'and', sc.getpeername()
     server = ser.get_hostname()
     chat.put(sc, server)
@@ -26,6 +20,15 @@ if sys.argv[1:2] == ['server']:
         if(send == 'leobye'):
             break
     sc.close()
+
+if sys.argv[1:2] == ['server']:
+    ser = chat.server(sys.argv.pop())
+    s = ser.setup(HOST)
+    print 'Listening at', s.getsockname()
+    server = ser.get_hostname()
+    while True:
+        sc, sockname = s.accept()
+        threading.Thread(target=run, args=(sc, ser, server)).start()
     ser.close()
 
 elif sys.argv[1:2] == ['client']:
