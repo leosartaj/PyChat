@@ -23,14 +23,44 @@ def run_thread(sc, ser):
     print 'We have accepted a connection from', sc.getpeername()
     print 'Socket connects', sc.getsockname(), 'and', sc.getpeername()
     name = ser.get_hostname()
+    info = sc.getsockname()
     client = get(sc)
-    ser.list_cli.append(ser.get_newid())
+    port = get(sc)
+    ser.list_cli.append((client, port))
     while True:
         message = get(sc)
-        if(message == 'leobye'):
-            break
+        for cli in ser.get_clients():
+            if cli[0] != client:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect((info[0], int(cli[1])))
+                put(s, client)
+                put(s, message)
+                s.close()
         print client, '>>>', repr(message)
     sc.close()
+
+def sendbycli(s, cli, port):
+    client = cli.get_clientname()
+    put(s, client)
+    put(s, port)
+    while True:
+        send = raw_input(client + ' >>> ')
+        put(s, send)
+        if(send == 'leobye'):
+            break
+    cli.close()
+
+def recvbycli(host, cli, port):
+    sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sc.bind((host, port))
+    sc.listen(128)
+    while True:
+        s, sockname = sc.accept()
+        client = get(s)
+        message = get(s)
+        print '\n', client, '>>>', message, '<<<'
+        s.close()
 
 class server:
     def __init__(self, hostname):
@@ -49,6 +79,7 @@ class server:
     def get_newid(self):
         self.ids += 1
         return self.ids
+
     def get_clients(self):
         return self.list_cli
 
@@ -64,6 +95,8 @@ class server:
 class client:
     def __init__(self, clientname):
         self.clientname = clientname
+        self.ports = 9000
+        self.num = 0
 
     def connect(self, host, port):
         self.host = host
@@ -71,6 +104,10 @@ class client:
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect((self.host, self.port))
         return self.s
+
+    def get_port(self):
+        self.ports += 1
+        return self.ports
 
     def get_clientname(self):
         return self.clientname
@@ -80,6 +117,10 @@ class client:
 
     def get_port(self):
         return self.port
+
+    def get_ip(self):
+        self.num += 1
+        return '192.168.0.' + str(self.num)
 
     def close(self):
         self.s.close()
