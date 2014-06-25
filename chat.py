@@ -1,9 +1,27 @@
-import socket, struct
+import socket, struct, sys, curses
 from random import randint
 
 si = struct.Struct('!I')
 
+def setup_screen():
+    stdscr = curses.initscr()
+    curses.noecho()
+    curses.cbreak()
+    stdscr.keypad(1)
+    return stdscr
+
+def stop_screen(stdscr):
+    curses.echo()
+    curses.nocbreak()
+    stdscr.keypad(0)
+    curses.endwin()
+
 def recv_all(sock, length):
+    """
+    recieves the message until
+    the given length is
+    recieved
+    """
     data = ''
     while len(data) < length:
         more = sock.recv(length - len(data))
@@ -13,14 +31,25 @@ def recv_all(sock, length):
     return data
 
 def get(sock):
+    """
+    decides the length
+    of the message
+    """
     lendata = recv_all(sock, si.size)
     (length,) = si.unpack(lendata)
     return recv_all(sock, length)
 
 def put(sock, message):
+    """
+    adds message length 
+    and sends to the server
+    """
     sock.send(si.pack(len(message)) + message.encode('utf-8'))
 
 def relay_msg(clients, host, port, client, message):
+    """
+    sends message to multiple clients
+    """
     for cli in clients:
         if cli[1] != port:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -30,6 +59,10 @@ def relay_msg(clients, host, port, client, message):
             s.close
 
 def server_thread(sc, ser):
+    """
+    New server thread created
+    when connected to a client
+    """
     info = sc.getsockname()
     client = get(sc)
     port = get(sc)
@@ -52,34 +85,60 @@ def server_thread(sc, ser):
         relay_msg(ser.get_clients(), info[0], port, client, message)
         print client, port, '>>>', repr(message)
 
-def sendbycli(s, cli, port):
+def sendbycli(s, cli, port, stdscr):
+    """
+    Sends the messages
+    to the server
+    """
     client = cli.get_clientname()
     host = s.getsockname()[0]
     put(s, client)
     put(s, port)
     active = get(s)
+    height, width = stdscr.getmaxyx()
+    win = curses.newwin(height / 2, width, height / 4, 0)
     if len(active) != 0:
-        print 'Active users -->', active 
+        win.addstr('Active users -->' + active + '\n')
+    win.refresh()
     while True:
         try:
-            send = raw_input('Me >>> ')
+            key = ''
+            send = ''
+            while key != '\n':
+                key = win.getch()
+                key = chr(key)
+                win.addstr(key)
+                win.refresh()
+                send += key
+            #send = raw_input('')
         except EOFError:
-            print '\nThank you for using PyGp'
-            print 'Contribute --> https://github.com/leosartaj/PyGp\n'
+            win.addstr('\nThank you for using PyGp\n')
+            win.addstr('Contribute --> https://github.com/leosartaj/PyGp\n')
+            win.refresh()
+            #print '\nThank you for using PyGp'
+            #print 'Contribute --> https://github.com/leosartaj/PyGp\n'
             sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sc.connect((host, int(port)))
             put(sc, client + '   ')
             sc.close()
             cli.close()
+            stop_screen(stdscr)
             return
         put(s, send)
 
-def recvbycli(host, cli, port):
+def recvbycli(host, cli, port, stdscr):
+    """
+    listens on an assigned port
+    for messages from other
+    clients
+    """
     clientname = cli.get_clientname()
     sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sc.bind((host, port))
     sc.listen(128)
+    height, width = stdscr.getmaxyx()
+    win = curses.newwin(height / 4, width, (3 * height) / 4, 0)
     while True:
         s, sockname = sc.accept()
         client = get(s)
@@ -88,10 +147,15 @@ def recvbycli(host, cli, port):
             sc.close()
             return
         message = get(s)
-        print '\n', client, '>>>', message, '<<<'
+        win.addstr('\n')
+        win.addstr(client + ' >>> ' + message + ' <<<\n')
+        win.refresh()
         s.close()
 
 class server:
+    """
+    implements the server
+    """
     def __init__(self, hostname):
         self.port = 8001
         self.hostname = hostname
@@ -117,6 +181,9 @@ class server:
         self.s.close()
 
 class client:
+    """
+    Sets up a basic client
+    """
     def __init__(self, clientname):
         self.clientname = clientname
         self.ports = []
@@ -129,6 +196,9 @@ class client:
         return self.s
 
     def get_port(self):
+        """
+        generates random port for a client
+        """
         random_port = randint(9000, 60000)
         while random_port in self.ports:
             random_port = randint(9000, 60000)
