@@ -38,11 +38,14 @@ elif sys.argv[1:2] == ['client']:
     #print 'listening on port', port[0]
     #print 'Press Ctrl+d to exit'
     name = ' '.join(str(name) for name in s.getsockname())
-    height, width = stdscr.getmaxyx()
-    win = curses.newwin(height / 4, width, 0, 0)
-    win.addstr('You have been assigned socket ' + name + '\n', curses.A_BOLD)
-    win.addstr('listening on port ' + port[1] + '\n', curses.A_BOLD)
-    win.addstr('Press ctrl+d to exit\n', curses.A_BOLD)
+    cli.height, cli.width = stdscr.getmaxyx()
+    height, width = cli.get_height(), cli.get_width()
+    win = curses.newwin(6, width, 0, 0)
+    chat.draw_line(win, width)
+    win.addstr('| You have been assigned socket ' + name + '\n', curses.A_BOLD)
+    win.addstr('| listening on port ' + port[1] + '\n', curses.A_BOLD)
+    win.addstr('| Press ctrl+d to exit\n', curses.A_BOLD)
+    chat.draw_line(win, width)
     win.refresh()
     # new client threads for listening and sending
     threading.Thread(target=chat.sendbycli, args=(s, cli, port[1], stdscr)).start()

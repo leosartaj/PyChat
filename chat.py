@@ -5,15 +5,22 @@ si = struct.Struct('!I')
 
 def setup_screen():
     stdscr = curses.initscr()
+    curses.start_color()
     curses.noecho()
     curses.cbreak()
+    curses.curs_set(0)
     stdscr.keypad(1)
     return stdscr
+
+def draw_line(stdscr, width):
+    header = '+' + (width - 2) * '-' + '+'
+    stdscr.addstr(header, curses.A_BOLD)
 
 def stop_screen(stdscr):
     curses.echo()
     curses.nocbreak()
     stdscr.keypad(0)
+    curses.curs_set(1)
     curses.endwin()
 
 def recv_all(sock, length):
@@ -71,13 +78,13 @@ def server_thread(sc, ser):
     print 'Connected server', info, 'and', client, sc.getpeername(), 'listening on', port
     ser.list_cli.append((client, port))
     print 'Clients', ser.get_clients()
-    relay_msg(ser.get_clients(), info[0], port, client, 'has connected')
+    relay_msg(ser.get_clients(), info[0], port, client, 'has connected\n')
     while True:
         try:
             message = get(sc)
         except EOFError:
             print '>>>', client, 'has been disconnected >>>', sc.getpeername()
-            relay_msg(ser.get_clients(), info[0], port, client, 'has been disconnected')
+            relay_msg(ser.get_clients(), info[0], port, client, 'has been disconnected\n')
             sc.close()
             index = ser.list_cli.index((client, port))
             del ser.list_cli[index]
@@ -95,21 +102,34 @@ def sendbycli(s, cli, port, stdscr):
     put(s, client)
     put(s, port)
     active = get(s)
-    height, width = stdscr.getmaxyx()
-    win = curses.newwin(height / 2, width, height / 4, 0)
+    height, width = cli.get_height(), cli.get_width()
+    win = curses.newwin((height - 5) / 2, width, (height + 5) / 2, 0)
     if len(active) != 0:
         win.addstr('Active users -->' + active + '\n')
+    draw_line(win, width)
+    win.keypad(1)
     win.refresh()
+    i = 0
     while True:
         try:
             key = ''
             send = ''
+            win.addstr('| Me >>> ', curses.A_BOLD)
+            win.refresh()
             while key != '\n':
                 key = win.getch()
-                key = chr(key)
-                win.addstr(key)
+                if key == '/x7f':
+                    send = send[:-1]
+                    win.delch()
+                else:
+                    key = chr(key)
+                    win.addstr(key)
+                    send += key
                 win.refresh()
-                send += key
+            if i > 1:
+                win.deleteln()
+                win.refresh()
+            i += 1
             #send = raw_input('')
         except EOFError:
             win.addstr('\nThank you for using PyGp\n')
@@ -137,8 +157,8 @@ def recvbycli(host, cli, port, stdscr):
     sc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sc.bind((host, port))
     sc.listen(128)
-    height, width = stdscr.getmaxyx()
-    win = curses.newwin(height / 4, width, (3 * height) / 4, 0)
+    height, width = cli.get_height(), cli.get_width()
+    win = curses.newwin((height - 5) / 2, width, 5, 0)
     while True:
         s, sockname = sc.accept()
         client = get(s)
@@ -147,8 +167,8 @@ def recvbycli(host, cli, port, stdscr):
             sc.close()
             return
         message = get(s)
-        win.addstr('\n')
-        win.addstr(client + ' >>> ' + message + ' <<<\n')
+        win.addstr('| ' + client + ' >>> ', curses.A_BOLD)
+        win.addstr(message)
         win.refresh()
         s.close()
 
@@ -187,6 +207,8 @@ class client:
     def __init__(self, clientname):
         self.clientname = clientname
         self.ports = []
+        self.width = 0
+        self.height = 0
 
     def connect(self, host, port):
         self.host = host
@@ -210,6 +232,12 @@ class client:
 
     def get_host(self):
         return self.host
+
+    def get_width(self):
+        return self.width
+
+    def get_height(self):
+        return self.height
 
     def close(self):
         self.s.close()
