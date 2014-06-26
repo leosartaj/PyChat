@@ -1,7 +1,12 @@
-import socket, struct, sys, curses, screen
+import socket, struct, sys, curses, screen, time
 from random import randint
 
 si = struct.Struct('!I')
+
+def timestamp():
+    localtime = time.localtime(time.time())
+    timer = ' ~ ' + str(localtime[3]) + ':' + str(localtime[4]) + ':' + str(localtime[5])
+    return timer
 
 def recv_all(sock, length):
     """
@@ -95,6 +100,7 @@ def sendbycli(s, cli, port, stdscr, win_recv):
         send = ''
         if prev != '':
             win.addstr('  Sent >>> ' + prev + '\n', curses.A_DIM)
+        localtime = time.asctime(time.localtime(time.time()))
         win.addstr('  Me >>> ', curses.A_BOLD)
         win.border('|', '|', '-', '-', '+','+', '+', '+') 
         win.refresh()
@@ -133,7 +139,9 @@ def sendbycli(s, cli, port, stdscr, win_recv):
             win.refresh()
         win.clear()
         win.addstr('\n')
-        win_recv.addstr('\n| Me >>> ', curses.A_BOLD)
+        win_recv.addstr('\n| Me', curses.A_BOLD)
+        win_recv.addstr(timestamp(), curses.A_DIM)
+        win_recv.addstr(' >>> ', curses.A_BOLD)
         win_recv.addstr(send)
         win_recv.refresh()
         screen.overflow_recv(win_recv, cli, height)
@@ -159,7 +167,9 @@ def recvbycli(host, cli, port, height, win_recv):
             sc.close()
             return
         message = get(s)
-        win_recv.addstr('\n| ' + client + ' >>> ', curses.A_BOLD)
+        win_recv.addstr('\n| ' + client, curses.A_BOLD)
+        win_recv.addstr(timestamp(), curses.A_DIM)
+        win_recv.addstr(' >>> ', curses.A_BOLD)
         win_recv.addstr(message)
         win_recv.refresh()
         cli.lines += 1
