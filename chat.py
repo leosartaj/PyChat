@@ -1,35 +1,7 @@
-import socket, struct, sys, curses
+import socket, struct, sys, curses, screen
 from random import randint
 
 si = struct.Struct('!I')
-
-def setup_screen():
-    stdscr = curses.initscr()
-    curses.start_color()
-    curses.noecho()
-    curses.cbreak()
-    curses.curs_set(0)
-    stdscr.keypad(1)
-    return stdscr
-
-def draw_line(stdscr, width):
-    header = '+' + (width - 2) * '-' + '+'
-    stdscr.addstr(header)
-
-def info_screen(width, name, port):
-    win = curses.newwin(5, width, 0, 0)
-    win.addstr('\n  You have been assigned' + name + '\n')
-    win.addstr('  listening on ' + port + '\n')
-    win.addstr('Press ctrl+d to exit')
-    win.border('|', '|', '-', '-', '+','+', '+', '+') 
-    win.refresh()
-    
-def stop_screen(stdscr):
-    curses.echo()
-    curses.nocbreak()
-    stdscr.keypad(0)
-    curses.curs_set(1)
-    curses.endwin()
 
 def recv_all(sock, length):
     """
@@ -81,7 +53,7 @@ def server_thread(sc, ser):
     info = sc.getsockname()
     client = get(sc)
     port = get(sc)
-    list_clients = ' '.join(str(cli[0]) for cli in ser.get_clients())
+    list_clients = ', '.join(str(cli[0]) for cli in ser.get_clients())
     put(sc, list_clients)
     print 'Connected server', info, 'and', client, sc.getpeername(), 'listening on', port
     ser.list_cli.append((client, port))
@@ -111,12 +83,12 @@ def sendbycli(s, cli, port, stdscr, win_recv):
     put(s, port)
     active = get(s)
     height, width = cli.get_height(), cli.get_width()
-    win = curses.newwin(5, width, height - 5, 0)
+    win = screen.new_window(5, width, height - 5, 0)
     win.addstr('\n')
     win.border('|', '|', '-', '-', '+','+', '+', '+')
     win.refresh()
     if len(active) != 0:
-        win.addstr('  Active users -->' + active + '\n')
+        win.addstr('  Active users --> ' + active + '\n')
     prev = ''
     while True:
         key = ''
@@ -135,8 +107,10 @@ def sendbycli(s, cli, port, stdscr, win_recv):
             if key == '\x7f':
                 if send == '':
                     continue
-                #send = send[:-1]
-                #win.deleteln()
+                send = send[:-1]
+                y, x = win.getyx()
+                win.delch(y, x - 1)
+                win.refresh()
             elif key == '\n':
                 if send == '':
                     continue
@@ -149,7 +123,7 @@ def sendbycli(s, cli, port, stdscr, win_recv):
                 put(sc, client + '   ')
                 sc.close()
                 cli.close()
-                stop_screen(stdscr)
+                screen.stop_screen(stdscr)
                 print 'Thank you for using PyGp'
                 print 'Contribute --> https://github.com/leosartaj/PyGp'
                 return
@@ -162,10 +136,7 @@ def sendbycli(s, cli, port, stdscr, win_recv):
         win_recv.addstr('\n| Me >>> ', curses.A_BOLD)
         win_recv.addstr(send)
         win_recv.refresh()
-        if cli.get_lines() == (height - 16):
-            cli.lines -= 1
-            win_recv.deleteln()
-            win_recv.refresh()
+        screen.overflow_recv(win_recv, cli, height)
         prev = send
         put(s, send)
 
@@ -192,11 +163,9 @@ def recvbycli(host, cli, port, height, win_recv):
         win_recv.addstr(message)
         win_recv.refresh()
         cli.lines += 1
-        if cli.get_lines() == (height - 16):
-            cli.lines -= 1
-            win_recv.deleteln()
-            win_recv.refresh()
+        screen.overflow_recv(win_recv, cli, height)
         s.close()
+
 
 class server:
     """
@@ -271,10 +240,3 @@ class client:
 
     def close(self):
         self.s.close()
-
-
-"""
-Issues
-backspace working
-nd recieve area updation
-"""

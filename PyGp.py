@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-import chat, sys, threading, curses
+import chat, sys, threading, screen
 
 HOST = sys.argv.pop() if len(sys.argv) == 4 else '127.0.0.1'
 
@@ -29,20 +29,17 @@ if sys.argv[1:2] == ['server']:
             sys.exit()
 
 elif sys.argv[1:2] == ['client']:
-    stdscr = chat.setup_screen()
+    stdscr = screen.setup_screen()
     cli = chat.client(sys.argv.pop())
     s = cli.connect(HOST, 8001)
     client = cli.get_clientname()
     port = cli.get_port()
-    #print 'You have been assigned socket name', s.getsockname()
-    #print 'listening on port', port[0]
-    #print 'Press Ctrl+d to exit'
     name = ' '.join(str(name) for name in s.getsockname())
     cli.height, cli.width = stdscr.getmaxyx()
     height, width = cli.get_height(), cli.get_width()
-    chat.info_screen(width, name, port[1])
+    screen.info_screen(width, name, port[1])
     # new client threads for listening and sending
-    win_recv = curses.newwin(height - 12, width, 6, 0)
+    win_recv = screen.new_window(height - 12, width, 6, 0)
     threading.Thread(target=chat.sendbycli, args=(s, cli, port[1], stdscr, win_recv)).start()
     threading.Thread(target=chat.recvbycli, args=(HOST, cli, port[0], height, win_recv)).start()
 
