@@ -82,6 +82,7 @@ def sendbycli(s, cli, port, stdscr, win_recv):
     put(s, client)
     put(s, port)
     active = get(s)
+    # setting up window
     height, width = cli.get_height(), cli.get_width()
     win = screen.new_window(5, width, height - 5, 0)
     screen.addstr(win, '\n')
@@ -100,11 +101,8 @@ def sendbycli(s, cli, port, stdscr, win_recv):
         screen.border(win)
         screen.refresh(win)
         while True:
-            key = win.getch()
-            try:
-                key = chr(key)
-            except:
-                continue
+            key = screen.getch(win)
+            key = chr(key)
             if key == '\x7f':
                 if send == '':
                     continue
@@ -118,6 +116,7 @@ def sendbycli(s, cli, port, stdscr, win_recv):
                 cli.lines += 1
                 break
             elif key == '\x04':
+                # shutting down when ctrl+d pressed
                 sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sc.connect((host, int(port)))
                 cmd = 'ser:dis`' + client
@@ -137,7 +136,7 @@ def sendbycli(s, cli, port, stdscr, win_recv):
         screen.clear(win)
         screen.addstr(win, '\n')
         screen.uprecv_win(win_recv, 'Me', send)
-        screen.overflow_recv(win_recv, cli, height)
+        screen.overflow_recv(win_recv, cli, height, 13)
         prev = send
         put(s, send)
 
@@ -148,6 +147,7 @@ def recvbycli(host, cli, port, height, win_recv):
     clients
     """
     clientname = cli.get_clientname()
+    # begin listening
     sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sc.bind((host, port))
@@ -160,9 +160,9 @@ def recvbycli(host, cli, port, height, win_recv):
             sc.close()
             return
         message = get(s)
-        screen.uprecv_win(win_recv, client, message)
         cli.lines += 1
-        screen.overflow_recv(win_recv, cli, height)
+        screen.uprecv_win(win_recv, client, message)
+        screen.overflow_recv(win_recv, cli, height, 13)
         s.close()
 
 
@@ -203,6 +203,7 @@ class client:
         self.ports = []
         self.width = 0
         self.height = 0
+        # number of lines written or recieved by client
         self.lines = 0
 
     def connect(self, host, port):
