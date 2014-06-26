@@ -40,16 +40,11 @@ elif sys.argv[1:2] == ['client']:
     name = ' '.join(str(name) for name in s.getsockname())
     cli.height, cli.width = stdscr.getmaxyx()
     height, width = cli.get_height(), cli.get_width()
-    win = curses.newwin(6, width, 0, 0)
-    chat.draw_line(win, width)
-    win.addstr('| You have been assigned socket ' + name + '\n', curses.A_BOLD)
-    win.addstr('| listening on port ' + port[1] + '\n', curses.A_BOLD)
-    win.addstr('| Press ctrl+d to exit\n', curses.A_BOLD)
-    chat.draw_line(win, width)
-    win.refresh()
+    chat.info_screen(width, name, port[1])
     # new client threads for listening and sending
-    threading.Thread(target=chat.sendbycli, args=(s, cli, port[1], stdscr)).start()
-    threading.Thread(target=chat.recvbycli, args=(HOST, cli, port[0], stdscr)).start()
+    win_recv = curses.newwin(height - 12, width, 6, 0)
+    threading.Thread(target=chat.sendbycli, args=(s, cli, port[1], stdscr, win_recv)).start()
+    threading.Thread(target=chat.recvbycli, args=(HOST, cli, port[0], height, win_recv)).start()
 
 else:
     print >>sys.stderr, 'usage: ./ChatCli.py server|client [username] [host]'

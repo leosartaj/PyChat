@@ -14,8 +14,16 @@ def setup_screen():
 
 def draw_line(stdscr, width):
     header = '+' + (width - 2) * '-' + '+'
-    stdscr.addstr(header, curses.A_BOLD)
+    stdscr.addstr(header)
 
+def info_screen(width, name, port):
+    win = curses.newwin(5, width, 0, 0)
+    win.addstr('\n  You have been assigned' + name + '\n')
+    win.addstr('  listening on ' + port + '\n')
+    win.addstr('Press ctrl+d to exit')
+    win.border('|', '|', '-', '-', '+','+', '+', '+') 
+    win.refresh()
+    
 def stop_screen(stdscr):
     curses.echo()
     curses.nocbreak()
@@ -78,13 +86,13 @@ def server_thread(sc, ser):
     print 'Connected server', info, 'and', client, sc.getpeername(), 'listening on', port
     ser.list_cli.append((client, port))
     print 'Clients', ser.get_clients()
-    relay_msg(ser.get_clients(), info[0], port, client, 'has connected\n')
+    relay_msg(ser.get_clients(), info[0], port, client, 'has connected')
     while True:
         try:
             message = get(sc)
         except EOFError:
             print '>>>', client, 'has been disconnected >>>', sc.getpeername()
-            relay_msg(ser.get_clients(), info[0], port, client, 'has been disconnected\n')
+            relay_msg(ser.get_clients(), info[0], port, client, 'has been disconnected')
             sc.close()
             index = ser.list_cli.index((client, port))
             del ser.list_cli[index]
@@ -92,7 +100,7 @@ def server_thread(sc, ser):
         relay_msg(ser.get_clients(), info[0], port, client, message)
         print client, port, '>>>', repr(message)
 
-def sendbycli(s, cli, port, stdscr):
+def sendbycli(s, cli, port, stdscr, win_recv):
     """
     Sends the messages
     to the server
@@ -103,50 +111,65 @@ def sendbycli(s, cli, port, stdscr):
     put(s, port)
     active = get(s)
     height, width = cli.get_height(), cli.get_width()
-    win = curses.newwin((height - 5) / 2, width, (height + 5) / 2, 0)
-    if len(active) != 0:
-        win.addstr('Active users -->' + active + '\n')
-    draw_line(win, width)
-    win.keypad(1)
+    win = curses.newwin(5, width, height - 5, 0)
+    win.addstr('\n')
+    win.border('|', '|', '-', '-', '+','+', '+', '+')
     win.refresh()
-    i = 0
+    if len(active) != 0:
+        win.addstr('  Active users -->' + active + '\n')
+    prev = ''
     while True:
-        try:
-            key = ''
-            send = ''
-            win.addstr('| Me >>> ', curses.A_BOLD)
+        key = ''
+        send = ''
+        if prev != '':
+            win.addstr('  Sent >>> ' + prev + '\n', curses.A_DIM)
+        win.addstr('  Me >>> ', curses.A_BOLD)
+        win.border('|', '|', '-', '-', '+','+', '+', '+') 
+        win.refresh()
+        while True:
+            key = win.getch()
+            try:
+                key = chr(key)
+            except:
+                continue
+            if key == '\x7f':
+                if send == '':
+                    continue
+                #send = send[:-1]
+                #win.deleteln()
+            elif key == '\n':
+                if send == '':
+                    continue
+                win.addstr(key)
+                cli.lines += 1
+                break
+            elif key == '\x04':
+                sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sc.connect((host, int(port)))
+                put(sc, client + '   ')
+                sc.close()
+                cli.close()
+                stop_screen(stdscr)
+                print 'Thank you for using PyGp'
+                print 'Contribute --> https://github.com/leosartaj/PyGp'
+                return
+            else:
+                win.addstr(key)
+                send += key
             win.refresh()
-            while key != '\n':
-                key = win.getch()
-                if key == '/x7f':
-                    send = send[:-1]
-                    win.delch()
-                else:
-                    key = chr(key)
-                    win.addstr(key)
-                    send += key
-                win.refresh()
-            if i > 1:
-                win.deleteln()
-                win.refresh()
-            i += 1
-            #send = raw_input('')
-        except EOFError:
-            win.addstr('\nThank you for using PyGp\n')
-            win.addstr('Contribute --> https://github.com/leosartaj/PyGp\n')
-            win.refresh()
-            #print '\nThank you for using PyGp'
-            #print 'Contribute --> https://github.com/leosartaj/PyGp\n'
-            sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sc.connect((host, int(port)))
-            put(sc, client + '   ')
-            sc.close()
-            cli.close()
-            stop_screen(stdscr)
-            return
+        win.clear()
+        win.addstr('\n')
+        win_recv.addstr('\n| Me >>> ', curses.A_BOLD)
+        win_recv.addstr(send)
+        win_recv.refresh()
+        if cli.get_lines() == (height - 16):
+            cli.lines -= 1
+            win_recv.deleteln()
+            win_recv.refresh()
+        prev = send
         put(s, send)
 
-def recvbycli(host, cli, port, stdscr):
+def recvbycli(host, cli, port, height, win_recv):
     """
     listens on an assigned port
     for messages from other
@@ -157,8 +180,6 @@ def recvbycli(host, cli, port, stdscr):
     sc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sc.bind((host, port))
     sc.listen(128)
-    height, width = cli.get_height(), cli.get_width()
-    win = curses.newwin((height - 5) / 2, width, 5, 0)
     while True:
         s, sockname = sc.accept()
         client = get(s)
@@ -167,9 +188,14 @@ def recvbycli(host, cli, port, stdscr):
             sc.close()
             return
         message = get(s)
-        win.addstr('| ' + client + ' >>> ', curses.A_BOLD)
-        win.addstr(message)
-        win.refresh()
+        win_recv.addstr('\n| ' + client + ' >>> ', curses.A_BOLD)
+        win_recv.addstr(message)
+        win_recv.refresh()
+        cli.lines += 1
+        if cli.get_lines() == (height - 16):
+            cli.lines -= 1
+            win_recv.deleteln()
+            win_recv.refresh()
         s.close()
 
 class server:
@@ -209,6 +235,7 @@ class client:
         self.ports = []
         self.width = 0
         self.height = 0
+        self.lines = 0
 
     def connect(self, host, port):
         self.host = host
@@ -239,5 +266,15 @@ class client:
     def get_height(self):
         return self.height
 
+    def get_lines(self):
+        return self.lines
+
     def close(self):
         self.s.close()
+
+
+"""
+Issues
+backspace working
+nd recieve area updation
+"""
