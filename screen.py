@@ -1,4 +1,4 @@
-import curses
+import curses, time
 
 def setup_screen():
     stdscr = curses.initscr()
@@ -34,6 +34,18 @@ def overflow_recv(win_recv, cli, height):
         win_recv.move(y - 1, x)
         win_recv.refresh()
             
+def timestamp():
+    localtime = time.localtime(time.time())
+    timer = ' ~ ' + str(localtime[3]) + ':' + str(localtime[4]) + ':' + str(localtime[5])
+    return timer
+
+def uprecv_win(win_recv, client, message):
+        win_recv.addstr('\n| ' + client, curses.A_BOLD)
+        win_recv.addstr(timestamp(), curses.A_DIM)
+        win_recv.addstr(' >>> ', curses.A_BOLD)
+        win_recv.addstr(message)
+        win_recv.refresh()
+
 def stop_screen(stdscr):
     curses.echo()
     curses.nocbreak()
