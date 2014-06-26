@@ -22,9 +22,31 @@ def info_screen(width, name, port):
     win.addstr('\n You have been assigned ' + name + '\n')
     win.addstr(' listening on ' + port + '\n')
     win.addstr(' Press ctrl+d to exit')
-    win.border('|', '|', '-', '-', '+','+', '+', '+') 
+    border(win)
     win.refresh()
     
+def border(win):
+    win.border('|', '|', '-', '-', '+','+', '+', '+')
+
+def backspace(win, width):
+    y, x = win.getyx()
+    win.delch(y, x - 1)
+    win.addstr(y, width - 2, ' |')
+    win.move(y, x - 1)
+    win.refresh()
+
+def addstr(win, message, attr = None):
+    if attr == None:
+        win.addstr(message)
+    elif attr == 'bold':
+        win.addstr(message, curses.A_BOLD)
+
+def refresh(win):
+    win.refresh()
+
+def clear(win):
+    win.clear()
+
 def overflow_recv(win_recv, cli, height):
     if cli.get_lines() == height - 13:
         cli.lines -= 1

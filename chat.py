@@ -1,4 +1,4 @@
-import socket, struct, sys, curses, screen
+import socket, struct, sys, screen
 from random import randint
 
 si = struct.Struct('!I')
@@ -84,20 +84,21 @@ def sendbycli(s, cli, port, stdscr, win_recv):
     active = get(s)
     height, width = cli.get_height(), cli.get_width()
     win = screen.new_window(5, width, height - 5, 0)
-    win.addstr('\n')
-    win.border('|', '|', '-', '-', '+','+', '+', '+')
-    win.refresh()
+    screen.addstr(win, '\n')
+    screen.border(win)
+    screen.refresh(win)
     if len(active) != 0:
-        win.addstr('  Active users --> ' + active + '\n')
+        screen.addstr(win, '  Active users --> ' + active + '\n')
     prev = ''
     while True:
         key = ''
         send = ''
+        leng = 0
         if prev != '':
-            win.addstr('  Sent >>> ' + prev + '\n', curses.A_DIM)
-        win.addstr('  Me >>> ', curses.A_BOLD)
-        win.border('|', '|', '-', '-', '+','+', '+', '+') 
-        win.refresh()
+            screen.addstr(win, '  Sent >>> ' + prev + '\n')
+        screen.addstr(win, '  Me >>> ', 'bold')
+        screen.border(win)
+        screen.refresh(win)
         while True:
             key = win.getch()
             try:
@@ -108,15 +109,12 @@ def sendbycli(s, cli, port, stdscr, win_recv):
                 if send == '':
                     continue
                 send = send[:-1]
-                y, x = win.getyx()
-                win.delch(y, x - 1)
-                win.addstr(y, width - 2, ' |')
-                win.move(y, x - 1)
-                win.refresh()
+                leng -= 1
+                screen.backspace(win, width)
             elif key == '\n':
                 if send == '':
                     continue
-                win.addstr(key)
+                screen.addstr(win, key)
                 cli.lines += 1
                 break
             elif key == '\x04':
@@ -131,11 +129,13 @@ def sendbycli(s, cli, port, stdscr, win_recv):
                 print 'Contribute --> https://github.com/leosartaj/PyGp'
                 return
             else:
-                win.addstr(key)
-                send += key
-            win.refresh()
-        win.clear()
-        win.addstr('\n')
+                if leng != (width - 12):
+                    screen.addstr(win, key)
+                    send += key
+                    leng += 1
+            screen.refresh(win)
+        screen.clear(win)
+        screen.addstr(win, '\n')
         screen.uprecv_win(win_recv, 'Me', send)
         screen.overflow_recv(win_recv, cli, height)
         prev = send
@@ -213,9 +213,7 @@ class client:
         return self.s
 
     def get_port(self):
-        """
-        generates random port for a client
-        """
+        #generates random port for a client
         random_port = randint(9000, 60000)
         while random_port in self.ports:
             random_port = randint(9000, 60000)
