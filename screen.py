@@ -63,7 +63,7 @@ def getch(win):
     """
     returns an inputted character
     """
-    return win.getch()
+    return chr(win.getch())
 
 def refresh(win):
     """

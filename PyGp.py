@@ -44,7 +44,7 @@ elif sys.argv[1:2] == ['client']:
     # new client thread for sending
     threading.Thread(target=chat.sendbycli, args=(s, cli, port[1], stdscr, win_recv)).start()
     # new client thread for listening
-    threading.Thread(target=chat.recvbycli, args=(HOST, cli, port[0], height, win_recv)).start()
+    threading.Thread(target=chat.recvbycli, args=(s.getsockname()[0], cli, port[0], height, win_recv)).start()
 
 else:
     print >>sys.stderr, 'usage: ./ChatCli.py server|client [username] [host]'

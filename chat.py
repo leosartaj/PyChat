@@ -33,17 +33,31 @@ def put(sock, message):
     """
     sock.send(si.pack(len(message)) + message.encode('utf-8'))
 
-def relay_msg(clients, host, port, client, message):
+def relay_msg(clients, port, client, message):
     """
     sends message to multiple clients
     """
     for cli in clients:
         if cli[1] != port:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect((host, int(cli[1])))
+            s.connect((cli[2], int(cli[1])))
             put(s, client)
             put(s, message)
-            s.close
+            s.close()
+
+def shutdown(stdscr, cliadd, cli, port):
+    """
+    helps to shutdown when client threads safely
+    """
+    sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sc.connect((cliadd, port))
+    cmd = 'ser:dis`' + cli.get_clientname()
+    put(sc, cmd)
+    sc.close()
+    cli.close()
+    screen.stop_screen(stdscr)
+    print 'Thank you for using PyGp'
+    print 'Contribute --> https://github.com/leosartaj/PyGp'
 
 def server_thread(sc, ser):
     """
@@ -53,23 +67,24 @@ def server_thread(sc, ser):
     info = sc.getsockname()
     client = get(sc)
     port = get(sc)
+    cliadd = sc.getpeername()[0]
     list_clients = ', '.join(str(cli[0]) for cli in ser.get_clients())
     put(sc, list_clients)
     print 'Connected server', info, 'and', client, sc.getpeername(), 'listening on', port
-    ser.list_cli.append((client, port))
+    ser.list_cli.append((client, port, cliadd))
     print 'Clients', ser.get_clients()
-    relay_msg(ser.get_clients(), info[0], port, client, 'has connected')
+    relay_msg(ser.get_clients(), port, client, 'has connected')
     while True:
         try:
             message = get(sc)
         except EOFError:
             print '>>>', client, 'has been disconnected >>>', sc.getpeername()
-            relay_msg(ser.get_clients(), info[0], port, client, 'has been disconnected')
+            relay_msg(ser.get_clients(), port, client, 'has been disconnected')
             sc.close()
-            index = ser.list_cli.index((client, port))
+            index = ser.list_cli.index((client, port, cliadd))
             del ser.list_cli[index]
             return
-        relay_msg(ser.get_clients(), info[0], port, client, message)
+        relay_msg(ser.get_clients(), port, client, message)
         print client, port, '>>>', repr(message)
 
 def sendbycli(s, cli, port, stdscr, win_recv):
@@ -102,7 +117,6 @@ def sendbycli(s, cli, port, stdscr, win_recv):
         screen.refresh(win)
         while True:
             key = screen.getch(win)
-            key = chr(key)
             if key == '\x7f':
                 if send == '':
                     continue
@@ -117,15 +131,8 @@ def sendbycli(s, cli, port, stdscr, win_recv):
                 break
             elif key == '\x04':
                 # shutting down when ctrl+d pressed
-                sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sc.connect((host, int(port)))
-                cmd = 'ser:dis`' + client
-                put(sc, cmd)
-                sc.close()
-                cli.close()
-                screen.stop_screen(stdscr)
-                print 'Thank you for using PyGp'
-                print 'Contribute --> https://github.com/leosartaj/PyGp'
+                cliadd = s.getsockname()[0]
+                shutdown(stdscr, cliadd,  cli, int(port))
                 return
             else:
                 if leng != (width - 12):
@@ -139,6 +146,7 @@ def sendbycli(s, cli, port, stdscr, win_recv):
         screen.overflow_recv(win_recv, cli, height, 13)
         prev = send
         put(s, send)
+
 
 def recvbycli(host, cli, port, height, win_recv):
     """
@@ -165,7 +173,6 @@ def recvbycli(host, cli, port, height, win_recv):
         screen.overflow_recv(win_recv, cli, height, 13)
         s.close()
 
-
 class server:
     """
     implements the server
@@ -180,6 +187,7 @@ class server:
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.s.bind((host, self.port))
         self.s.listen(128)
+        self.host = host
         return self.s
 
     def get_clients(self):
@@ -187,6 +195,9 @@ class server:
 
     def get_hostname(self):
         return self.hostname
+
+    def get_host(sefl):
+        return self.host
 
     def get_port(self):
         return self.port
