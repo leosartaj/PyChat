@@ -3,6 +3,13 @@ from random import randint
 
 si = struct.Struct('!I')
 
+def listen(host, port):
+    sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sc.bind((host, port))
+    sc.listen(128)
+    return sc
+
 def recv_all(sock, length):
     """
     recieves the message until
@@ -59,6 +66,25 @@ def shutdown(stdscr, cliadd, cli, port):
     print 'Thank you for using PyGp'
     print 'Contribute --> https://github.com/leosartaj/PyGp'
 
+def cmd(ser, cliadd, port, message):
+    """
+    for running server side commands
+    """
+    if message[:5] != 'ser::':
+        return False
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((cliadd, port))
+    put(s, 'server')
+    req = message[5::]
+    if req == 'active':
+        list_clients = ', '.join(str(cli[0]) for cli in ser.get_clients())
+        put(s, list_clients)
+    else:
+        error = 'invalid command'
+        put(s, error)
+    s.close()
+    return True
+
 def server_thread(sc, ser):
     """
     New server thread created
@@ -84,7 +110,8 @@ def server_thread(sc, ser):
             index = ser.list_cli.index((client, port, cliadd))
             del ser.list_cli[index]
             return
-        relay_msg(ser.get_clients(), port, client, message)
+        if not cmd(ser, cliadd, int(port), message):
+            relay_msg(ser.get_clients(), port, client, message)
         print client, port, '>>>', repr(message)
 
 def sendbycli(s, cli, port, stdscr, win_recv):
@@ -142,7 +169,8 @@ def sendbycli(s, cli, port, stdscr, win_recv):
             screen.refresh(win)
         screen.clear(win)
         screen.addstr(win, '\n')
-        screen.uprecv_win(win_recv, 'Me', send)
+        if send[:5] != 'ser::':
+            screen.uprecv_win(win_recv, 'Me', send)
         screen.overflow_recv(win_recv, cli, height, 13)
         prev = send
         put(s, send)
@@ -156,10 +184,7 @@ def recvbycli(host, cli, port, height, win_recv):
     """
     clientname = cli.get_clientname()
     # begin listening
-    sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sc.bind((host, port))
-    sc.listen(128)
+    sc = listen(host, port)
     while True:
         s, sockname = sc.accept()
         client = get(s)
