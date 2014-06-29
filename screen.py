@@ -1,3 +1,11 @@
+##
+# PyGp
+# https://github.com/leosartaj/PyGp.git
+#
+# Copyright (c) 2014 Sartaj Singh
+# Licensed under the MIT license.
+##
+
 import curses, time
 
 def setup_screen():
@@ -63,7 +71,8 @@ def getch(win):
     """
     returns an inputted character
     """
-    return chr(win.getch())
+    key = win.getch()
+    return key
 
 def refresh(win):
     """

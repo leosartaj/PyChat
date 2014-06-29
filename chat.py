@@ -1,3 +1,11 @@
+##
+# PyGp
+# https://github.com/leosartaj/PyGp.git
+#
+# Copyright (c) 2014 Sartaj Singh
+# Licensed under the MIT license.
+##
+
 import socket, struct, sys, screen
 from random import randint
 
@@ -58,32 +66,13 @@ def shutdown(stdscr, cliadd, cli, port):
     """
     sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sc.connect((cliadd, port))
-    cmd = 'ser:dis`' + cli.get_clientname()
-    put(sc, cmd)
+    camd = 'ser:dis' + cli.get_clientname()
+    put(sc, camd)
     sc.close()
     cli.close()
     screen.stop_screen(stdscr)
     print 'Thank you for using PyGp'
     print 'Contribute --> https://github.com/leosartaj/PyGp'
-
-def cmd(ser, cliadd, port, message):
-    """
-    for running server side commands
-    """
-    if message[:5] != 'ser::':
-        return False
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((cliadd, port))
-    put(s, 'server')
-    req = message[5::]
-    if req == 'active':
-        list_clients = ', '.join(str(cli[0]) for cli in ser.get_clients())
-        put(s, list_clients)
-    else:
-        error = 'invalid command'
-        put(s, error)
-    s.close()
-    return True
 
 def server_thread(sc, ser):
     """
@@ -110,8 +99,7 @@ def server_thread(sc, ser):
             index = ser.list_cli.index((client, port, cliadd))
             del ser.list_cli[index]
             return
-        if not cmd(ser, cliadd, int(port), message):
-            relay_msg(ser.get_clients(), port, client, message)
+        relay_msg(ser.get_clients(), port, client, message)
         print client, port, '>>>', repr(message)
 
 def sendbycli(s, cli, port, stdscr, win_recv):
@@ -143,7 +131,8 @@ def sendbycli(s, cli, port, stdscr, win_recv):
         screen.border(win)
         screen.refresh(win)
         while True:
-            key = screen.getch(win)
+            key = win.getch()
+            key = chr(key)
             if key == '\x7f':
                 if send == '':
                     continue
@@ -169,8 +158,7 @@ def sendbycli(s, cli, port, stdscr, win_recv):
             screen.refresh(win)
         screen.clear(win)
         screen.addstr(win, '\n')
-        if send[:5] != 'ser::':
-            screen.uprecv_win(win_recv, 'Me', send)
+        screen.uprecv_win(win_recv, 'Me', send)
         screen.overflow_recv(win_recv, cli, height, 13)
         prev = send
         put(s, send)
@@ -188,7 +176,7 @@ def recvbycli(host, cli, port, height, win_recv):
     while True:
         s, sockname = sc.accept()
         client = get(s)
-        if client == 'ser:dis`' + clientname:
+        if client == 'ser:dis' + clientname:
             s.close()
             sc.close()
             return
