@@ -6,6 +6,9 @@
 # Licensed under the MIT license.
 ##
 
+"""
+using the curses module provides the useful methods for managing the display
+"""
 import curses, time
 
 def setup_screen():

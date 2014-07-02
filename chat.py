@@ -6,12 +6,18 @@
 # Licensed under the MIT license.
 ##
 
+"""
+contains the main logic
+"""
 import socket, struct, sys, screen
 from random import randint
 
 si = struct.Struct('!I')
 
 def listen(host, port):
+    """
+    sets up a socket for listening incoming connections
+    """
     sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sc.bind((host, port))
@@ -238,7 +244,7 @@ class client:
         return self.s
 
     def get_port(self):
-        #generates random port for a client
+        # generates random port for a client
         random_port = randint(9000, 60000)
         while random_port in self.ports:
             random_port = randint(9000, 60000)

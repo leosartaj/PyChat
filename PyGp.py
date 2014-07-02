@@ -8,6 +8,9 @@
 # Licensed under the MIT license.
 ##
 
+"""
+This file initializes the server or the client
+"""
 import chat, sys, threading, screen
 
 HOST = sys.argv.pop() if len(sys.argv) == 4 else '127.0.0.1'
@@ -43,7 +46,7 @@ elif sys.argv[1:2] == ['client']:
     client = cli.get_clientname()
     port = cli.get_port()
     name = ' '.join(str(name) for name in s.getsockname())
-    # initializing curses
+    # setting up the window
     stdscr = screen.setup_screen()
     cli.height, cli.width = stdscr.getmaxyx()
     height, width = cli.get_height(), cli.get_width()
