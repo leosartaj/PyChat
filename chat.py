@@ -86,8 +86,9 @@ def server_thread(sc, ser):
     when connected to a client
     """
     info = sc.getsockname()
+    port = ser.gen_port()
+    put(sc, port)
     client = get(sc)
-    port = get(sc)
     cliadd = sc.getpeername()[0]
     list_clients = ', '.join(str(cli[0]) for cli in ser.get_clients())
     put(sc, list_clients)
@@ -116,7 +117,6 @@ def sendbycli(s, cli, port, stdscr, win_recv):
     client = cli.get_clientname()
     host = s.getsockname()[0]
     put(s, client)
-    put(s, port)
     active = get(s)
     # setting up window
     height, width = cli.get_height(), cli.get_width()
@@ -154,7 +154,7 @@ def sendbycli(s, cli, port, stdscr, win_recv):
             elif key == '\x04':
                 # shutting down when ctrl+d pressed
                 cliadd = s.getsockname()[0]
-                shutdown(stdscr, cliadd,  cli, int(port))
+                shutdown(stdscr, cliadd,  cli, port)
                 return
             else:
                 if leng != (width - 12):
@@ -198,6 +198,7 @@ class server:
     """
     def __init__(self, hostname):
         self.port = 8001
+        self.ports = []
         self.hostname = hostname
         self.list_cli = []
 
@@ -220,6 +221,14 @@ class server:
 
     def get_port(self):
         return self.port
+
+    def gen_port(self):
+        # generates random port for a client
+        random_port = randint(9000, 60000)
+        while random_port in self.ports:
+            random_port = randint(9000, 60000)
+        self.ports.append(random_port)
+        return str(random_port)
 
     def close(self):
         self.s.close()
