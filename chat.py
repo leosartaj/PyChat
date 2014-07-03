@@ -7,7 +7,7 @@
 ##
 
 """
-contains the main logic
+runs PyGp on the terminal
 """
 import sys, screen
 
@@ -24,7 +24,7 @@ def server_thread(sc, ser):
     list_clients = ', '.join(str(cli[0]) for cli in ser.get_clients())
     ser.put(sc, list_clients)
     print 'Connected server', info, 'and', client, sc.getpeername(), 'listening on', port
-    ser.list_cli.append((client, port, cliadd))
+    ser.add(client, port, cliadd)
     print 'Clients', ser.get_clients()
     ser.relay_msg(port, client, 'has connected')
     while True:
@@ -34,8 +34,7 @@ def server_thread(sc, ser):
             print '>>>', client, 'has been disconnected >>>', sc.getpeername()
             ser.relay_msg(port, client, 'has been disconnected')
             sc.close()
-            index = ser.list_cli.index((client, port, cliadd))
-            del ser.list_cli[index]
+            ser.remove(client, port, cliadd)
             return
         ser.relay_msg(port, client, message)
         print client, port, '>>>', repr(message)
@@ -80,6 +79,7 @@ def sendbycli(s, cli, port, stdscr, win_recv):
                 if send == '':
                     continue
                 screen.addstr(win, key)
+                # increase the number of lines written
                 cli.lines += 1
                 break
             elif key == '\x04':
@@ -98,7 +98,9 @@ def sendbycli(s, cli, port, stdscr, win_recv):
             screen.refresh(win)
         screen.clear(win)
         screen.addstr(win, '\n')
+        # update the recv win
         screen.uprecv_win(win_recv, 'Me', send)
+        # handle overflow
         screen.overflow_recv(win_recv, cli, height, 13)
         prev = send
         cli.put(s, send)

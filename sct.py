@@ -1,3 +1,14 @@
+##
+# PyGp
+# https://github.com/leosartaj/PyGp.git
+#
+# Copyright (c) 2014 Sartaj Singh
+# Licensed under the MIT license.
+##
+
+"""
+handles the transmission, server and client
+"""
 import struct, socket
 from random import randint
 
@@ -18,7 +29,15 @@ class transmission(object):
         sc.listen(128)
         return sc
 
-    def recv_all(self, sock, length):
+    def connect_sock(self, host, port):
+        """
+        connects to socket
+        """
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((host, port))
+        return s
+
+    def _recv_all(self, sock, length):
         """
         recieves the message until
         the given length is
@@ -37,33 +56,37 @@ class transmission(object):
         decides the length
         of the message
         """
-        lendata = self.recv_all(sock, self.si.size)
+        lendata = self._recv_all(sock, self.si.size)
         (length,) = self.si.unpack(lendata)
-        return self.recv_all(sock, length)
+        return self._recv_all(sock, length)
 
     def put(self, sock, message):
         """
         adds message length 
-        and sends to the server
+        and sends
         """
         sock.send(self.si.pack(len(message)) + message.encode('utf-8'))
 
 class server(transmission):
     """
     implements the server
+    inherits from transmission
     """
     def __init__(self, hostname):
+        """
+        initializes various important variables
+        """
         super(server, self).__init__()
         self.port = 8001
-        self.ports = []
+        self._ports = []
         self.hostname = hostname
         self.list_cli = []
 
     def setup(self, host):
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.s.bind((host, self.port))
-        self.s.listen(128)
+        """
+        sets up a listening socket
+        """
+        self.s = self.listen(host, self.port)
         self.host = host
         return self.s
 
@@ -73,11 +96,23 @@ class server(transmission):
         """
         for cli in self.get_clients():
             if cli[1] != port:
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect((cli[2], int(cli[1])))
+                s = self.connect_sock(cli[2], int(cli[1]))
                 self.put(s, client)
                 self.put(s, message)
                 s.close()
+
+    def add(self, client, port, cliadd):
+        """
+        adds a client entry
+        """
+        self.list_cli.append((client, port, cliadd))
+
+    def remove(self, client, port, cliadd):
+        """
+        removes a client entry
+        """
+        index = self.list_cli.index((client, port, cliadd))
+        del self.list_cli[index]
 
     def get_clients(self):
         return self.list_cli
@@ -92,21 +127,30 @@ class server(transmission):
         return self.port
 
     def gen_port(self):
-        # generates random port for a client
+        """
+        generates random port for a client
+        """
         random_port = randint(9000, 60000)
-        while random_port in self.ports:
+        while random_port in self._ports:
             random_port = randint(9000, 60000)
-        self.ports.append(random_port)
+        self._ports.append(random_port)
         return str(random_port)
 
     def close(self):
+        """
+        closes the socket
+        """
         self.s.close()
 
 class client(transmission):
     """
     Sets up a basic client
+    inherits from transmission
     """
     def __init__(self, clientname):
+        """
+        initializes various important variables
+        """
         super(client, self).__init__()
         self.clientname = clientname
         self.ports = []
@@ -116,10 +160,12 @@ class client(transmission):
         self.lines = 0
 
     def connect(self, host, port):
+        """
+        connects to the server socket
+        """
         self.host = host
         self.port = port
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.connect((self.host, self.port))
+        self.s = self.connect_sock(self.host, self.port)
         return self.s
 
 
@@ -142,12 +188,14 @@ class client(transmission):
         """
         helps to shutdown recieve client thread safely
         """
-        sc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sc.connect((cliadd, port))
+        sc = self.connect_sock(cliadd, port)
         camd = 'ser:dis' + self.get_clientname()
         self.put(sc, camd)
         sc.close()
         self.close()
 
     def close(self):
+        """
+        closes the socket
+        """
         self.s.close()
