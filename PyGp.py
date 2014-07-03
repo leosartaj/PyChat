@@ -11,12 +11,12 @@
 """
 This file initializes the server or the client
 """
-import chat, sys, threading, screen
+import chat, sys, threading, screen, sct
 
 HOST = sys.argv.pop() if len(sys.argv) == 4 else '127.0.0.1'
 
 if sys.argv[1:2] == ['server']:
-    ser = chat.server(sys.argv.pop())
+    ser = sct.server(sys.argv.pop())
     s = ser.setup(HOST)
     print 'Listening at', s.getsockname()
     threads = []
@@ -41,10 +41,10 @@ if sys.argv[1:2] == ['server']:
 
 elif sys.argv[1:2] == ['client']:
     # connecting to server
-    cli = chat.client(sys.argv.pop())
+    cli = sct.client(sys.argv.pop())
     s = cli.connect(HOST, 8001)
     client = cli.get_clientname()
-    port =chat.get(s)
+    port = cli.get(s)
     port_int = int(port)
     name = ' '.join(str(name) for name in s.getsockname())
     # setting up the window
