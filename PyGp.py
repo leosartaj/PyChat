@@ -11,7 +11,9 @@
 """
 This file initializes the server or the client
 """
-import chat, sys, threading, screen, sct
+import sys, threading
+sys.path.insert(0, 'system/')
+import chat, sct, screen
 
 HOST = sys.argv.pop() if len(sys.argv) == 4 else '127.0.0.1'
 
