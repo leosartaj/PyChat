@@ -30,6 +30,8 @@ def server_thread(sc, ser):
     while True:
         try:
             message = ser.get(sc)
+            logdata = client + ' ' + port + ' ' + message + '\n'
+            ser.savefile('log.txt', logdata, 'PyGp_server') # saves server data
         except EOFError:
             print '>>>', client, 'has been disconnected >>>', sc.getpeername()
             ser.relay_msg(port, client, 'has been disconnected')
@@ -126,7 +128,6 @@ def recvbycli(host, cli, port, height, win_recv):
     clientname = cli.get_clientname()
     # begin listening
     sc = cli.listen(host, port)
-    files = 0 # counts the number of files
     while True:
         s, sockname = sc.accept()
         client = cli.get(s)
@@ -136,9 +137,7 @@ def recvbycli(host, cli, port, height, win_recv):
             return
         message = cli.get(s)
         if message[:5] == 'file:': # checks if incoming message is a file
-            name = str(files) + '_' + message[5:]
-            message = cli.savefile(name, cli.get(s)) # saves the file on the disk
-            files += 1
+            message = cli.savefile(message[5:], cli.get(s), 'PyGp_recv') # saves the file on the disk
         cli.lines += 1
         screen.uprecv_win(win_recv, client, message)
         screen.overflow_recv(win_recv, cli, height, 13)
