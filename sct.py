@@ -65,7 +65,31 @@ class transmission(object):
         adds message length 
         and sends
         """
-        sock.send(self.si.pack(len(message)) + message.encode('utf-8'))
+        sock.send(self.si.pack(len(message)) + message)
+
+    def fcode(self, name):
+        """
+        prepares a file for sending
+        """
+        try:
+            f = open(name)
+            send = ''
+            for line in f:
+                send += line
+        except:
+            send = 'ser:error'
+        return send
+
+    def savefile(self, name, fdata):
+        """
+        saves a file 
+        suffixes PyGp_ to the name
+        """
+        new = 'PyGp_' + name
+        f = open(new, 'w')
+        f.write(fdata)
+        f.close()
+        return 'recieved file -> ' + new
 
 class server(transmission):
     """
@@ -99,6 +123,18 @@ class server(transmission):
                 s = self.connect_sock(cli[2], int(cli[1]))
                 self.put(s, client)
                 self.put(s, message)
+                s.close()
+
+    def relay_file(self, port, client, message, fdata):
+        """
+        sends file data to multiple clients
+        """
+        for cli in self.get_clients():
+            if cli[1] != port:
+                s = self.connect_sock(cli[2], int(cli[1]))
+                self.put(s, client)
+                self.put(s, message)
+                self.put(s, fdata)
                 s.close()
 
     def add(self, client, port, cliadd):
@@ -167,7 +203,6 @@ class client(transmission):
         self.port = port
         self.s = self.connect_sock(self.host, self.port)
         return self.s
-
 
     def get_clientname(self):
         return self.clientname

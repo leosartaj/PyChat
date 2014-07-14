@@ -36,8 +36,17 @@ def server_thread(sc, ser):
             sc.close()
             ser.remove(client, port, cliadd)
             return
-        ser.relay_msg(port, client, message)
-        print client, port, '>>>', repr(message)
+        if message[:5] == 'file:':
+            msg = 'Sending file -> ' + message[5:]
+            fdata = ser.get(sc)
+            if fdata != 'ser:error':
+                print client, port, '>>>', repr(msg)
+                ser.relay_file(port, client, message, fdata) # sends files
+            else:
+                print client, port, '>>>', repr(msg), fdata
+        else:
+            print client, port, '>>>', repr(message)
+            ser.relay_msg(port, client, message) # sends messages
 
 def sendbycli(s, cli, port, stdscr, win_recv):
     """
@@ -103,8 +112,10 @@ def sendbycli(s, cli, port, stdscr, win_recv):
         # handle overflow
         screen.overflow_recv(win_recv, cli, height, 13)
         prev = send
+        if send[:5] == 'file:':
+            cli.put(s, send)
+            send = cli.fcode(send[5:])
         cli.put(s, send)
-
 
 def recvbycli(host, cli, port, height, win_recv):
     """
@@ -115,6 +126,7 @@ def recvbycli(host, cli, port, height, win_recv):
     clientname = cli.get_clientname()
     # begin listening
     sc = cli.listen(host, port)
+    files = 0 # counts the number of files
     while True:
         s, sockname = sc.accept()
         client = cli.get(s)
@@ -123,6 +135,10 @@ def recvbycli(host, cli, port, height, win_recv):
             sc.close()
             return
         message = cli.get(s)
+        if message[:5] == 'file:': # checks if incoming message is a file
+            name = str(files) + '_' + message[5:]
+            message = cli.savefile(name, cli.get(s)) # saves the file on the disk
+            files += 1
         cli.lines += 1
         screen.uprecv_win(win_recv, client, message)
         screen.overflow_recv(win_recv, cli, height, 13)
