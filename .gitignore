@@ -1,3 +1,4 @@
 *.pyc
-PyGp_server/PyGp_log.txt
+PyGp_server/*
+PyGp_recv/*
 
