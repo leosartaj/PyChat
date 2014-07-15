@@ -12,6 +12,8 @@
 This file initializes the server or the client
 """
 import sys, threading, time
+from time import asctime
+from time import time
 from threading import Thread
 sys.path.insert(0, 'system/') # allows importing modules from different directory
 import chat, sct, screen
@@ -21,8 +23,9 @@ HOST = sys.argv.pop() if len(sys.argv) == 4 else '127.0.0.1'
 if sys.argv[1:2] == ['server']:
     ser = sct.server(sys.argv.pop())
     s = ser.setup(HOST)
-    disp = 'Listening at ' + str(s.getsockname()) + '\n' # data printed on start
-    logdata =  10 * '-' + '\n' + time.asctime() + '\n' + disp
+    startTime = time()
+    disp = 'Listening at ' + str(s.getsockname()) + '\n' 
+    logdata =  10 * '-' + '\n' + asctime() + '\n' + disp # data printed on start
     print logdata
     ser.savefile('log.txt', logdata, 'PyGp_server') # logging new session
     threads = []
@@ -40,7 +43,8 @@ if sys.argv[1:2] == ['server']:
             threads.append(thr)
             thr.start()
         except:
-            logdata =  '\nPyGp --> Server Has been shutdown\n'
+            shutTime = time()
+            logdata =  '\nPyGp --> Server Has been shutdown ~ ' + asctime() + ' (running time ~ ' + str((shutTime - startTime) / 3600.0) + ' hrs)\n' 
             ser.savefile('log.txt', logdata, 'PyGp_server')
             print logdata
             for thread in threads:

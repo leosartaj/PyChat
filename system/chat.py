@@ -9,7 +9,7 @@
 """
 runs PyGp on the terminal
 """
-import sys, screen
+import screen
 
 def server_thread(sc, ser):
     """

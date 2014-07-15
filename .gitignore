@@ -1,3 +1,4 @@
 *.pyc
 PyGp_recv/*
+PyGp_server/*
 
