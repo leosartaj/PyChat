@@ -23,15 +23,17 @@ def server_thread(sc, ser):
     cliadd = sc.getpeername()[0]
     list_clients = ', '.join(str(cli[0]) for cli in ser.get_clients())
     ser.put(sc, list_clients)
-    print 'Connected server', info, 'and', client, sc.getpeername(), 'listening on', port
     ser.add(client, port, cliadd)
-    print 'Clients', ser.get_clients()
+    conn = 'Connected server ' + str(info) + ' and ' + client + ' ' + str(sc.getpeername()) + ' listening on ' + port
+    clientlist = 'Clients ' + str(ser.get_clients())
+    logdata = conn + '\n' + clientlist + '\n'
+    print conn
+    print clientlist
+    ser.savefile('log.txt', logdata, 'PyGp_server') # saves server data
     ser.relay_msg(port, client, 'has connected')
     while True:
         try:
             message = ser.get(sc)
-            logdata = client + ' ' + port + ' ' + message + '\n'
-            ser.savefile('log.txt', logdata, 'PyGp_server') # saves server data
         except EOFError:
             print '>>>', client, 'has been disconnected >>>', sc.getpeername()
             ser.relay_msg(port, client, 'has been disconnected')
@@ -49,6 +51,8 @@ def server_thread(sc, ser):
         else:
             print client, port, '>>>', repr(message)
             ser.relay_msg(port, client, message) # sends messages
+        logdata = client + ' ' + port + ' ' + message + '\n'
+        ser.savefile('log.txt', logdata, 'PyGp_server')
 
 def sendbycli(s, cli, port, stdscr, win_recv):
     """

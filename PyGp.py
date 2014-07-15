@@ -11,7 +11,8 @@
 """
 This file initializes the server or the client
 """
-import sys, threading
+import sys, threading, time
+from threading import Thread
 sys.path.insert(0, 'system/') # allows importing modules from different directory
 import chat, sct, screen
 
@@ -20,7 +21,10 @@ HOST = sys.argv.pop() if len(sys.argv) == 4 else '127.0.0.1'
 if sys.argv[1:2] == ['server']:
     ser = sct.server(sys.argv.pop())
     s = ser.setup(HOST)
-    print 'Listening at', s.getsockname()
+    disp = 'Listening at ' + str(s.getsockname()) + '\n' # data printed on start
+    logdata =  10 * '-' + '\n' + time.asctime() + '\n' + disp
+    print logdata
+    ser.savefile('log.txt', logdata, 'PyGp_server') # logging new session
     threads = []
     while True:
         threads_copy = threads
@@ -32,11 +36,13 @@ if sys.argv[1:2] == ['server']:
         try:
             sc, sockname = s.accept()
             # start a new server thread
-            thr = threading.Thread(target=chat.server_thread, args=(sc, ser))
+            thr = Thread(target=chat.server_thread, args=(sc, ser))
             threads.append(thr)
             thr.start()
         except:
-            print '\nPyGp --> Server Has been shutdown'
+            logdata =  '\nPyGp --> Server Has been shutdown\n'
+            ser.savefile('log.txt', logdata, 'PyGp_server')
+            print logdata
             for thread in threads:
                 thread.join()
             sys.exit()
@@ -56,9 +62,9 @@ elif sys.argv[1:2] == ['client']:
     screen.info_screen(width, name, port)
     win_recv = screen.new_window(height - 12, width, 6, 0)
     # new client thread for sending
-    threading.Thread(target=chat.sendbycli, args=(s, cli, port_int, stdscr, win_recv)).start()
+    Thread(target=chat.sendbycli, args=(s, cli, port_int, stdscr, win_recv)).start()
     # new client thread for listening
-    threading.Thread(target=chat.recvbycli, args=(s.getsockname()[0], cli, port_int, height, win_recv)).start()
+    Thread(target=chat.recvbycli, args=(s.getsockname()[0], cli, port_int, height, win_recv)).start()
 
 else:
     print >>sys.stderr, 'usage: ./ChatCli.py server|client [username] [host]'
