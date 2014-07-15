@@ -8,7 +8,7 @@ Run the following commands to get a copy.
 
 ```
 # clone the repo
-git clone https://github.com/leosartaj/jquery.ss.calculator.git
+git clone https://github.com/leosartaj/PyGp.git
 
 ```
 Note: Requires python 2.7 to run
