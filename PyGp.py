@@ -60,11 +60,12 @@ elif sys.argv[1:2] == ['client']:
     port_int = int(port)
     name = ' '.join(str(name) for name in s.getsockname())
     # setting up the window
-    stdscr = screen.setup_screen()
+    handle = screen.screenHandler() # initializes the screen handler
+    stdscr = handle.setup_screen()
     cli.height, cli.width = stdscr.getmaxyx()
     height, width = cli.get_height(), cli.get_width()
-    screen.info_screen(width, name, port)
-    win_recv = screen.new_window(height - 12, width, 6, 0)
+    handle.info_screen(width, name, port)
+    win_recv = handle.new_window(height - 12, width, 6, 0)
     # new client thread for sending
     Thread(target=chat.sendbycli, args=(s, cli, port_int, stdscr, win_recv)).start()
     # new client thread for listening

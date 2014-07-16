@@ -64,61 +64,42 @@ def sendbycli(s, cli, port, stdscr, win_recv):
     cli.put(s, client)
     active = cli.get(s)
     # setting up window
+    handle = screen.screenHandler() # initialiizes the screen handler
     height, width = cli.get_height(), cli.get_width()
-    win = screen.new_window(5, width, height - 5, 0)
-    screen.addstr(win, '\n')
-    screen.border(win)
-    screen.refresh(win)
+    win = handle.new_window(5, width, height - 5, 0)
+    handle.addstr(win, '\n')
+    handle.border(win)
+    handle.refresh(win)
     if len(active) != 0:
-        screen.addstr(win, '  Active users --> ' + active + '\n')
+        handle.addstr(win, '  Active users --> ' + active + '\n')
     prev = ''
+    keyHandle = screen.keyHandler(win, width) # handles inputting
     while True:
-        key = ''
-        send = ''
-        leng = 0
         if prev != '':
-            screen.addstr(win, '  Sent >>> ' + prev + '\n')
-        screen.addstr(win, '  Me >>> ', 'bold')
-        screen.border(win)
-        screen.refresh(win)
+            handle.addstr(win, '  Sent >>> ' + prev + '\n')
+        handle.addstr(win, '  Me >>> ', 'bold')
+        handle.border(win)
+        handle.refresh(win)
+        keyHandle.reset()
         while True:
-            key = win.getch()
-            key = chr(key)
-            if key == '\x7f':
-                if send == '':
-                    continue
-                send = send[:-1]
-                leng -= 1
-                screen.backspace(win, width)
-            elif key == '\n':
-                if send == '':
-                    continue
-                screen.addstr(win, key)
-                # increase the number of lines written
-                cli.lines += 1
-                break
-            elif key == '\x04':
-                # shutting down when ctrl+d pressed
-                cliadd = s.getsockname()[0]
-                cli.shutdown(cliadd, port)
-                screen.stop_screen(stdscr)
+            key = keyHandle.get_key() # gets the character typed
+            if key == '\x04': # shutting down when ctrl+d pressed
+                cli.shutdown(s.getsockname()[0], port)
+                handle.stop_screen(stdscr)
                 print 'Thank you for using PyGp'
                 print 'Contribute --> https://github.com/leosartaj/PyGp'
                 return
-            else:
-                if leng != (width - 12):
-                    screen.addstr(win, key)
-                    send += key
-                    leng += 1
-            screen.refresh(win)
-        screen.clear(win)
-        screen.addstr(win, '\n')
+            if keyHandle.keyOperation(key): # Handle different keys
+                break
+        handle.clear(win)
+        handle.addstr(win, '\n')
+        send = keyHandle.get_message() # return the message
         # update the recv win
-        screen.uprecv_win(win_recv, 'Me', send)
+        handle.uprecv_win(win_recv, 'Me', send)
         # handle overflow
-        screen.overflow_recv(win_recv, cli, height, 13)
+        handle.overflow_recv(win_recv, keyHandle, height, 13)
         prev = send
-        if send[:5] == 'file:':
+        if send[:5] == 'file:': # handle if file is sent
             cli.put(s, send)
             send = cli.fcode(send[5:])
         cli.put(s, send)
@@ -130,6 +111,7 @@ def recvbycli(host, cli, port, height, win_recv):
     clients
     """
     clientname = cli.get_clientname()
+    handle = screen.screenHandler() # initialiizes the screen handler
     # begin listening
     sc = cli.listen(host, port)
     while True:
@@ -143,6 +125,6 @@ def recvbycli(host, cli, port, height, win_recv):
         if message[:5] == 'file:': # checks if incoming message is a file
             message = cli.savefile(message[5:], cli.get(s), 'PyGp_recv') # saves the file on the disk
         cli.lines += 1
-        screen.uprecv_win(win_recv, client, message)
-        screen.overflow_recv(win_recv, cli, height, 13)
+        handle.uprecv_win(win_recv, client, message)
+        handle.overflow_recv(win_recv, cli, height, 13)
         s.close()
