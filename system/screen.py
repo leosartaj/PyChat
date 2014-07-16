@@ -170,8 +170,8 @@ class keyHandler(screenHandler):
         elif key == '\x7f':
             self._backspace() # handle backspace
         elif key == '\n':
-            self._newline(key) # handle newline character
-            return True
+            if self._newline(key): # handle newline character
+                return True
         else:
             self._display(key) # handle other keys
         self.refresh(self.win)
@@ -235,11 +235,12 @@ class keyHandler(screenHandler):
         handles the newline character
         """
         if self.send == '':
-            return
+            return False
         self.addstr(self.win, key)
         # increase the number of lines written
         self.lines += 1
         self._push(self.send) # push on the stack
+        return True
 
     def _backspace(self):
         """
