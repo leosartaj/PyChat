@@ -183,8 +183,10 @@ class keyHandler(screenHandler):
         """
         if len(self.dummy) == 1:
             self.dummy += key
-            if self.dummy == '[A':
+            if self.dummy == '[A': # for up arrow key
                 self._last()
+            elif self.dummy == '[B': # for down arrow key
+                self._lastUp()
             self.dummy = ''
             self.bol = 0
         else:
@@ -192,14 +194,29 @@ class keyHandler(screenHandler):
 
     def _last(self):
         """
-        displays the last entered message
+        Up arrow key functionality
         """
         leng = len(self.stack)
         if leng == 0:
             return
         while self.leng != 0:
             self._backspace() # backspacing
-        self.send = self.stack[leng - 1]
+        self.send = self.stack.pop()
+        self.stack.insert(0, self.send)
+        self.leng = len(self.send)
+        self.addstr(self.win, self.send)
+
+    def _lastUp(self):
+        """
+        down arrow key functionality
+        """
+        leng = len(self.stack)
+        if leng < 2:
+            return
+        while self.leng != 0:
+            self._backspace() # backspacing
+        self.send = self.stack.pop(0)
+        self.stack.append(self.send)
         self.leng = len(self.send)
         self.addstr(self.win, self.send)
 

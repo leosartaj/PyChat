@@ -82,7 +82,7 @@ def sendbycli(s, cli, port, stdscr, win_recv):
         handle.refresh(win)
         keyHandle.reset()
         while True:
-            key = keyHandle.get_key() # gets the character typed
+            key = keyHandle.get_key() # inputted character
             if key == '\x04': # shutting down when ctrl+d pressed
                 cli.shutdown(s.getsockname()[0], port)
                 handle.stop_screen(stdscr)
