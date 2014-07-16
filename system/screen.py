@@ -140,28 +140,35 @@ class keyHandler(screenHandler):
     and the message to be sent
     """
     def __init__(self, win, width):
-        self.send = ''
-        self.leng = 0
-        self.lines = 0
-        self.win = win
-        self.width = width
-        self.stack = []
+        """
+        initializes various useful variables
+        """
+        self.send = '' # message
+        self.leng = 0 # length of a message
+        self.lines = 0 # number of lines sent
+        self.win = win # input window
+        self.width = width # width of window
+        self.stack = [] # stack of sent messages
+        self.bol = 0 # booloean
+        self.dummy = '' # dummmy string
 
     def get_key(self):
         """
         key input
         """
-        key = chr(self.getch(self.win))
-        return key
+        key = self.getch(self.win)
+        return chr(key)
 
     def keyOperation(self, key):
         """
         Operation to be performed for specific keys
         """
-        if key == '\x7f':
+        if self.bol:
+            self._arrow(key)
+        elif key == '\x1b':
+            self.bol = 1
+        elif key == '\x7f':
             self._backspace() # handle backspace
-        elif key == '[A' or key =='\x1b':
-            self._last()
         elif key == '\n':
             self._newline(key) # handle newline character
             return True
@@ -170,26 +177,41 @@ class keyHandler(screenHandler):
         self.refresh(self.win)
         return False
 
+    def _arrow(self, key):
+        """
+        Handles the arrow keys
+        """
+        if len(self.dummy) == 1:
+            self.dummy += key
+            if self.dummy == '[A':
+                self._last()
+            self.dummy = ''
+            self.bol = 0
+        else:
+            self.dummy += key
+
     def _last(self):
         """
-        provides the linux like upper key functionality
+        displays the last entered message
         """
         leng = len(self.stack)
         if leng == 0:
             return
-        self.send = ''
-        self.addstr(self.win, self.send)
+        while self.leng != 0:
+            self._backspace() # backspacing
         self.send = self.stack[leng - 1]
+        self.leng = len(self.send)
         self.addstr(self.win, self.send)
 
     def _display(self, key):
         """
         handles the keys to be displayed
         """
-        if self.leng != (self.width - 12):
-            self.addstr(self.win, key)
-            self.send += key
-            self.leng += 1
+        if self.leng == (self.width - 12):
+            return
+        self.addstr(self.win, key)
+        self.send += key
+        self.leng += 1
 
     def _newline(self, key):
         """
@@ -207,7 +229,7 @@ class keyHandler(screenHandler):
         provides the backspace functionality
         """
         if self.send == '':
-            return
+            return 
         self.send = self.send[:-1]
         self.leng -= 1
         self.backspace(self.win, self.width)
