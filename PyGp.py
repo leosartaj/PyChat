@@ -52,6 +52,14 @@ if sys.argv[1:2] == ['server']:
             sys.exit()
 
 elif sys.argv[1:2] == ['client']:
+    # setting up curses
+    handle = screen.screenHandler() # initializes the screen handler
+    stdscr = handle.setup_screen()
+    # Welcome screen
+    handle.welcome(stdscr)
+    handle.getch(stdscr)
+    handle.clear(stdscr)
+    handle.refresh(stdscr)
     # connecting to server
     cli = sct.client(sys.argv.pop())
     s = cli.connect(HOST, 8001)
@@ -59,9 +67,7 @@ elif sys.argv[1:2] == ['client']:
     port = cli.get(s)
     port_int = int(port)
     name = ' '.join(str(name) for name in s.getsockname())
-    # setting up the window
-    handle = screen.screenHandler() # initializes the screen handler
-    stdscr = handle.setup_screen()
+    # Setting up the main window
     cli.height, cli.width = stdscr.getmaxyx()
     height, width = cli.get_height(), cli.get_width()
     handle.info_screen(width, name, port)

@@ -35,17 +35,25 @@ class screenHandler():
         win = curses.newwin(height, width, y, x)
         return win
 
+    def welcome(self, stdscr):
+        """
+        welcome screen
+        """
+        self.addstr(stdscr, '\n PyGp\n')
+        self.addstr(stdscr, ' Press any key to continue\n')
+        self.border(stdscr)
+
     def info_screen(self, width, name, port):
         """
         updates the general
         info tab
         """
-        win = curses.newwin(5, width, 0, 0)
-        win.addstr('\n You have been assigned ' + name + '\n')
-        win.addstr(' listening on ' + port + '\n')
-        win.addstr(' Press ctrl+d to exit')
+        win = self.new_window(5, width, 0, 0)
+        self.addstr(win, '\n You have been assigned ' + name + '\n')
+        self.addstr(win, ' listening on ' + port + '\n')
+        self.addstr(win, ' Press ctrl+d to exit')
         self.border(win)
-        win.refresh()
+        self.refresh(win)
         
     def border(self, win):
         """
@@ -63,7 +71,7 @@ class screenHandler():
         win.delch(y, x - 1)
         win.addstr(y, width - 2, ' |')
         win.move(y, x - 1)
-        win.refresh()
+        self.refresh(win)
 
     def addstr(self, win, message, attr = None):
         """
@@ -103,7 +111,7 @@ class screenHandler():
             win_recv.move(1, 0)
             win_recv.deleteln()
             win_recv.move(y - 1, x)
-            win_recv.refresh()
+            self.refresh(win_recv)
                 
     def timestamp(self):
         """
@@ -118,11 +126,11 @@ class screenHandler():
         updates the recieve 
         window
         """
-        win_recv.addstr('\n| ' + client, curses.A_BOLD)
-        win_recv.addstr(self.timestamp(), curses.A_DIM)
-        win_recv.addstr(' >>> ', curses.A_BOLD)
-        win_recv.addstr(message)
-        win_recv.refresh()
+        self.addstr(win_recv, '\n| ' + client, 'bold')
+        self.addstr(win_recv, self.timestamp())
+        self.addstr(win_recv, ' >>> ', 'bold')
+        self.addstr(win_recv, message)
+        self.refresh(win_recv)
 
     def stop_screen(self, stdscr):
         """
@@ -170,8 +178,8 @@ class keyHandler(screenHandler):
         elif key == '\x7f':
             self._backspace() # handle backspace
         elif key == '\n':
-            self._newline(key) # handle newline character
-            return True
+            if self._newline(key): # handle newline character
+                return True
         else:
             self._display(key) # handle other keys
         self.refresh(self.win)
@@ -235,11 +243,12 @@ class keyHandler(screenHandler):
         handles the newline character
         """
         if self.send == '':
-            return
+            return False
         self.addstr(self.win, key)
         # increase the number of lines written
         self.lines += 1
         self._push(self.send) # push on the stack
+        return True
 
     def _backspace(self):
         """
