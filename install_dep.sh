@@ -11,6 +11,6 @@
 # Installs dependencies
 unzip dep/pyfiglet-master.zip # unzip
 cd pyfiglet-master
-./setup.py install # install
+python2 setup.py install # install
 cd ..
 rm -r pyfiglet-master # clean the directory
