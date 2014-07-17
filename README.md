@@ -11,7 +11,16 @@ Run the following commands to get a copy.
 git clone https://github.com/leosartaj/PyGp.git
 
 ```
-Note: Requires python 2.7 to run
+
+### Dependencies
+
+PyGp depends on pyfiglet for the welcome screen. You may choose not to install it.
+
+```
+# install and download pyfiglet
+pip2 install git+https://github.com/pwaller/pyfiglet
+
+```
 
 ## Documentation
 

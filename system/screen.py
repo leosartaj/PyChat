@@ -10,7 +10,10 @@
 Provides useful methods for managing the display
 """
 import curses, time
-from pyfiglet import figlet_format # pyfiglet module for ascii art
+try:
+    from pyfiglet import figlet_format # pyfiglet module for ascii art
+except:
+    pass
 
 class screenHandler():
     """
@@ -58,7 +61,10 @@ class screenHandler():
         """
         Displays heading
         """
-        fig_art = figlet_format(text, font=face).split('\n') # ascii art
+        try:
+            fig_art = figlet_format(text, font=face).split('\n') # ascii art
+        except:
+            fig_art = 'PyGp' # incase figlet_format couldnt load
         ht = y 
         for fig in fig_art: # print the art
             if bold:
