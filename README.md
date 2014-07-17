@@ -22,6 +22,16 @@ pip2 install git+https://github.com/pwaller/pyfiglet
 
 ```
 
+#### or
+
+```
+# run installation script
+./install_dep.sh
+
+```
+
+PyGp depends on Python 2.7
+
 ## Documentation
 
 ### Starting a server
