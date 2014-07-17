@@ -9,7 +9,7 @@
 ##
 
 # Installs dependencies
-tar -zxpf dep/pyfiglet.tar.gz # untar
+unzip dep/pyfiglet-master.zip # unzip
 cd pyfiglet-master
 ./setup.py install # install
 cd ..
