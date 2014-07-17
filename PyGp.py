@@ -57,7 +57,11 @@ elif sys.argv[1:2] == ['client']:
     stdscr = handle.setup_screen()
     # Welcome screen
     handle.welcome(stdscr)
-    handle.getch(stdscr)
+    try:
+        handle.getch(stdscr)
+    except:
+        handle.stop_screen(stdscr)
+        sys.exit()
     handle.clear(stdscr)
     handle.refresh(stdscr)
     # connecting to server

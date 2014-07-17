@@ -35,7 +35,9 @@ def server_thread(sc, ser):
         try:
             message = ser.get(sc)
         except EOFError:
-            print '>>>', client, 'has been disconnected >>>', sc.getpeername()
+            disconnect =  '>>> ' + client + ' has been disconnected >>> ' + str(sc.getpeername())
+            ser.savefile('log.txt', disconnect, 'PyGp_server') # saves server data
+            print disconnect
             ser.relay_msg(port, client, 'has been disconnected')
             sc.close()
             ser.remove(client, port, cliadd)

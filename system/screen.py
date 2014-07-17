@@ -7,9 +7,10 @@
 ##
 
 """
-using the curses module provides the useful methods for managing the display
+Provides useful methods for managing the display
 """
 import curses, time
+from pyfiglet import figlet_format # pyfiglet module for ascii art
 
 class screenHandler():
     """
@@ -39,9 +40,36 @@ class screenHandler():
         """
         welcome screen
         """
-        self.addstr(stdscr, '\n PyGp\n')
-        self.addstr(stdscr, ' Press any key to continue\n')
+        y, x = stdscr.getmaxyx()
+        self._head(stdscr, 'PyGp', 'starwars', 5, (x / 4) + 20) # heading
+        # useful messages
+        stdscr.addstr(y - 2, 2, 'Press any key to continue')
+        msg = 'Copyright (c) 2014 Sartaj Singh'
+        stdscr.addstr(y - 3, x - len(msg) - 2, msg)
+        msg = 'github.com/leosartaj/PyGp'
+        stdscr.addstr(y - 2, x - len(msg) - 4, msg)
         self.border(stdscr)
+        self.refresh(stdscr)
+        time.sleep(0.5) # sleep for the bold effect
+        self._head(stdscr, 'PyGp', 'starwars', 5, (x / 4) + 20, 1) # bold heading
+        self.refresh(stdscr)
+
+    def _head(self, stdscr, text, face, y, x, bold = 0):
+        """
+        Displays heading
+        """
+        fig_art = figlet_format(text, font=face).split('\n') # ascii art
+        ht = y 
+        for fig in fig_art: # print the art
+            if bold:
+                stdscr.addstr(ht, x, fig, curses.A_BOLD)
+            else:
+                stdscr.addstr(ht, x, fig)
+            ht += 1
+        y, x = stdscr.getyx()
+        stdscr.addstr(y, x + 4, 'Terminal Based Chat Client\n')
+        self.border(stdscr)
+        self.refresh(stdscr)
 
     def info_screen(self, width, name, port):
         """

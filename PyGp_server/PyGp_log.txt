@@ -1,1 +1,182 @@
 # Server generated log file
+----------
+Thu Jul 17 17:06:59 2014
+Listening at ('127.0.0.1', 8001)
+Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39633) listening on 48796
+Clients [('Sartaj Singh', '48796', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39633)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39637) listening on 20963
+Clients [('Sartaj Singh', '20963', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39637)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39639) listening on 40993
+Clients [('Sartaj Singh', '40993', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39639)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39641) listening on 10873
+Clients [('Sartaj Singh', '10873', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39641)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39643) listening on 46517
+Clients [('Sartaj Singh', '46517', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39643)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39669) listening on 46043
+Clients [('Sartaj Singh', '46043', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39669)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39674) listening on 20073
+Clients [('Sartaj Singh', '20073', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39674)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39676) listening on 15505
+Clients [('Sartaj Singh', '15505', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39676)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39678) listening on 26430
+Clients [('Sartaj Singh', '26430', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39678)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39696) listening on 12815
+Clients [('Sartaj Singh', '12815', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39696)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39698) listening on 28468
+Clients [('Sartaj Singh', '28468', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39698)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39709) listening on 50584
+Clients [('Sartaj Singh', '50584', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39709)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39712) listening on 51889
+Clients [('Sartaj Singh', '51889', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39712)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39714) listening on 12306
+Clients [('Sartaj Singh', '12306', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39714)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39717) listening on 54908
+Clients [('Sartaj Singh', '54908', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39717)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39719) listening on 48443
+Clients [('Sartaj Singh', '48443', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39719)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39722) listening on 51511
+Clients [('Sartaj Singh', '51511', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39722)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39724) listening on 28011
+Clients [('Sartaj Singh', '28011', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39724)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39726) listening on 20987
+Clients [('Sartaj Singh', '20987', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39726)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39732) listening on 45180
+Clients [('Sartaj Singh', '45180', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39732)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39775) listening on 56607
+Clients [('Sartaj Singh', '56607', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39775)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39777) listening on 48889
+Clients [('Sartaj Singh', '48889', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39777)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39779) listening on 20980
+Clients [('Sartaj Singh', '20980', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39779)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39782) listening on 17077
+Clients [('Sartaj Singh', '17077', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39782)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39865) listening on 42838
+Clients [('Sartaj Singh', '42838', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39865)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39873) listening on 28501
+Clients [('Sartaj Singh', '28501', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39873)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39877) listening on 27663
+Clients [('Sartaj Singh', '27663', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39877)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39880) listening on 33059
+Clients [('Sartaj Singh', '33059', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39880)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39882) listening on 50679
+Clients [('Sartaj Singh', '50679', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39882)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39884) listening on 9740
+Clients [('Sartaj Singh', '9740', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39884)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39886) listening on 42047
+Clients [('Sartaj Singh', '42047', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39886)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39888) listening on 36050
+Clients [('Sartaj Singh', '36050', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39888)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39890) listening on 32431
+Clients [('Sartaj Singh', '32431', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39890)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39892) listening on 59452
+Clients [('Sartaj Singh', '59452', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39892)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39894) listening on 20760
+Clients [('Sartaj Singh', '20760', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39894)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39896) listening on 10881
+Clients [('Sartaj Singh', '10881', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39896)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39902) listening on 49187
+Clients [('Sartaj Singh', '49187', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39902)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39904) listening on 50655
+Clients [('Sartaj Singh', '50655', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39904)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39907) listening on 41114
+Clients [('Sartaj Singh', '41114', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39907)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39909) listening on 59264
+Clients [('Sartaj Singh', '59264', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39909)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39911) listening on 49381
+Clients [('Sartaj Singh', '49381', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39911)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39913) listening on 44508
+Clients [('Sartaj Singh', '44508', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39913)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39915) listening on 44649
+Clients [('Sartaj Singh', '44649', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39915)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 39917) listening on 47788
+Clients [('Sartaj Singh', '47788', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 39917)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40141) listening on 14296
+Clients [('Sartaj Singh', '14296', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40141)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40143) listening on 34265
+Clients [('Sartaj Singh', '34265', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40143)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40145) listening on 33700
+Clients [('Sartaj Singh', '33700', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40145)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40152) listening on 17481
+Clients [('Sartaj Singh', '17481', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40152)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40154) listening on 46795
+Clients [('Sartaj Singh', '46795', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40154)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40156) listening on 21786
+Clients [('Sartaj Singh', '21786', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40156)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40158) listening on 30207
+Clients [('Sartaj Singh', '30207', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40158)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40160) listening on 42054
+Clients [('Sartaj Singh', '42054', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40160)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40165) listening on 9413
+Clients [('Sartaj Singh', '9413', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40165)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40167) listening on 56169
+Clients [('Sartaj Singh', '56169', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40167)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40169) listening on 15163
+Clients [('Sartaj Singh', '15163', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40169)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40173) listening on 39988
+Clients [('Sartaj Singh', '39988', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40173)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40175) listening on 17559
+Clients [('Sartaj Singh', '17559', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40175)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40177) listening on 44134
+Clients [('Sartaj Singh', '44134', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40177)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40179) listening on 29109
+Clients [('Sartaj Singh', '29109', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40179)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40185) listening on 25881
+Clients [('Sartaj Singh', '25881', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40185)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40187) listening on 34850
+Clients [('Sartaj Singh', '34850', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40187)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40191) listening on 20466
+Clients [('Sartaj Singh', '20466', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40191)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40193) listening on 10985
+Clients [('Sartaj Singh', '10985', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40193)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40195) listening on 24751
+Clients [('Sartaj Singh', '24751', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40195)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40197) listening on 14278
+Clients [('Sartaj Singh', '14278', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40197)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40199) listening on 27722
+Clients [('Sartaj Singh', '27722', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40199)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40203) listening on 21033
+Clients [('Sartaj Singh', '21033', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40203)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40205) listening on 34189
+Clients [('Sartaj Singh', '34189', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40205)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40207) listening on 34810
+Clients [('Sartaj Singh', '34810', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40207)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40209) listening on 36602
+Clients [('Sartaj Singh', '36602', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40209)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40213) listening on 23225
+Clients [('Sartaj Singh', '23225', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40213)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40215) listening on 13491
+Clients [('Sartaj Singh', '13491', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40215)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40218) listening on 36480
+Clients [('Sartaj Singh', '36480', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40218)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40220) listening on 51651
+Clients [('Sartaj Singh', '51651', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40220)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40222) listening on 24742
+Clients [('Sartaj Singh', '24742', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40222)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40224) listening on 25739
+Clients [('Sartaj Singh', '25739', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40224)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40226) listening on 47722
+Clients [('Sartaj Singh', '47722', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40226)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40228) listening on 37256
+Clients [('Sartaj Singh', '37256', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40228)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40230) listening on 14942
+Clients [('Sartaj Singh', '14942', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40230)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40232) listening on 33390
+Clients [('Sartaj Singh', '33390', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40232)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40234) listening on 11206
+Clients [('Sartaj Singh', '11206', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40234)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40238) listening on 34050
+Clients [('Sartaj Singh', '34050', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40238)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40240) listening on 10850
+Clients [('Sartaj Singh', '10850', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40240)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40242) listening on 29061
+Clients [('Sartaj Singh', '29061', '127.0.0.1')]
+Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40243) listening on 44829
+Clients [('Sartaj Singh', '29061', '127.0.0.1'), ('Sartaj Singh', '44829', '127.0.0.1')]
+Sartaj Singh 44829 hi
+Sartaj Singh 44829 hello
+Sartaj Singh 44829 same name
+Sartaj Singh 29061 yup
+Sartaj Singh 29061 byee
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40242)>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40243)Connected server ('127.0.0.1', 8001) and Sartaj Singh ('127.0.0.1', 40257) listening on 23105
+Clients [('Sartaj Singh', '23105', '127.0.0.1')]
+>>> Sartaj Singh has been disconnected >>> ('127.0.0.1', 40257)
