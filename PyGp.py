@@ -52,6 +52,17 @@ if sys.argv[1:2] == ['server']:
             sys.exit()
 
 elif sys.argv[1:2] == ['client']:
+    # connecting to server
+    cli = sct.client(sys.argv.pop())
+    try:
+        s = cli.connect(HOST, 8001) # connect to server
+    except:
+        print 'Could Not Connect to Server' # Exit of connection failed
+        sys.exit()
+    client = cli.get_clientname()
+    port = cli.get(s)
+    port_int = int(port)
+    name = ' '.join(str(name) for name in s.getsockname())
     # setting up curses
     handle = screen.screenHandler() # initializes the screen handler
     stdscr = handle.setup_screen()
@@ -64,13 +75,6 @@ elif sys.argv[1:2] == ['client']:
         sys.exit()
     handle.clear(stdscr)
     handle.refresh(stdscr)
-    # connecting to server
-    cli = sct.client(sys.argv.pop())
-    s = cli.connect(HOST, 8001)
-    client = cli.get_clientname()
-    port = cli.get(s)
-    port_int = int(port)
-    name = ' '.join(str(name) for name in s.getsockname())
     # Setting up the main window
     cli.height, cli.width = stdscr.getmaxyx()
     height, width = cli.get_height(), cli.get_width()
