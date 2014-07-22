@@ -1,6 +1,6 @@
 # README
 
-A terminal based chat client. PyGp supports group chat only.
+A terminal based chat client. PyGp supports group chat feature only.
 
 ## Getting Started
 
@@ -12,9 +12,31 @@ git clone https://github.com/leosartaj/PyGp.git
 
 ```
 
-### Dependencies
+## Installation
 
-PyGp depends on pyfiglet for the welcome screen. You may choose not to install it.
+Run the install script to install PyGp
+
+```
+# Installation script
+./install.sh
+
+```
+
+## Uninstalling
+
+Run the uninstall script to uninstall PyGp
+
+```
+# Uninstalls PyGp
+./uninstall.sh
+
+```
+
+## Dependencies
+
+PyGp is based on Python 2.7
+
+PyGp depends on pyfiglet for the welcome screen.
 
 ```
 # install and download pyfiglet
@@ -22,15 +44,7 @@ pip2 install git+https://github.com/pwaller/pyfiglet
 
 ```
 
-#### or
-
-```
-# run installation script
-./install_dep.sh
-
-```
-
-PyGp depends on Python 2.7
+Note: Install script installs the dependencies for you
 
 ## Documentation
 
@@ -38,23 +52,19 @@ PyGp depends on Python 2.7
 Clients connect to a server. To start a server run the following commands.
 
 ```
-# change to the directory
-cd [path/PyGp]
 # Runs the server
-python PyGp.py server [server name] [ip address]
+pygp server [server name] [ip address]
 
 ```
 
-The server maintains a log file in PyGp\_server directory
+The server maintains a log file in /usr/local/PyGp/PyGp\_server directory
 
 ### Starting a client
 Clients connect to a server. To connect to a server run the following commands.
 
 ```
-# change to the directory
-cd [path/PyGp]
 # Runs the client
-python PyGp.py client [name] [ip address of server]
+pygp client [name] [ip address of server]
 
 ```
 
@@ -68,7 +78,6 @@ To send a file to other clients when connected to a server.
 # Sends a file to other clients
 # Type the following
 file:[path of the file]
-
 ```
 
-Note: Recieved files are kept in PyGp\_recv directory
+Note: Recieved files are kept in /usr/local/PyGp/PyGp\_recv directory
