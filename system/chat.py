@@ -96,10 +96,11 @@ def sendbycli(s, cli, port, stdscr, win_recv):
         handle.clear(win)
         handle.addstr(win, '\n')
         send = keyHandle.get_message() # return the message
+        cli.lines += 1
+        # handle overflow
+        handle.overflow_recv(win_recv, cli, height, 13)
         # update the recv win
         handle.uprecv_win(win_recv, 'Me', send)
-        # handle overflow
-        handle.overflow_recv(win_recv, keyHandle, height, 13)
         prev = send
         if send[:5] == 'file:': # handle if file is sent
             cli.put(s, send)
@@ -127,6 +128,6 @@ def recvbycli(host, cli, port, height, win_recv):
         if message[:5] == 'file:': # checks if incoming message is a file
             message = cli.savefile(message[5:], cli.get(s), 'PyGp_recv', client) # saves the file on the disk
         cli.lines += 1
-        handle.uprecv_win(win_recv, client, message)
         handle.overflow_recv(win_recv, cli, height, 13)
+        handle.uprecv_win(win_recv, client, message)
         s.close()
