@@ -15,7 +15,7 @@ import sys, threading, time
 from time import asctime
 from time import time
 from threading import Thread
-sys.path.insert(0, 'system/') # allows importing modules from different directory
+sys.path.insert(0, '/usr/local/PyGp/system/') # allows importing modules from different directory
 import chat, sct, screen
 
 HOST = sys.argv.pop() if len(sys.argv) == 4 else '127.0.0.1'

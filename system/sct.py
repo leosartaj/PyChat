@@ -83,7 +83,7 @@ class transmission(object):
             send = 'ser:error'
         return send
 
-    def savefile(self, name, fdata, directory = '', prefix = 'PyGp'):
+    def savefile(self, name, fdata, directory = '', prefix = 'PyGp', root = '/usr/local/PyGp/'):
         """
         saves a file 
         suffixes PyGp_  and a counter to the name
@@ -91,11 +91,12 @@ class transmission(object):
         try:
             fname = os.path.basename(name)
             new = prefix + '_' + fname
-            f = open(os.path.join(directory, new), 'a')
+            save = root + directory
+            f = open(os.path.join(save, new), 'a')
             f.write(fdata)
             f.close()
         except:
-            return 'Cannot recieve file'
+            return 'Cannot save file'
 
         return 'recieved file -> ' + new
 
