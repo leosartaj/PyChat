@@ -125,7 +125,7 @@ def recvbycli(host, cli, port, height, win_recv):
             return
         message = cli.get(s)
         if message[:5] == 'file:': # checks if incoming message is a file
-            message = cli.savefile(message[5:], cli.get(s), 'PyGp_recv') # saves the file on the disk
+            message = cli.savefile(message[5:], cli.get(s), 'PyGp_recv', client) # saves the file on the disk
         cli.lines += 1
         handle.uprecv_win(win_recv, client, message)
         handle.overflow_recv(win_recv, cli, height, 13)

@@ -83,14 +83,14 @@ class transmission(object):
             send = 'ser:error'
         return send
 
-    def savefile(self, name, fdata, directory = ''):
+    def savefile(self, name, fdata, directory = '', prefix = 'PyGp'):
         """
         saves a file 
         suffixes PyGp_  and a counter to the name
         """
         try:
             fname = os.path.basename(name)
-            new = 'PyGp_' + fname
+            new = prefix + '_' + fname
             f = open(os.path.join(directory, new), 'a')
             f.write(fdata)
             f.close()

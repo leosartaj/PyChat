@@ -57,7 +57,7 @@ elif sys.argv[1:2] == ['client']:
     try:
         s = cli.connect(HOST, 8001) # connect to server
     except:
-        print 'Could Not Connect to Server' # Exit of connection failed
+        print 'Could Not Connect to Server at', HOST # Exit of connection failed
         sys.exit()
     client = cli.get_clientname()
     port = cli.get(s)
