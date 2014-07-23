@@ -30,13 +30,6 @@ then
     exit 1
 fi
 
-# Installs dependencies
-unzip dep/pyfiglet-master.zip # unzip
-cd pyfiglet-master
-python2 setup.py install # install
-cd ..
-rm -r pyfiglet-master # clean the directory
-
 # Path to install
 path=/usr/local/PyGp
 

@@ -10,10 +10,7 @@
 Provides useful methods for managing the display
 """
 import curses, time
-try:
-    from pyfiglet import figlet_format # pyfiglet module for ascii art
-except:
-    pass
+import os # handling file access
 
 class screenHandler():
     """
@@ -44,7 +41,7 @@ class screenHandler():
         welcome screen
         """
         y, x = stdscr.getmaxyx()
-        self._head(stdscr, 'PyGp', 'starwars', 5, (x / 4) + 20) # heading
+        self._head(stdscr, 'text', 5, (x / 4) + 20) # heading
         # useful messages
         stdscr.addstr(y - 2, 2, 'Press any key to continue')
         msg = 'Copyright (c) 2014 Sartaj Singh'
@@ -54,17 +51,17 @@ class screenHandler():
         self.border(stdscr)
         self.refresh(stdscr)
         time.sleep(0.5) # sleep for the bold effect
-        self._head(stdscr, 'PyGp', 'starwars', 5, (x / 4) + 20, 1) # bold heading
+        self._head(stdscr, 'text', 5, (x / 4) + 20, 1) # bold heading
         self.refresh(stdscr)
 
-    def _head(self, stdscr, text, face, y, x, bold = 0):
+    def _head(self, stdscr, text, y, x, bold = 0, directory = '/usr/local/PyGp/system'):
         """
         Displays heading
         """
         try:
-            fig_art = figlet_format(text, font=face).split('\n') # ascii art
+            fig_art = open(os.path.join(directory, text), 'r')
         except:
-            fig_art = 'PyGp' # incase figlet_format couldnt load
+            fig_art = 'PyGp' # incase text couldnt load
         ht = y 
         for fig in fig_art: # print the art
             if bold:
@@ -72,8 +69,7 @@ class screenHandler():
             else:
                 stdscr.addstr(ht, x, fig)
             ht += 1
-        y, x = stdscr.getyx()
-        stdscr.addstr(y, x + 4, 'Terminal Based Chat Client\n')
+        stdscr.addstr(ht + 1, x, 'Terminal Based Chat Client\n')
         self.border(stdscr)
         self.refresh(stdscr)
 
