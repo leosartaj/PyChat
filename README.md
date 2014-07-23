@@ -36,16 +36,6 @@ Run the uninstall script to uninstall PyGp
 
 PyGp is based on Python 2.7
 
-PyGp depends on pyfiglet for the welcome screen.
-
-```
-# install and download pyfiglet
-pip2 install git+https://github.com/pwaller/pyfiglet
-
-```
-
-Note: Install script installs the dependencies for you
-
 ## Documentation
 
 ### Starting a server
