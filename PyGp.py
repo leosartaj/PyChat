@@ -22,7 +22,11 @@ HOST = sys.argv.pop() if len(sys.argv) == 4 else '127.0.0.1'
 
 if sys.argv[1:2] == ['server']:
     ser = sct.server(sys.argv.pop())
-    s = ser.setup(HOST)
+    try:
+        s = ser.setup(HOST)
+    except Exception as e:
+        print 'Cannot start server on', HOST # exit if cannot assign address
+        sys.exit()
     startTime = time()
     disp = 'Listening at ' + str(s.getsockname()) + '\n' 
     logdata =  10 * '-' + '\n' + asctime() + '\n' + disp # data printed on start
