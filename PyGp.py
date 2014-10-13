@@ -12,11 +12,12 @@
 This file initializes the server or the client
 """
 import sys, threading, time
+import signal # signal handling
 from time import asctime
 from time import time
 from threading import Thread
 sys.path.insert(0, '/usr/local/PyGp/system/') # allows importing modules from different directory
-import chat, sct, screen
+import chat, sct, screen, csig
 
 HOST = sys.argv.pop() if len(sys.argv) == 4 else '127.0.0.1'
 
@@ -45,7 +46,7 @@ if sys.argv[1:2] == ['server']:
             # start a new server thread
             thr = Thread(target=chat.server_thread, args=(sc, ser))
             threads.append(thr)
-            thr.start()
+            thr.start() 
         except:
             shutTime = time()
             logdata =  '\nPyGp --> Server Has been shutdown ~ ' + asctime() + ' (running time ~ ' + str((shutTime - startTime) / 3600.0) + ' hrs)\n' 
@@ -56,6 +57,9 @@ if sys.argv[1:2] == ['server']:
             sys.exit()
 
 elif sys.argv[1:2] == ['client']:
+
+    signal.signal(signal.SIGWINCH, csig.sigwinch_handler) # setup sigwinch handler
+
     # connecting to server
     cli = sct.client(sys.argv.pop())
     try:
@@ -87,7 +91,7 @@ elif sys.argv[1:2] == ['client']:
     # new client thread for sending
     Thread(target=chat.sendbycli, args=(s, cli, port_int, stdscr, win_recv)).start()
     # new client thread for listening
-    Thread(target=chat.recvbycli, args=(s.getsockname()[0], cli, port_int, height, win_recv)).start()
+    Thread(target=chat.recvbycli, args=(s.getsockname()[0], cli, port_int, height, stdscr, win_recv)).start()
 
 else:
     print >>sys.stderr, 'usage: ./ChatCli.py server|client [username] [host]'

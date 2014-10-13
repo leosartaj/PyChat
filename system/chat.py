@@ -61,73 +61,83 @@ def sendbycli(s, cli, port, stdscr, win_recv):
     Sends the messages
     to the server
     """
-    client = cli.get_clientname()
-    host = s.getsockname()[0]
-    cli.put(s, client)
-    active = cli.get(s)
-    # setting up window
-    handle = screen.screenHandler() # initialiizes the screen handler
-    height, width = cli.get_height(), cli.get_width()
-    win = handle.new_window(5, width, height - 5, 0)
-    handle.addstr(win, '\n')
-    handle.border(win)
-    handle.refresh(win)
-    if len(active) != 0:
-        handle.addstr(win, '  Active users --> ' + active + '\n')
-    prev = ''
-    keyHandle = screen.keyHandler(win, width) # handles inputting
-    while True:
-        if prev != '':
-            handle.addstr(win, '  Sent >>> ' + prev + '\n')
-        handle.addstr(win, '  Me >>> ', 'bold')
+    try:
+        client = cli.get_clientname()
+        host = s.getsockname()[0]
+        cli.put(s, client)
+        active = cli.get(s)
+        # setting up window
+        handle = screen.screenHandler() # initialiizes the screen handler
+        height, width = cli.get_height(), cli.get_width()
+        win = handle.new_window(5, width, height - 5, 0)
+        handle.addstr(win, '\n')
         handle.border(win)
         handle.refresh(win)
-        keyHandle.reset()
+        if len(active) != 0:
+            handle.addstr(win, '  Active users --> ' + active + '\n')
+        prev = ''
+        keyHandle = screen.keyHandler(win, width) # handles inputting
         while True:
-            key = keyHandle.get_key() # inputted character
-            if key == '\x04': # shutting down when ctrl+d pressed
-                cli.shutdown(s.getsockname()[0], port)
-                handle.stop_screen(stdscr)
-                print 'Thank you for using PyGp'
-                print 'Contribute --> https://github.com/leosartaj/PyGp'
-                return
-            if keyHandle.keyOperation(key): # Handle different keys
-                break
-        handle.clear(win)
-        handle.addstr(win, '\n')
-        send = keyHandle.get_message() # return the message
-        cli.lines += 1
-        # handle overflow
-        handle.overflow_recv(win_recv, cli, height, 13)
-        # update the recv win
-        handle.uprecv_win(win_recv, 'Me', send)
-        prev = send
-        if send[:5] == 'file:': # handle if file is sent
+            if prev != '':
+                handle.addstr(win, '  Sent >>> ' + prev + '\n')
+            handle.addstr(win, '  Me >>> ', 'bold')
+            handle.border(win)
+            handle.refresh(win)
+            keyHandle.reset()
+            while True:
+                key = keyHandle.get_key() # inputted character
+                if key == '\x04': # shut down when ctrl+d pressed
+                    cli.shutdown(s.getsockname()[0], port)
+                    handle.stop_screen(stdscr)
+                    print 'Thank you for using PyGp'
+                    print 'Contribute --> https://github.com/leosartaj/PyGp'
+                    return
+                if keyHandle.keyOperation(key): # Handle different keys
+                    break
+            handle.clear(win)
+            handle.addstr(win, '\n')
+            send = keyHandle.get_message() # return the message
+            cli.lines += 1
+            # handle overflow
+            handle.overflow_recv(win_recv, cli, height, 13)
+            # update the recv win
+            handle.uprecv_win(win_recv, 'Me', send)
+            prev = send
+            if send[:5] == 'file:': # handle if file is sent
+                cli.put(s, send)
+                send = cli.fcode(send[5:])
             cli.put(s, send)
-            send = cli.fcode(send[5:])
-        cli.put(s, send)
+    except Exception as e:
+        cli.shutdown(s.getsockname()[0], port)
+        handle.stop_screen(stdscr)
+        raise(e)
 
-def recvbycli(host, cli, port, height, win_recv):
+def recvbycli(host, cli, port, height, stdscr, win_recv):
     """
     listens on an assigned port
     for messages from other
     clients
     """
-    clientname = cli.get_clientname()
-    handle = screen.screenHandler() # initialiizes the screen handler
-    # begin listening
-    sc = cli.listen(host, port)
-    while True:
-        s, sockname = sc.accept()
-        client = cli.get(s)
-        if client == 'ser:dis' + clientname:
+    try:
+        clientname = cli.get_clientname()
+        handle = screen.screenHandler() # initialiizes the screen handler
+        # begin listening
+        sc = cli.listen(host, port)
+        while True:
+            s, sockname = sc.accept()
+            client = cli.get(s)
+            if client == 'ser:dis' + clientname:
+                s.close()
+                sc.close()
+                return
+            message = cli.get(s)
+            if message[:5] == 'file:': # checks if incoming message is a file
+                message = cli.savefile(message[5:], cli.get(s), 'PyGp_recv', client) # saves the file on the disk
+            cli.lines += 1
+            handle.overflow_recv(win_recv, cli, height, 13)
+            handle.uprecv_win(win_recv, client, message)
             s.close()
-            sc.close()
-            return
-        message = cli.get(s)
-        if message[:5] == 'file:': # checks if incoming message is a file
-            message = cli.savefile(message[5:], cli.get(s), 'PyGp_recv', client) # saves the file on the disk
-        cli.lines += 1
-        handle.overflow_recv(win_recv, cli, height, 13)
-        handle.uprecv_win(win_recv, client, message)
-        s.close()
+    except Exception, e:
+        sc.close()
+        handle.stop_screen(stdscr)
+        raise(e)
