@@ -19,7 +19,11 @@ def server_thread(sc, ser):
     info = sc.getsockname()
     port = ser.gen_port()
     ser.put(sc, port)
-    client = ser.get(sc)
+    try:
+        client = ser.get(sc)
+    except: # connection failure
+        sc.close()
+        return
     cliadd = sc.getpeername()[0]
     list_clients = ', '.join(str(cli[0]) for cli in ser.get_clients())
     ser.put(sc, list_clients)
@@ -55,6 +59,7 @@ def server_thread(sc, ser):
             ser.relay_msg(port, client, message) # sends messages
         logdata = client + ' ' + port + ' ' + message + '\n'
         ser.savefile('log.txt', logdata, 'PyGp_server')
+
 
 def sendbycli(s, cli, port, stdscr, win_recv):
     """

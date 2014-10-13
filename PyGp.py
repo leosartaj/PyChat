@@ -75,12 +75,13 @@ elif sys.argv[1:2] == ['client']:
     handle = screen.screenHandler() # initializes the screen handler
     stdscr = handle.setup_screen()
     # Welcome screen
-    handle.welcome(stdscr)
     try:
+        handle.welcome(stdscr)
         handle.getch(stdscr)
-    except:
+    except Exception, e: # if cannot start curses
         handle.stop_screen(stdscr)
-        sys.exit()
+        cli.close()
+        raise(e)
     handle.clear(stdscr)
     handle.refresh(stdscr)
     # Setting up the main window
