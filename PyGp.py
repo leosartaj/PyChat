@@ -95,4 +95,4 @@ elif sys.argv[1:2] == ['client']:
     Thread(target=chat.recvbycli, args=(s.getsockname()[0], cli, port_int, height, stdscr, win_recv)).start()
 
 else:
-    print >>sys.stderr, 'usage: ./ChatCli.py server|client [username] [host]'
+    print >>sys.stderr, 'usage: pygp [server|client] [username] [host]'
