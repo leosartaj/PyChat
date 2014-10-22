@@ -43,9 +43,11 @@ Clients connect to a server. To start a server run the following commands.
 
 ```
 # Runs the server
-pygp server [server name] [ip address]
+pygp server [ip address] [options]
 
 ```
+
+* Run pygp -h/--help for various options
 
 The server maintains a log file in /usr/local/PyGp/PyGp\_server directory
 
@@ -54,9 +56,11 @@ Clients connect to a server. To connect to a server run the following commands.
 
 ```
 # Runs the client
-pygp client [name] [ip address of server]
+pygp client [ip address of server] [options]
 
 ```
+
+* Run pygp -h/--help for various options
 
 ### Additional Options
 
@@ -65,9 +69,11 @@ pygp client [name] [ip address of server]
 To send a file to other clients when connected to a server.
 
 ```
+
 # Sends a file to other clients
 # Type the following
 file:[path of the file]
+
 ```
 
 Note: Recieved files are kept in /usr/local/PyGp/PyGp\_recv directory
