@@ -14,6 +14,7 @@ This file initializes the server or the client
 import sys, threading, time
 import signal # signal handling
 import optparse # parsing the options
+from getpass import getuser
 from time import asctime
 from time import time
 from threading import Thread
@@ -40,8 +41,8 @@ def parse_args():
     help = "The port to listen/connect on."
     parser.add_option('-p', '--port', type='int', help=help, default=8001)
 
-    help = "The name of server/client. Defaults to the system hostname"
-    parser.add_option('-n', '--name', help=help, default=sct.transmission().systemHostname())
+    help = "The name of server/client. Defaults to username."
+    parser.add_option('-n', '--name', help=help, default=getuser())
 
     options, args = parser.parse_args()
 

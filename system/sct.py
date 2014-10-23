@@ -20,12 +20,6 @@ class transmission(object):
     def __init__(self):
             self.si = struct.Struct('!I')
 
-    def systemHostname(self):
-        """
-        returns the system hostname
-        """
-        return socket.gethostname()
-
     def listen(self, host, port):
         """
         sets up a socket for listening incoming connections
