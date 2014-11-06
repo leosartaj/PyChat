@@ -24,8 +24,8 @@ class serverProtocol(basic.LineReceiver):
 
     def lineReceived(self, line):
         if line[0:2] == '$$':
-            self.peerName = line[2:]
-            log.msg('PeerName of %s is %s' %(self.peer, self.peerName))
+            self.peername = line[2:]
+            log.msg('PeerName of %s is %s' %(self.peer, self.peername))
         else:
             log.msg('Received %s' %(line))
             self.relay(line)
