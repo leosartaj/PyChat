@@ -8,24 +8,24 @@
 # Licensed under the MIT license.
 ##
 
+"""
+implements the server as a twistd plugin
+"""
+
+# twisted imports
 from zope.interface import implements
-from twisted.python import usage
 from twisted.plugin import IPlugin
 from twisted.application import internet, service
-import sys
-#sys.path.insert(0, os.path.abspath(os.getcwd()))
-from server.serverFactory import serverFactory
-from server.serverProtocol import serverProtocol
 
-class Options(usage.Options):
-
-    optParameters = [
-        ['port', 'p', 8001, 'The port number to listen on.'],
-        ['iface', 'i', 'localhost', 'The interface to listen on.'],
-        ]
+# user imports
+from server.protocol.serverFactory import serverFactory
+from server.protocol.serverProtocol import serverProtocol
+from server.options import Options # custom options
 
 class ChatServiceMaker(object):
-
+    """
+    implements PyGp as a twistd plugin
+    """
     implements(service.IServiceMaker, IPlugin)
 
     tapname = "PyGp"
@@ -33,14 +33,14 @@ class ChatServiceMaker(object):
     options = Options
 
     def makeService(self, options):
-        top_service = service.MultiService()
+        top_service = service.MultiService() # parent service
 
-        factory = serverFactory()
-        factory.protocol = serverProtocol
+        factory = serverFactory() # initialize factory
+        factory.protocol = serverProtocol 
 
         tcp_service = internet.TCPServer(int(options['port']), factory, interface=options['iface'])
-        tcp_service.setServiceParent(top_service)
+        tcp_service.setServiceParent(top_service) # add the service
 
         return top_service
 
-service_maker = ChatServiceMaker()
+service_maker = ChatServiceMaker() # initializing

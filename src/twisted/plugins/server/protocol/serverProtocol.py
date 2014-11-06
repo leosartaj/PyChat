@@ -15,7 +15,7 @@ class serverProtocol(basic.LineReceiver):
     """
     Implements the server interaction protocol
     """
-    from os import linesep as delimiter
+    from os import linesep as delimiter # os supported delimiter
 
     def connectionMade(self):
         self.peer = self.transport.getPeer()
@@ -31,7 +31,10 @@ class serverProtocol(basic.LineReceiver):
             self.relay(line)
 
     def relay(self, line):
-        line = '~~' + line
+        """
+        relay the message to other clients
+        """
+        line = '~~' + self.peername + ' >>> ' + line
         for client in self.factory.getClients():
             if client != self:
                 client.sendLine(line)
@@ -40,4 +43,3 @@ class serverProtocol(basic.LineReceiver):
         self.factory.removeClients(self)
         log.msg('Disconnected from %s' %(self.peer))
         log.msg(reason.getErrorMessage())
-

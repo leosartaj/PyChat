@@ -15,7 +15,7 @@ class serverFactory(ServerFactory):
     Implements the server factory
     """
     def __init__(self):
-        self.clients = []
+        self.clients = [] # connected clients
 
     def updateClients(self, client):
         self.clients.append(client)
