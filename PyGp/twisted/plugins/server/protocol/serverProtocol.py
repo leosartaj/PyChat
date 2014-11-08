@@ -23,9 +23,13 @@ class serverProtocol(basic.LineReceiver):
         log.msg('Connected to %s' %(self.peer))
 
     def lineReceived(self, line):
+        """
+        Handle recived lines
+        """
         if line[0:2] == '$$':
             self.peername = line[2:]
             log.msg('PeerName of %s is %s' %(self.peer, self.peername))
+            self.relay('has joined')
         else:
             log.msg('Received %s' %(line))
             self.relay(line)
@@ -40,6 +44,17 @@ class serverProtocol(basic.LineReceiver):
                 client.sendLine(line)
 
     def connectionLost(self, reason):
+        """
+        safely disconnect user
+        """
         self.factory.removeClients(self)
-        log.msg('Disconnected from %s' %(self.peer))
+        self.relay('has been disconnected')
+        self._logConnectionLost(reason)
+
+    def _logConnectionLost(self, reason):
+        """
+        log when connection is lost
+        """
+        line = 'Disconnected from %s' %(self.peer)
+        log.msg(line)
         log.msg(reason.getErrorMessage())
