@@ -26,4 +26,5 @@ def stop_reactor(_):
     """
     stop the reactor
     """
-    reactor.stop()
+    if reactor.running:
+        reactor.stop()

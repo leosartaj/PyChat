@@ -22,9 +22,6 @@ from twisted.internet import defer
 from protocol.ChatClientFactory import ChatClientFactory
 from protocol.ChatClientProtocol import ChatClientProtocol
 
-# GUI
-from gui.clientGUIClass import clientGUIClass # For the GUI
-
 # Other imports
 from defer import * # import all the callbacks and errbacks
 from options import parse_args
@@ -48,7 +45,6 @@ if __name__ == '__main__':
     deferred.addBoth(stop_reactor) 
 
     log.startLogging(sys.stdout)  # Start Logging
-
-    clientGUIClass('gui/clientGUI.glade') # start the GUI interface
+    #clientGUIClass('gui/clientGUI.glade', factory) # start the GUI interface
 
     reactor.run()

@@ -38,7 +38,7 @@ class serverProtocol(basic.LineReceiver):
         """
         relay the message to other clients
         """
-        line = '~~' + self.peername + ' >>> ' + line
+        line = self.peername + ' >>> ' + line
         for client in self.factory.getClients():
             if client != self:
                 client.sendLine(line)

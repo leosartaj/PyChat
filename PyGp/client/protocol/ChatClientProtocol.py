@@ -10,17 +10,25 @@
 
 from twisted.internet import stdio
 from twisted.python import log
-from StdioChatClientProtocol import StdioChatClientProtocol
+from twisted.protocols import basic
 
-class ChatClientProtocol(StdioChatClientProtocol):
+import sys
+sys.path.insert(0, '../gui') # allows importing modules from different directory
+from gui.clientGUIClass import clientGUIClass
+
+class ChatClientProtocol(basic.LineReceiver):
     """
     Implements the client interaction protocol
     """
+    from os import linesep as delimiter # set delimiter
+
     def connectionMade(self):
-        main = StdioChatClientProtocol()
-        main.use = self
-        self.std = stdio.StandardIO(main) # start Stdio
+        self.gui = clientGUIClass(self)
         self.peer = self.transport.getPeer()
         log.msg('Connected to server at %s' % (self.peer)) # logs the connection
         setName = '$$' + self.factory.name
         self.sendLine(setName)
+
+    def lineReceived(self, line):
+        log.msg('%s' % (line))
+        self.gui.updateTextView(line)

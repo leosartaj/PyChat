@@ -25,7 +25,7 @@ class ChatClientFactory(ClientFactory):
 
     def clientConnectionFailed(self, connector, reason):
         log.err(reason.getErrorMessage())
-        #self._stopReactor('Could Not Connect to Server')
+        self._stopReactor('Could Not Connect to Server')
 
     def clientConnectionLost(self, connector, reason):
         log.err(reason.getErrorMessage())

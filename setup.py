@@ -3,17 +3,20 @@ try:
 except ImportError:
     from distutils.core import setup
 
-config = {
-    'description': 'My Project',
-    'author': 'My Name',
-    'url': 'URL to get it at.',
-    'download_url': 'Where to download it.',
-    'author_email': 'My email.',
-    'version': '0.1',
-    'install_requires': ['nose'],
-    'packages': ['NAME'],
-    'scripts': [],
-    'name': 'projectname'
-}
-
-setup(**config)
+setup(
+    name = 'PyGp',
+    version = '0.0.1',
+    author = 'Sartaj Singh',
+    author_email = 'singhsartaj94@gmail.com',
+    description = ('Asynchronous Chat Client'),
+    license = 'MIT',
+    keywords = 'chat client server',
+    url = 'http://github.com/leosartaj/PyGp',
+    packages=[''],
+    scripts=[''],
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Topic :: Utilities',
+        'License :: OSI Approved :: MIT License',
+    ],
+)
