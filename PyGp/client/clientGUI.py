@@ -8,21 +8,26 @@
 # Licensed under the MIT license.
 ##
 
-"""
-Runs the client 
-"""
-
 # system imports
 import sys
+
+# twisted imports
+from twisted.internet import gtk2reactor
+gtk2reactor.install() # install reactor for gui
 from twisted.internet import reactor
 from twisted.python import log
 from twisted.internet import defer
 
-# user imports
+# protocol
 from protocol.ChatClientFactory import ChatClientFactory
 from protocol.ChatClientProtocol import ChatClientProtocol
+
+# GUI
+from gui.clientGUIClass import clientGUIClass # For the GUI
+
+# Other imports
 from defer import * # import all the callbacks and errbacks
-from parse_args import parse_args
+from options import parse_args
 
 def start_factory(options):
     """
@@ -34,13 +39,16 @@ def start_factory(options):
     reactor.connectTCP(HOST, options.port, factory)
     return deferred
 
-
 if __name__ == '__main__':
     options, HOST = parse_args() # parse the arguments
 
+    # setup the factory
     deferred = start_factory(options)
     deferred.addBoth(stop_log) 
     deferred.addBoth(stop_reactor) 
 
-    log.startLogging(sys.stdout) 
+    log.startLogging(sys.stdout)  # Start Logging
+
+    clientGUIClass('gui/clientGUI.glade') # start the GUI interface
+
     reactor.run()
