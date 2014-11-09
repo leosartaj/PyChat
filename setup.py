@@ -34,7 +34,7 @@ def readFile(fName):
     return lines
 
 setup(
-    name = 'PyGp',
+    name = 'PyChat',
     version = '1.0.0',
     author = 'Sartaj Singh',
     author_email = 'singhsartaj94@gmail.com',
@@ -42,11 +42,11 @@ setup(
     long_description = readFile('README.md'),
     license = 'MIT',
     keywords = 'chat client server',
-    url = 'http://github.com/leosartaj/PyGp',
-    packages= ['PyGp', 'PyGp/client', 'PyGp/client/protocol', 'PyGp/client/gui', 'twisted.plugins', 'PyGp/server', 'PyGp/server/protocol'],
-    scripts=['bin/pygpcli'],
+    url = 'http://github.com/leosartaj/PyChat',
+    packages= ['PyChat', 'PyChat/client', 'PyChat/client/protocol', 'PyChat/client/gui', 'twisted.plugins', 'PyChat/server', 'PyChat/server/protocol'],
+    scripts=['bin/pychat'],
+    package_data = {'PyChat/client/gui': ['*.glade']},
     install_requires = ['Twisted'],
-    package_data = {'PyGp/client/gui': ['*.glade']},
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Topic :: Utilities',

@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 
 ##
-# PyGp
-# https://github.com/leosartaj/PyGp.git
+# PyChat
+# https://github.com/leosartaj/PyChat.git
 #
 # Copyright (c) 2014 Sartaj Singh
 # Licensed under the MIT license.
@@ -19,12 +19,12 @@ from twisted.python import log
 from twisted.internet import defer
 
 # protocol
-from PyGp.client.protocol.ChatClientFactory import ChatClientFactory
-from PyGp.client.protocol.ChatClientProtocol import ChatClientProtocol
+from PyChat.client.protocol.ChatClientFactory import ChatClientFactory
+from PyChat.client.protocol.ChatClientProtocol import ChatClientProtocol
 
 # Other imports
-from PyGp.client.defer import * # import all the callbacks and errbacks
-from PyGp.client.options import parse_args
+from PyChat.client.defer import * # import all the callbacks and errbacks
+from PyChat.client.options import parse_args
 
 def start_factory(options):
     """

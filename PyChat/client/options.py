@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 
 ##
-# PyGp
-# https://github.com/leosartaj/PyGp.git
+# PyChat
+# https://github.com/leosartaj/PyChat.git
 #
 # Copyright (c) 2014 Sartaj Singh
 # Licensed under the MIT license.
@@ -18,7 +18,7 @@ def parse_args():
     usage = """usage: %prog [options]
 
     Run 
-    PyGp -h/--help
+    pychat -h/--help
     For help
 """
     parser = optparse.OptionParser(usage)

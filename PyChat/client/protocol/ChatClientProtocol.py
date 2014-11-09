@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 
 ##
-# PyGp
-# https://github.com/leosartaj/PyGp.git
+# PyChat
+# https://github.com/leosartaj/PyChat.git
 #
 # Copyright (c) 2014 Sartaj Singh
 # Licensed under the MIT license.
@@ -14,7 +14,7 @@ from twisted.protocols import basic
 
 import sys
 try:
-    from PyGp.client.gui.clientGUIClass import clientGUIClass
+    from PyChat.client.gui.clientGUIClass import clientGUIClass
 except ImportError: # for debugging
     sys.path.insert(0, '../gui') # allows importing modules from different directory
     from gui.clientGUIClass import clientGUIClass

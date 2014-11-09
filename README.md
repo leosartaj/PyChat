@@ -4,25 +4,25 @@ A simple chat client.
 
 ## Installation
 
-PyGp can be installed using pip
+PyChat can be installed using pip
 
 ```
-pip install PyGp
+pip install PyChat
 
 ```
 
 ## Uninstalling
 
-PyGp can be uninstalled using pip
+PyChat can be uninstalled using pip
 
 ```
-pip uninstall PyGp
+pip uninstall PyChat
 
 ```
 
 ## Dependencies
 
-PyGp is based on Python 2.7. PyGP uses Twisted Framework.
+PyChat is based on Python 2.7. PyGP uses Twisted Framework.
 
 ## Documentation
 
@@ -31,19 +31,19 @@ Clients connect to a server. Server uses twisted's plugin system, twistd. To sta
 
 ```
 # Runs the server
-twistd PyGp [options]
+twistd PyChat [options]
 
 ```
 
-* Run twistd PyGp --help for various options
+* Run twistd PyChat --help for various options
 
 ### Starting a client
 Clients connect to a server. To connect to a server run the following commands.
 
 ```
 # Runs the client
-pygpcli [options]
+pychat [options]
 
 ```
 
-* Run pygpcli -h/--help for various options
+* Run pychat -h/--help for various options

@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
 
 ##
-# PyGp
-# https://github.com/leosartaj/PyGp.git
+# PyChat
+# https://github.com/leosartaj/PyChat.git
 #
 # Copyright (c) 2014 Sartaj Singh
 # Licensed under the MIT license.
@@ -18,17 +18,17 @@ from twisted.plugin import IPlugin
 from twisted.application import internet, service
 
 # user imports
-from PyGp.server.protocol.serverFactory import serverFactory
-from PyGp.server.protocol.serverProtocol import serverProtocol
-from PyGp.server.options import Options # custom options
+from PyChat.server.protocol.serverFactory import serverFactory
+from PyChat.server.protocol.serverProtocol import serverProtocol
+from PyChat.server.options import Options # custom options
 
 class ChatServiceMaker(object):
     """
-    implements PyGp as a twistd plugin
+    implements PyChat as a twistd plugin
     """
     implements(service.IServiceMaker, IPlugin)
 
-    tapname = "PyGp"
+    tapname = "PyChat"
     description = "A Chat Client"
     options = Options
 
