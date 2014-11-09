@@ -19,12 +19,12 @@ from twisted.python import log
 from twisted.internet import defer
 
 # protocol
-from PyGp.PyGp.client.protocol.ChatClientFactory import ChatClientFactory
-from PyGp.PyGp.client.protocol.ChatClientProtocol import ChatClientProtocol
+from PyGp.client.protocol.ChatClientFactory import ChatClientFactory
+from PyGp.client.protocol.ChatClientProtocol import ChatClientProtocol
 
 # Other imports
-from PyGp.PyGp.client.defer import * # import all the callbacks and errbacks
-from PyGp.PyGp.client.options import parse_args
+from PyGp.client.defer import * # import all the callbacks and errbacks
+from PyGp.client.options import parse_args
 
 def start_factory(options):
     """

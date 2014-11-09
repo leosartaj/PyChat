@@ -13,8 +13,7 @@ from twisted.python import log
 from twisted.protocols import basic
 
 import sys
-sys.path.insert(0, '../gui') # allows importing modules from different directory
-from gui.clientGUIClass import clientGUIClass
+from PyGp.client.gui.clientGUIClass import clientGUIClass
 
 class ChatClientProtocol(basic.LineReceiver):
     """

@@ -18,8 +18,9 @@ setup(
     license = 'MIT',
     keywords = 'chat client server',
     url = 'http://github.com/leosartaj/PyGp',
-    packages=['PyGp/client', 'PyGp/client/protocol'],
+    packages= ['PyGp', 'PyGp/client', 'PyGp/client/protocol', 'PyGp/client/gui'],
     scripts=['bin/client'],
+    package_data = {'PyGp/client/gui': ['*.glade']},
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Topic :: Utilities',
