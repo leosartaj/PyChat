@@ -31,4 +31,10 @@ class ChatClientProtocol(basic.LineReceiver):
 
     def lineReceived(self, line):
         log.msg('%s' % (line))
-        self.gui.updateTextView(line)
+
+        # extract name and message
+        line = line.split(' ')
+        name = line[0] 
+        msg = ' '.join(line[1:])
+
+        self.gui.updateTextView(name, msg)

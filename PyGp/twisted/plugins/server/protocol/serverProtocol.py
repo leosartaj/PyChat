@@ -31,14 +31,14 @@ class serverProtocol(basic.LineReceiver):
             log.msg('PeerName of %s is %s' %(self.peer, self.peername))
             self.relay('has joined')
         else:
-            log.msg('Received %s' %(line))
+            log.msg('Received %s from %s' %(line, self.peername))
             self.relay(line)
 
     def relay(self, line):
         """
         relay the message to other clients
         """
-        line = self.peername + ' >>> ' + line
+        line = self.peername + ' ' + line
         for client in self.factory.getClients():
             if client != self:
                 client.sendLine(line)
