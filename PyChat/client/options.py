@@ -29,6 +29,9 @@ def parse_args():
     help = "The name of client. Defaults to username."
     parser.add_option('-n', '--name', help=help, default=getuser())
 
+    help = "The name of log file. Defaults to pychat.log in cwd."
+    parser.add_option('-l', '--log', help=help, default='pychat.log')
+
     options, args = parser.parse_args()
 
     if len(args) == 1:

@@ -10,6 +10,7 @@
 
 # system imports
 import sys
+import os
 
 # twisted imports
 from twisted.internet import gtk2reactor
@@ -44,6 +45,12 @@ if __name__ == '__main__':
     deferred.addBoth(stop_log) 
     deferred.addBoth(stop_reactor) 
 
-    log.startLogging(sys.stdout)  # Start Logging
+    try:
+        # Start Logging
+        # Logs in pwd as pychat.log by default
+        log.startLogging(open(options.log , 'a'))
+    except Exception, e:
+        print e
+        sys.exit(1) # end program if invalid log file
 
     reactor.run()

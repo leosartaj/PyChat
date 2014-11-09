@@ -42,7 +42,7 @@ Clients connect to a server. To connect to a server run the following commands.
 
 ```
 # Runs the client
-pychat [options]
+pychat [interface] [options]
 
 ```
 

@@ -35,7 +35,7 @@ def readFile(fName):
 
 setup(
     name = 'PyChat',
-    version = '1.0.0',
+    version = '1.0.1',
     author = 'Sartaj Singh',
     author_email = 'singhsartaj94@gmail.com',
     description = ('Asynchronous Chat Client'),
