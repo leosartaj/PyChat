@@ -15,7 +15,11 @@ def parse_args():
     """
     Parses the arguments
     """
-    usage = """
+    usage = """usage: %prog [options]
+
+    Run 
+    PyGp -h/--help
+    For help
 """
     parser = optparse.OptionParser(usage)
 

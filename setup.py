@@ -11,6 +11,10 @@ else:
         return name.split('.', 1)[0]
 
     def _hacked_write_toplevel_names(cmd, basename, filename):
+        """
+        Allows for clean uninstall
+        Does not tamper with twisted
+        """
         pkgs = dict.fromkeys(
             [_top_level_package(k)
                 for k in cmd.distribution.iter_distribution_names()
@@ -31,7 +35,7 @@ def readFile(fName):
 
 setup(
     name = 'PyGp',
-    version = '0.0.0',
+    version = '1.0.0',
     author = 'Sartaj Singh',
     author_email = 'singhsartaj94@gmail.com',
     description = ('Asynchronous Chat Client'),
@@ -40,7 +44,7 @@ setup(
     keywords = 'chat client server',
     url = 'http://github.com/leosartaj/PyGp',
     packages= ['PyGp', 'PyGp/client', 'PyGp/client/protocol', 'PyGp/client/gui', 'twisted.plugins', 'PyGp/server', 'PyGp/server/protocol'],
-    scripts=['bin/client'],
+    scripts=['bin/pygpcli'],
     install_requires = ['Twisted'],
     package_data = {'PyGp/client/gui': ['*.glade']},
     classifiers=[
@@ -51,6 +55,10 @@ setup(
 )
 
 try:
+    """
+    Update Twisted Plugin Cache
+    Normal user may not be able to do so
+    """
     from twisted.plugin import IPlugin, getPlugins
     list(getPlugins(IPlugin))
 except Exception, e:
