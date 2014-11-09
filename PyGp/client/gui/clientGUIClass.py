@@ -92,7 +92,7 @@ class clientGUIClass:
         """
 
         self.textview.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse('#002b36')) 
-        self.textview.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse('#2aa198'))
+        self.textview.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse('white'))
 
     def updateTextView(self, name, msg):
         """
@@ -125,6 +125,7 @@ class clientGUIClass:
         When the button is clicked
         """
         text = self.chatbox.get_text()
+        #self.textview.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse('white')) 
         if text:
             self.chatbox.set_text('') # clear the textbox and focus it
             self.updateTextView('me', text)

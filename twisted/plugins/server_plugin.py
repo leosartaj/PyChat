@@ -18,9 +18,9 @@ from twisted.plugin import IPlugin
 from twisted.application import internet, service
 
 # user imports
-from server.protocol.serverFactory import serverFactory
-from server.protocol.serverProtocol import serverProtocol
-from server.options import Options # custom options
+from PyGp.server.protocol.serverFactory import serverFactory
+from PyGp.server.protocol.serverProtocol import serverProtocol
+from PyGp.server.options import Options # custom options
 
 class ChatServiceMaker(object):
     """
