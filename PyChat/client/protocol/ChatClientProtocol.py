@@ -8,16 +8,15 @@
 # Licensed under the MIT license.
 ##
 
-from twisted.internet import stdio
 from twisted.python import log
 from twisted.protocols import basic
 
 import sys
 try:
-    from PyChat.client.gui.clientGUIClass import clientGUIClass
-except ImportError: # for debugging
     sys.path.insert(0, '../gui') # allows importing modules from different directory
     from gui.clientGUIClass import clientGUIClass
+except ImportError: # for debugging
+    from PyChat.client.gui.clientGUIClass import clientGUIClass
 
 class ChatClientProtocol(basic.LineReceiver):
     """
@@ -28,14 +27,29 @@ class ChatClientProtocol(basic.LineReceiver):
     def connectionMade(self):
         self.gui = clientGUIClass(self)
         self.peer = self.transport.getPeer()
+
         log.msg('Connected to server at %s' % (self.peer)) # logs the connection
+        self.update('server Connected')
+
         setName = '$$' + self.factory.name
-        self.sendLine(setName)
+        self.sendLine(setName) # register with server
+
+    def send(self, text):
+        """
+        Logs and sends the messages
+        """
+        log.msg('me %s' % (text))
+        self.sendLine(text)
 
     def lineReceived(self, line):
         log.msg('%s' % (line))
+        self.update(line)
 
-        # extract name and message
+    def update(self, line):
+        """
+        Extracts name and message
+        updates on the big screen
+        """
         line = line.split(' ')
         name = line[0] 
         msg = ' '.join(line[1:])

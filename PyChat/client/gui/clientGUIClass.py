@@ -1,21 +1,22 @@
 #!/usr/bin/env python2
+
 ##
 # PyChat
 # https://github.com/leosartaj/PyChat.git
-#
 # Copyright (c) 2014 Sartaj Singh
 # Licensed under the MIT license.
 ##
 
 # system imports
 import os
+from random import choice
 
 # For the GUI
 import gtk
+import markup # functions for formatting text
 
 # twisted imports
 from twisted.python import log
-
 
 class clientGUIClass:
     """ 
@@ -29,7 +30,7 @@ class clientGUIClass:
 
         self.save_objects() # save objects
 
-        self.color() # setup appearances
+        self.basic_markup() # setup appearances
 
         self.chatbox.grab_focus() # focus here
 
@@ -66,33 +67,20 @@ class clientGUIClass:
         self.chatbox = self.builder.get_object('chatbox') 
         self.scroll = self.builder.get_object('scrolledwindow')
 
-    def color(self):
+    def basic_markup(self):
         """
         set the appearances, 'cause appearances are good
-
-        SOLARIZED HEX     
-        --------- ------- 
-        base03    #002b36  
-        base02    #073642  
-        base01    #586e75 
-        base00    #657b83 
-        base0     #839496 
-        base1     #93a1a1 
-        base2     #eee8d5  
-        base3     #fdf6e3 
-        yellow    #b58900  
-        orange    #cb4b16  
-        red       #dc322f  
-        magenta   #d33682  
-        violet    #6c71c4 
-        blue      #268bd2  
-        cyan      #2aa198  
-        green     #859900  
-
         """
 
-        self.textview.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse('#002b36')) 
-        self.textview.modify_text(gtk.STATE_NORMAL, gtk.gdk.color_parse('white'))
+        self.colors = {'me': 'white', 'server': 'white'} # client colors
+        markup.background(self.textview, '#002b36') # set the background
+        markup.textcolor(self.textview, 'white') # set the textcolor 
+
+    def formatMsg(self, name, msg):
+        """
+        Format The received Message
+        """
+        return name + ' >>> ' + msg + '\n'
 
     def updateTextView(self, name, msg):
         """
@@ -104,14 +92,14 @@ class clientGUIClass:
 
         buf = text.get_buffer()
         buf.insert(buf.get_end_iter(), msg)
+        
+        if not name in self.colors:
+            key = choice(markup.color_dict.keys()) # select a random color
+            self.colors[name] = markup.color_dict[key] # save the color
+
+        markup.color_text(buf, self.colors[name]) # color the line
 
         self.autoScroll() # Scroll Please
-
-    def formatMsg(self, name, msg):
-        """
-        Format The received Message
-        """
-        return name + ' >>> ' + msg + '\n'
 
     def autoScroll(self):
         """
@@ -125,12 +113,11 @@ class clientGUIClass:
         When the button is clicked
         """
         text = self.chatbox.get_text()
-        #self.textview.modify_base(gtk.STATE_NORMAL, gtk.gdk.color_parse('white')) 
         if text:
-            self.chatbox.set_text('') # clear the textbox and focus it
+            self.chatbox.set_text('') # clear the textbox
             self.updateTextView('me', text)
-            self.client.sendLine(text)
-        self.chatbox.grab_focus()
+            self.client.send(text) # logs and sends the message
+        self.chatbox.grab_focus() # focus the textbox
 
     def close(self, *args):
         """

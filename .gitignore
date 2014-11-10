@@ -1,7 +1,4 @@
 *.pyc
 *.log
 *.cache
-PyGp_recv/*
-PyGp_server/PyGp_log.txt
-.dep
 todo

@@ -8,6 +8,12 @@
 # Licensed under the MIT license.
 ##
 
+"""
+Development script
+To run without actually installing
+Picks up local changes
+"""
+
 # system imports
 import sys
 import os
@@ -20,12 +26,12 @@ from twisted.python import log
 from twisted.internet import defer
 
 # protocol
-from PyChat.client.protocol.ChatClientFactory import ChatClientFactory
-from PyChat.client.protocol.ChatClientProtocol import ChatClientProtocol
+from protocol.ChatClientFactory import ChatClientFactory
+from protocol.ChatClientProtocol import ChatClientProtocol
 
 # Other imports
-from PyChat.client.defer import * # import all the callbacks and errbacks
-from PyChat.client.options import parse_args
+from defer import * # import all the callbacks and errbacks
+from options import parse_args
 
 def start_factory(options):
     """
@@ -45,13 +51,6 @@ if __name__ == '__main__':
     deferred.addBoth(stop_log) 
     deferred.addBoth(stop_reactor) 
 
-    try:
-        # Start Logging
-        # Logs in pwd as pychat.log by default
-        log.startLogging(open(options.log , 'a'))
-    except Exception, e:
-        print 'Cannot Start PyChat'
-        print e
-        sys.exit(1) # end program if invalid log file
+    log.startLogging(sys.stdout)
 
     reactor.run()
