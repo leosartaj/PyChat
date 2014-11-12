@@ -63,9 +63,16 @@ class clientGUIClass:
         Get the required objects
         """
         self.window = self.builder.get_object('MainWindow')
+
+        # main chat area
         self.textview = self.builder.get_object('textview') 
-        self.chatbox = self.builder.get_object('chatbox') 
         self.scroll = self.builder.get_object('scrolledwindow')
+
+        # Connected Users board
+        self.userview = self.builder.get_object('userview') 
+        self.scrollusers = self.builder.get_object('scrolledwindow1')
+
+        self.chatbox = self.builder.get_object('chatbox') 
 
     def basic_markup(self):
         """
@@ -75,6 +82,30 @@ class clientGUIClass:
         self.colors = {'me': 'white', 'server': 'white'} # client colors
         markup.background(self.textview, '#002b36') # set the background
         markup.textcolor(self.textview, 'white') # set the textcolor 
+
+    def register_color(self, name):
+        """
+        Register color of the user
+        """
+        key = choice(markup.color_dict.keys()) # select a random color
+        self.colors[name] = markup.color_dict[key] # save the color
+
+    def updateConnUsers(self):
+        """
+        Updates the connected users panel
+        """
+        if not self.scrollusers.get_property('visible'): # do not update if not visible
+            return
+
+        # reset the view
+        userview = self.userview
+        buf = userview.get_buffer()
+        buf.set_text('Connected Users\n')
+
+        # updated connected users
+        users = self.client.users
+        for user in users:
+            buf.insert(buf.get_end_iter(), user[0] + '\n')
 
     def formatMsg(self, name, msg):
         """
@@ -94,18 +125,17 @@ class clientGUIClass:
         buf.insert(buf.get_end_iter(), msg)
         
         if not name in self.colors:
-            key = choice(markup.color_dict.keys()) # select a random color
-            self.colors[name] = markup.color_dict[key] # save the color
+            self.register_color(name)
 
         markup.color_text(buf, self.colors[name]) # color the line
 
-        self.autoScroll() # Scroll Please
+        self.autoScroll(self.scroll) # Scroll Please
 
-    def autoScroll(self):
+    def autoScroll(self, scroll):
         """
         Autoscroll TextView
         """
-        obj = self.scroll.get_vadjustment() # get the adjustment, returns the adjustment object
+        obj = scroll.get_vadjustment() # get the adjustment, returns the adjustment object
         obj.set_value(obj.upper - obj.page_size)
 
     def sendButton(self, button):

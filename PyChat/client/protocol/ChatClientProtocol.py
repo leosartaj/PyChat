@@ -27,11 +27,12 @@ class ChatClientProtocol(basic.LineReceiver):
     def connectionMade(self):
         self.gui = clientGUIClass(self)
         self.peer = self.transport.getPeer()
+        self.users = [] # list of connnected users
 
         log.msg('Connected to server at %s' % (self.peer)) # logs the connection
         self.update('server Connected')
 
-        setName = '$$' + self.factory.name
+        setName = 'c$~' + self.factory.name
         self.sendLine(setName) # register with server
 
     def send(self, text):
@@ -42,8 +43,30 @@ class ChatClientProtocol(basic.LineReceiver):
         self.sendLine(text)
 
     def lineReceived(self, line):
+        if line[0:3] == 's$~':
+            line = self.handleUser(line[3:])
         log.msg('%s' % (line))
         self.update(line)
+
+    def handleUser(self, line):
+        """
+        Stores useful information about new connected user
+        adds a tuple of name and ip address of user
+        updates the gui
+        """
+        lineArr = line.split(' ')
+        line = lineArr[1] + ' has '
+
+        if lineArr[0] == 'add':
+            self.users.append((lineArr[1], lineArr[2]))
+            line += 'joined'
+        elif lineArr[0] == 'rem':
+            del self.users[self.users.index((lineArr[1], lineArr[2]))]
+            line += 'disconnected'
+
+        self.gui.updateConnUsers()
+
+        return line
 
     def update(self, line):
         """
@@ -51,7 +74,7 @@ class ChatClientProtocol(basic.LineReceiver):
         updates on the big screen
         """
         line = line.split(' ')
-        name = line[0] 
+        name = line[0]
         msg = ' '.join(line[1:])
 
         self.gui.updateTextView(name, msg)

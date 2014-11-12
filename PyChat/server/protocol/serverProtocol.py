@@ -20,35 +20,46 @@ class serverProtocol(basic.LineReceiver):
     def connectionMade(self):
         self.peer = self.transport.getPeer()
         self.factory.updateClients(self)
+        self.connectedUsers()
         log.msg('Connected to %s' %(self.peer))
 
     def lineReceived(self, line):
         """
         Handle recived lines
         """
-        if line[0:2] == '$$':
-            self.peername = line[2:]
+        if line[0:3] == 'c$~':
+            self.peername = line[3:]
             log.msg('PeerName of %s is %s' %(self.peer, self.peername))
-            self.relay('has joined')
+            self.factory.updateUsers(self.peername, self.peer) # register name and ip with factory
+            self.relay(str(self.peer), self.peername, 's$~add ')
         else:
             log.msg('Received %s from %s' %(line, self.peername))
-            self.relay(line)
+            self.relay(line, self.peername)
 
-    def relay(self, line):
+    def relay(self, line, name='', prefix=''):
         """
         relay the message to other clients
         """
-        line = self.peername + ' ' + line
+        line = prefix + name + ' ' + line
         for client in self.factory.getClients():
             if client != self:
                 client.sendLine(line)
+
+    def connectedUsers(self):
+        """
+        Tells the client about already connected users
+        """
+        for name, ip in self.factory.getUsers():
+            line = 's$~add ' + name + ' ' + str(ip)
+            self.sendLine(line)
 
     def connectionLost(self, reason):
         """
         safely disconnect user
         """
         self.factory.removeClients(self)
-        self.relay('has been disconnected')
+        self.factory.removeUsers(self.peername, self.peer)
+        self.relay(str(self.peer), self.peername, 's$~rem ')
         self._logConnectionLost(reason)
 
     def _logConnectionLost(self, reason):

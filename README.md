@@ -1,6 +1,6 @@
 # README
 
-A simple chat client.
+PyChat is an asynchronous chat client.
 
 ## Installation
 

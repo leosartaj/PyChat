@@ -8,6 +8,10 @@
 # Licensed under the MIT license.
 ##
 
+"""
+Contains helper functions for parsing arguments
+"""
+
 import optparse # parsing the options
 from getpass import getuser
 
