@@ -48,6 +48,29 @@
                 </child>
               </object>
             </child>
+            <child>
+              <object class="GtkMenuItem" id="View">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">_View</property>
+                <property name="use_underline">True</property>
+                <child type="submenu">
+                  <object class="GtkMenu" id="file_sub1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkCheckMenuItem" id="connectedusers">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Users</property>
+                        <property name="use_underline">True</property>
+                        <signal name="toggled" handler="on_connectedusers_toggled" swapped="no"/>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -80,7 +103,7 @@
               </object>
               <packing>
                 <property name="resize">False</property>
-                <property name="shrink">True</property>
+                <property name="shrink">False</property>
               </packing>
             </child>
             <child>
@@ -93,6 +116,8 @@
                   <object class="GtkTextView" id="userview">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="wrap_mode">word</property>
+                    <property name="cursor_visible">False</property>
                   </object>
                 </child>
               </object>

@@ -56,15 +56,16 @@ class ChatClientProtocol(basic.LineReceiver):
         """
         lineArr = line.split(' ')
         line = lineArr[1] + ' has '
+        ip = ' '.join(lineArr[2:])
 
         if lineArr[0] == 'add':
-            self.users.append((lineArr[1], lineArr[2]))
+            self.users.append((lineArr[1], ip))
             line += 'joined'
         elif lineArr[0] == 'rem':
-            del self.users[self.users.index((lineArr[1], lineArr[2]))]
+            del self.users[self.users.index((lineArr[1], ip))]
             line += 'disconnected'
 
-        self.gui.updateConnUsers()
+        self.gui.updateConnUsers(lineArr[1])
 
         return line
 

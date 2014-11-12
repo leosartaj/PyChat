@@ -36,7 +36,9 @@ class clientGUIClass:
 
         self.builder.connect_signals(self.setup_signals()) # setup signals
 
-        self.window.show_all() # display everything
+        self.window.show_all() # display widgets
+
+        self.scrollusers.hide() # hide users panel by default
 
     def load_interface(self):
         """
@@ -54,7 +56,8 @@ class clientGUIClass:
         sig = { 'on_MainWindow_destroy'     : self.close
               , 'on_exit_button_press_event': self.close
               , 'on_chatbox_activate'       : self.sendButton
-              , 'on_sendButton_clicked'     : self.sendButton }
+              , 'on_sendButton_clicked'     : self.sendButton 
+              , 'on_connectedusers_toggled': self.toggleUsersPanel }
 
         return sig
 
@@ -80,8 +83,13 @@ class clientGUIClass:
         """
 
         self.colors = {'me': 'white', 'server': 'white'} # client colors
+
         markup.background(self.textview, '#002b36') # set the background
         markup.textcolor(self.textview, 'white') # set the textcolor 
+
+        markup.background(self.userview, '#002b36') # set the background
+        markup.textcolor(self.userview, 'white') # set the textcolor 
+        self.userview.get_buffer().set_text('Connected Users\n') # setup connected user panel board
 
     def register_color(self, name):
         """
@@ -90,10 +98,24 @@ class clientGUIClass:
         key = choice(markup.color_dict.keys()) # select a random color
         self.colors[name] = markup.color_dict[key] # save the color
 
-    def updateConnUsers(self):
+    def toggleUsersPanel(self, widget):
+        """
+        Toggles the connected users panel
+        """
+        userPanel = self.scrollusers
+        if userPanel.get_property('visible'):
+            userPanel.hide()
+        else:
+            userPanel.show()
+            self.updateConnUsers('me')
+
+    def updateConnUsers(self, name):
         """
         Updates the connected users panel
         """
+        if not name in self.colors:
+            self.register_color(name) # register user color
+
         if not self.scrollusers.get_property('visible'): # do not update if not visible
             return
 
@@ -104,8 +126,9 @@ class clientGUIClass:
 
         # updated connected users
         users = self.client.users
-        for user in users:
-            buf.insert(buf.get_end_iter(), user[0] + '\n')
+        for user, ip in users:
+            buf.insert(buf.get_end_iter(), user + '\n')
+            markup.color_text(buf, self.colors[user]) # color the line
 
     def formatMsg(self, name, msg):
         """
@@ -124,9 +147,6 @@ class clientGUIClass:
         buf = text.get_buffer()
         buf.insert(buf.get_end_iter(), msg)
         
-        if not name in self.colors:
-            self.register_color(name)
-
         markup.color_text(buf, self.colors[name]) # color the line
 
         self.autoScroll(self.scroll) # Scroll Please
