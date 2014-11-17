@@ -28,13 +28,13 @@ def parse_args():
     parser = optparse.OptionParser(usage)
 
     help = "The port to listen/connect on."
-    parser.add_option('-p', '--port', type='int', help=help, default=8001)
+    parser.add_option('--port', '-p', type='int', help=help, default=8001)
 
     help = "The name of client. Defaults to username."
-    parser.add_option('-n', '--name', help=help, default=getuser())
+    parser.add_option('--client', '-c', type='str', help=help, default=getuser())
 
     help = "The name of log file. Defaults to pychat.log in cwd."
-    parser.add_option('-l', '--log', help=help, default='pychat.log')
+    parser.add_option('--log', '-l', help=help, default='pychat.log')
 
     options, args = parser.parse_args()
 

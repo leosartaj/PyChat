@@ -38,7 +38,7 @@ def start_factory(options):
     Starts the factory
     """
     deferred = defer.Deferred()
-    factory = ChatClientFactory(options.name, deferred) # setting up the factory
+    factory = ChatClientFactory(options.client, deferred) # setting up the factory
     factory.protocol = ChatClientProtocol
     reactor.connectTCP(HOST, options.port, factory)
     return deferred
