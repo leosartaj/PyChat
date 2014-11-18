@@ -13,8 +13,7 @@ import sys
 
 # twisted imports
 from twisted.python import log
-from twisted.protocols import basic
-
+from twisted.protocols import basic 
 class ChatClientProtocol(basic.LineReceiver):
     """
     Implements the client interaction protocol
@@ -77,4 +76,4 @@ class ChatClientProtocol(basic.LineReceiver):
         name = line[0]
         msg = ' '.join(line[1:])
 
-        self.gui.updateTextView(name, msg)
+        self.gui.updateView(name, msg)

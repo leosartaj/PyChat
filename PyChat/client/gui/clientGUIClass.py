@@ -18,6 +18,7 @@ from twisted.python import log
 import gtk
 import markup # functions for formatting text
 import notebook # functions for handling notebook
+import textview # functions for handling textview
 
 # other imports
 from connect import setup_factory
@@ -42,7 +43,7 @@ class clientGUIClass:
 
         self.scrollusers.hide() # hide users panel by default
 
-        setup_factory(self, host, port, client)
+        setup_factory(self, host, port, client) # connect
 
     def load_interface(self):
         """
@@ -137,33 +138,12 @@ class clientGUIClass:
             buf.insert(buf.get_end_iter(), user + '\n')
             markup.color_text(buf, self.colors[user]) # color the line
 
-    def formatMsg(self, name, msg):
+    def updateView(self, name, text):
         """
-        Format The received Message
+        Wrapper for updating textview
         """
-        return name + ' >>> ' + msg + '\n'
-
-    def updateTextView(self, name, msg):
-        """
-        Updates the Textview appropriately
-        """
-        msg = self.formatMsg(name, msg) # get the formatted message
-
-        text = self.textview
-
-        buf = text.get_buffer()
-        buf.insert(buf.get_end_iter(), msg)
-        
-        markup.color_text(buf, self.colors[name]) # color the line
-
-        self.autoScroll(self.scroll) # Scroll Please
-
-    def autoScroll(self, scroll):
-        """
-        Autoscroll TextView
-        """
-        obj = scroll.get_vadjustment() # get the adjustment, returns the adjustment object
-        obj.set_value(obj.upper - obj.page_size)
+        textview.updateTextView(self.textview, self.colors, name, text)
+        textview.autoScroll(self.scroll) # Scroll Please
 
     def sendButton(self, button):
         """
@@ -172,7 +152,7 @@ class clientGUIClass:
         text = self.chatbox.get_text()
         if text:
             self.chatbox.set_text('') # clear the textbox
-            self.updateTextView('me', text)
+            self.updateView('me', text)
             self.client.send(text) # logs and sends the message
         self.chatbox.grab_focus() # focus the textbox
 
