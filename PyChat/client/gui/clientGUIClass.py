@@ -14,6 +14,7 @@ from random import choice
 # For the GUI
 import gtk
 import markup # functions for formatting text
+import notebook # functions for handling notebook
 
 # twisted imports
 from twisted.python import log
@@ -66,6 +67,9 @@ class clientGUIClass:
         Get the required objects
         """
         self.window = self.builder.get_object('MainWindow')
+
+        # Notebook
+        self.notebook = self.builder.get_object('notebook')
 
         # main chat area
         self.textview = self.builder.get_object('textview') 
