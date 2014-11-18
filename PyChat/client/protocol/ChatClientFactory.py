@@ -15,7 +15,8 @@ class ChatClientFactory(ClientFactory):
     """
     Implements the client factory
     """
-    def __init__(self, name, deferred):
+    def __init__(self, gui, name, deferred):
+        self.gui = gui
         self.name = name
         self.deferred = deferred
 

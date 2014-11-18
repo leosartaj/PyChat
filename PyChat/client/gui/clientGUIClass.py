@@ -11,21 +11,22 @@
 import os
 from random import choice
 
+# twisted imports
+from twisted.python import log
+
 # For the GUI
 import gtk
 import markup # functions for formatting text
 import notebook # functions for handling notebook
 
-# twisted imports
-from twisted.python import log
+# other imports
+from connect import setup_factory
 
 class clientGUIClass:
     """ 
     Sets up the GUI interface
     """
-    def __init__(self, client):
-
-        self.client = client # remember the client
+    def __init__(self, host, port, client):
 
         self.load_interface() # load the interface
 
@@ -40,6 +41,8 @@ class clientGUIClass:
         self.window.show_all() # display widgets
 
         self.scrollusers.hide() # hide users panel by default
+
+        setup_factory(self, host, port, client)
 
     def load_interface(self):
         """

@@ -8,15 +8,12 @@
 # Licensed under the MIT license.
 ##
 
+# system import
+import sys
+
+# twisted imports
 from twisted.python import log
 from twisted.protocols import basic
-
-import sys
-try:
-    sys.path.insert(0, '../gui') # allows importing modules from different directory
-    from gui.clientGUIClass import clientGUIClass
-except ImportError: # for debugging
-    from PyChat.client.gui.clientGUIClass import clientGUIClass
 
 class ChatClientProtocol(basic.LineReceiver):
     """
@@ -25,7 +22,9 @@ class ChatClientProtocol(basic.LineReceiver):
     from os import linesep as delimiter # set delimiter
 
     def connectionMade(self):
-        self.gui = clientGUIClass(self)
+        self.gui = self.factory.gui # refrence to the gui
+        self.gui.client = self # give your refrence the gui
+
         self.peer = self.transport.getPeer()
         self.users = [] # list of connnected users
 
