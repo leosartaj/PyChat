@@ -43,7 +43,7 @@ setup(
     license = 'MIT',
     keywords = 'chat client server',
     url = 'http://github.com/leosartaj/PyChat',
-    packages= ['PyChat', 'PyChat/client', 'PyChat/client/protocol', 'PyChat/client/gui', 'twisted.plugins', 'PyChat/server', 'PyChat/server/protocol'],
+    packages= ['PyChat', 'PyChat/client', 'PyChat/client/protocol', 'PyChat/client/gui', 'PyChat/client/gui/helper', 'twisted.plugins', 'PyChat/server', 'PyChat/server/protocol'],
     scripts=['bin/pychat'],
     package_data = {'PyChat/client/gui': ['*.glade']},
     install_requires = ['Twisted'],

@@ -8,7 +8,6 @@
 ##
 
 # system imports
-import os
 from random import choice
 
 # twisted imports
@@ -16,12 +15,16 @@ from twisted.python import log
 
 # For the GUI
 import gtk
-import markup # functions for formatting text
-import notebook # functions for handling notebook
-import textview # functions for handling textview
+from connectBoxClass import connectBoxClass
+
+# helper modules
+import helper.markup as markup # functions for formatting text
+import helper.notebook as notebook # functions for handling notebook
+import helper.textview as textview # functions for handling textview
 
 # other imports
 from connect import setup_factory
+from helper import helperFunc as hf
 
 class clientGUIClass:
     """ 
@@ -32,16 +35,13 @@ class clientGUIClass:
         self.load_interface() # load the interface
 
         self.save_objects() # save objects
-
-        self.basic_markup() # setup appearances
-
-        self.chatbox.grab_focus() # focus here
-
         self.builder.connect_signals(self.setup_signals()) # setup signals
-
         self.window.show_all() # display widgets
 
+        self.basic_markup() # setup appearances
+        self.chatbox.grab_focus() # focus here
         self.scrollusers.hide() # hide users panel by default
+        self.updateView('server', 'Not Connected') # Tell users if not connected
 
         setup_factory(self, host, port, client) # connect
 
@@ -50,7 +50,7 @@ class clientGUIClass:
         Loads the interface
         in particular loads the glade file
         """
-        fName = os.path.join(os.path.dirname(__file__), 'clientGUI.glade') # hack for loading the glade file
+        fName = hf.find_file(__file__, 'clientGUI.glade')
         self.builder = gtk.Builder()
         self.builder.add_from_file(fName)
 
