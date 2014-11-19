@@ -21,7 +21,7 @@ class connectBoxClass:
 
         self.parent = parent # save the parent caller
 
-        self.load_interface() # load the interface
+        self.builder = hf.load_interface(__file__, 'connectBox.glade') # load the interface
         self.save_objects() # save objects
         self.builder.connect_signals(self.setup_signals()) # setup signals
 
@@ -29,21 +29,15 @@ class connectBoxClass:
 
         self.window.show_all() # display widgets
 
-    def load_interface(self):
-        """
-        Loads the interface
-        in particular loads the glade file
-        """
-        fName = hf.find_file(__file__, 'connectBox.glade')
-        self.builder = gtk.Builder()
-        self.builder.add_from_file(fName)
+        self.entry.grab_focus()
 
     def setup_signals(self):
         """
         Sets up the signals
         """
         sig = { 'on_mainwindow_destroy': self.close
-              , 'on_cancel_clicked'   : self.close }
+              , 'on_connect_clicked'   : self.connect
+              , 'on_cancel_clicked'    : self.close }
 
         return sig
 
@@ -52,6 +46,31 @@ class connectBoxClass:
         Get the required objects
         """
         self.window = self.builder.get_object('mainwindow')
+        self.entry = self.builder.get_object('entry')
+        self.spinbutton = self.builder.get_object('spinbutton')
+
+    def connect(self, button):
+        """
+        Handles when connect button is clicked
+        """
+        entry = self.entry
+        buf = entry.get_buffer()
+        host = buf.get_text()
+        if not host:
+            entry.grab_focus()
+            return
+        spin = self.spinbutton
+        buf_spin = spin.get_buffer()
+        try:
+            port = buf_spin.get_text()
+            if not port:
+                raise ValueError
+            port = int(port)
+        except ValueError:
+            spin.grab_focus()
+            return
+        self.parent.connect(host, port) # try to connect
+        self.close() # close the window
 
     def close(self, *args):
         """

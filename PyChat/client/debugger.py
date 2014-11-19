@@ -33,6 +33,6 @@ if __name__ == '__main__':
 
     log.startLogging(sys.stdout)
 
-    clientGUIClass(host, options.port, options.client) # start the gui
+    clientGUIClass(options.client) # start the gui
 
     reactor.run()

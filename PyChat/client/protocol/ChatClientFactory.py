@@ -26,16 +26,14 @@ class ChatClientFactory(ClientFactory):
 
     def clientConnectionFailed(self, connector, reason):
         log.err(reason.getErrorMessage())
-        self._stopReactor('Could Not Connect to Server')
+        self._notify('Could Not Connect to Server')
 
     def clientConnectionLost(self, connector, reason):
         log.err(reason.getErrorMessage())
-        self._stopReactor('Connection to server has been lost')
+        self._notify('Connection to server has been lost')
 
-    def _stopReactor(self, msg):
+    def _notify(self, msg):
         """
-        Fire the deferred
+        Update the gui
         """
-        if self.deferred is not None:
-            d, self.deferred = self.deferred, None
-            d.callback(msg)
+        self.gui.connectionLost(msg)

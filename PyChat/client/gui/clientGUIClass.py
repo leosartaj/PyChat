@@ -30,9 +30,11 @@ class clientGUIClass:
     """ 
     Sets up the GUI interface
     """
-    def __init__(self, host, port, client):
+    def __init__(self, name):
 
-        self.load_interface() # load the interface
+        self.name = name # save the client name
+
+        self.builder = hf.load_interface(__file__, 'clientGUI.glade') # load the interface
 
         self.save_objects() # save objects
         self.builder.connect_signals(self.setup_signals()) # setup signals
@@ -43,16 +45,9 @@ class clientGUIClass:
         self.scrollusers.hide() # hide users panel by default
         self.updateView('server', 'Not Connected') # Tell users if not connected
 
-        setup_factory(self, host, port, client) # connect
-
-    def load_interface(self):
-        """
-        Loads the interface
-        in particular loads the glade file
-        """
-        fName = hf.find_file(__file__, 'clientGUI.glade')
-        self.builder = gtk.Builder()
-        self.builder.add_from_file(fName)
+        # variables
+        self.protocol = None # when connected has the refrence to protocol
+        self.connected = False
 
     def setup_signals(self):
         """
@@ -62,7 +57,8 @@ class clientGUIClass:
               , 'on_exit_button_press_event': self.close
               , 'on_chatbox_activate'       : self.sendButton
               , 'on_sendButton_clicked'     : self.sendButton 
-              , 'on_connectedusers_toggled': self.toggleUsersPanel }
+              , 'on_connectedusers_toggled' : self.toggleUsersPanel
+              , 'on_connect_activate'       : self.set_connect_box }
 
         return sig
 
@@ -90,14 +86,21 @@ class clientGUIClass:
         set the appearances, 'cause appearances are good
         """
 
-        self.colors = {'me': 'white', 'server': 'white'} # client colors
+        self.colors = self.reset_color()
 
         markup.background(self.textview, '#002b36') # set the background
         markup.textcolor(self.textview, 'white') # set the textcolor 
 
         markup.background(self.userview, '#002b36') # set the background
         markup.textcolor(self.userview, 'white') # set the textcolor 
-        self.userview.get_buffer().set_text('Connected Users\n') # setup connected user panel board
+        self.userview.get_buffer().set_text('Not connected\n') # setup connected user panel board
+
+    def reset_color(self, color={}):
+        """
+        Resets the color dict to default
+        """
+        colors = {'me': 'white', 'server': 'white'} # client colors
+        return colors
 
     def register_color(self, name):
         """
@@ -105,6 +108,12 @@ class clientGUIClass:
         """
         key = choice(markup.color_dict.keys()) # select a random color
         self.colors[name] = markup.color_dict[key] # save the color
+
+    def remove_color(self, name):
+        """
+        Remove color of the disconnected user
+        """
+        del self.colors[name]
 
     def toggleUsersPanel(self, widget):
         """
@@ -130,13 +139,47 @@ class clientGUIClass:
         # reset the view
         userview = self.userview
         buf = userview.get_buffer()
-        buf.set_text('Connected Users\n')
+        if self.connected:
+            buf.set_text('Connected Users\n')
+        else:
+            buf.set_text('Not Connected\n') # tell if not connected
+            return
+
+        if not self.protocol:
+            return
 
         # updated connected users
-        users = self.client.users
+        users = self.protocol.users
         for user, ip in users:
             buf.insert(buf.get_end_iter(), user + '\n')
             markup.color_text(buf, self.colors[user]) # color the line
+
+    def set_connect_box(self, menuitem):
+        """
+        sets up the connection box
+        """
+        connectBoxClass(self)
+
+    def connect(self, host, port):
+        """
+        handles connection to the server
+        """
+        if self.connected: # hack for now
+            self.protocol.transport.loseConnection()
+        self.connected = True
+        setup_factory(self, host, port, self.name) # connect
+        self.updateConnUsers('me') # update the connected users panel
+
+    def connectionLost(self, msg):
+        """
+        Handles when connection is lost
+        or failed
+        """
+        self.connected = False
+        self.protocol = None # reset to refrence to None
+        self.colors = self.reset_color(self.colors)
+        self.updateView('server', msg)
+        self.updateConnUsers('me') # update the connected users panel
 
     def updateView(self, name, text):
         """
@@ -153,7 +196,7 @@ class clientGUIClass:
         if text:
             self.chatbox.set_text('') # clear the textbox
             self.updateView('me', text)
-            self.client.send(text) # logs and sends the message
+            self.protocol.send(text) # logs and sends the message
         self.chatbox.grab_focus() # focus the textbox
 
     def close(self, *args):

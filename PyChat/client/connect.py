@@ -20,9 +20,6 @@ from twisted.internet import reactor
 from protocol.ChatClientFactory import ChatClientFactory
 from protocol.ChatClientProtocol import ChatClientProtocol
 
-# other imports
-from defer import * # import all the callbacks and errbacks
-
 def start_factory(gui, host, port, client='default'):
     """
     Starts the factory
@@ -39,7 +36,3 @@ def setup_factory(gui, host, port, client='default'):
     sets up the deferred
     """
     deferred = start_factory(gui, host, port, client)
-
-    # setup returned deferred
-    deferred.addBoth(stop_log) 
-    deferred.addBoth(stop_reactor) 

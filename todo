@@ -1,5 +1,8 @@
+Make client class for each established protocol, get it working for single client
+Then, Tabbed Chatting
+Also, Correct updating colors array
+
 Docs
-GUI initializes, then connect from GUI
 rc file, for default configuration
 FTP
 Secure connection

@@ -14,6 +14,7 @@ import sys
 # twisted imports
 from twisted.python import log
 from twisted.protocols import basic 
+
 class ChatClientProtocol(basic.LineReceiver):
     """
     Implements the client interaction protocol
@@ -64,6 +65,8 @@ class ChatClientProtocol(basic.LineReceiver):
             line += 'disconnected'
 
         self.gui.updateConnUsers(lineArr[1])
+        if lineArr[0] == 'rem':
+            self.gui.remove_color(lineArr[1]) # remove the assigned color
 
         return line
 
