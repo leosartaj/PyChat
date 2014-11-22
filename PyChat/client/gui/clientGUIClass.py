@@ -193,7 +193,7 @@ class clientGUIClass:
         When the button is clicked
         """
         text = self.chatbox.get_text()
-        if text:
+        if text and self.connected:
             self.chatbox.set_text('') # clear the textbox
             self.updateView('me', text)
             self.protocol.send(text) # logs and sends the message

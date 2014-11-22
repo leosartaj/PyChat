@@ -23,7 +23,7 @@ class ChatClientProtocol(basic.LineReceiver):
 
     def connectionMade(self):
         self.gui = self.factory.gui # refrence to the gui
-        self.gui.client = self # give your refrence the gui
+        self.gui.protocol = self # give your refrence the gui
 
         self.peer = self.transport.getPeer()
         self.users = [] # list of connnected users
