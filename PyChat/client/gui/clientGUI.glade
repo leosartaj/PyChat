@@ -192,6 +192,7 @@
                 <property name="primary_icon_sensitive">True</property>
                 <property name="secondary_icon_sensitive">True</property>
                 <signal name="activate" handler="on_chatbox_activate" swapped="no"/>
+                <signal name="key-press-event" handler="on_key_press" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>

@@ -25,6 +25,7 @@ import helper.textview as textview # functions for handling textview
 # other imports
 from connect import setup_factory
 from helper import helperFunc as hf
+from helper.stack import stack
 
 class clientGUIClass:
     """ 
@@ -45,6 +46,8 @@ class clientGUIClass:
         self.scrollusers.hide() # hide users panel by default
         self.updateView('server', 'Not Connected') # Tell users if not connected
 
+        self.stack = stack() # for upper key and lower key functionality
+
         # variables
         self.protocol = None # when connected has the refrence to protocol
         self.connected = False
@@ -58,9 +61,11 @@ class clientGUIClass:
               , 'on_chatbox_activate'       : self.sendButton
               , 'on_sendButton_clicked'     : self.sendButton 
               , 'on_connectedusers_toggled' : self.toggleUsersPanel
-              , 'on_connect_activate'       : self.set_connect_box }
+              , 'on_connect_activate'       : self.set_connect_box
+              , 'on_key_press'              : self.handleKeys }
 
         return sig
+
 
     def save_objects(self):
         """
@@ -193,11 +198,34 @@ class clientGUIClass:
         When the button is clicked
         """
         text = self.chatbox.get_text()
-        if text and self.connected:
+        if text:
+            self.stack.push(text) # push the text on stack
             self.chatbox.set_text('') # clear the textbox
             self.updateView('me', text)
-            self.protocol.send(text) # logs and sends the message
+            if self.connected:
+                self.protocol.send(text) # logs and sends the message
         self.chatbox.grab_focus() # focus the textbox
+
+    def handleKeys(self, widget, key):
+        """
+        Handles key press
+        event in chatbox
+        returns last entered text when up key is pressed
+        cycles up the stack when down key is pressed
+        """
+        keyname = gtk.gdk.keyval_name(key.keyval)
+
+        text = None
+        if keyname == 'Up':
+            text = self.stack.pop()
+        elif keyname == 'Down':
+            text = self.stack.up()
+        else:
+            self.stack.reset_point() # reset the pointer
+
+        if text != None:
+            self.chatbox.set_text(text)
+            self.chatbox.set_position(len(text)) # set the cursor position
 
     def close(self, *args):
         """
