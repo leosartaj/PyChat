@@ -33,6 +33,9 @@ if __name__ == '__main__':
 
     log.startLogging(sys.stdout)
 
-    clientGUIClass(options.client) # start the gui
+    gui = clientGUIClass(options.client) # start the gui
+
+    if host != None and options.port != None: # allow deafult connecting
+        gui.connect(host, options.port)
 
     reactor.run()

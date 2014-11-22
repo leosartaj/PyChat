@@ -1,8 +1,15 @@
+FOR 2.0 RELEASE
+
+Fine tune connect box
+setup shortcuts
+remove/add unncecessary/ncecessary tooltips
+Allow commandline arguments for automatic connection
+
 Make client class for each established protocol, get it working for single client
 Then, Tabbed Chatting
 Also, Correct updating colors array
 
 Docs
-rc file, for default configuration
+rc file, for default configuration  #maybe
 FTP
 Secure connection

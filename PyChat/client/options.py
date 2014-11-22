@@ -19,7 +19,7 @@ def parse_args():
     """
     Parses the arguments
     """
-    usage = """usage: %prog [options]
+    usage = """usage: %prog [host] [options]
 
     Run 
     pychat -h/--help
@@ -28,7 +28,7 @@ def parse_args():
     parser = optparse.OptionParser(usage)
 
     help = "The port to listen/connect on."
-    parser.add_option('--port', '-p', type='int', help=help, default=8001)
+    parser.add_option('--port', '-p', type='int', help=help, default=None)
 
     help = "The name of client. Defaults to username."
     parser.add_option('--client', '-c', type='str', help=help, default=getuser())
@@ -41,7 +41,7 @@ def parse_args():
     if len(args) == 1:
         HOST = args[0]
     elif len(args) == 0:
-        HOST = '127.0.0.1'
+        HOST = None
     else:
         parser.error('Invalid number of arguments, got ' + str(len(args)) + ' args expecting 0/1')
 
