@@ -1,5 +1,6 @@
 from distutils import log
 from setuptools import setup
+from PyChat import __version__
 
 try:
     from setuptools.command import egg_info
@@ -35,7 +36,7 @@ def readFile(fName):
 
 setup(
     name = 'PyChat',
-    version = '1.2.1',
+    version = __version__,
     author = 'Sartaj Singh',
     author_email = 'singhsartaj94@gmail.com',
     description = ('Asynchronous Chat Client'),
@@ -43,7 +44,7 @@ setup(
     license = 'MIT',
     keywords = 'chat client server',
     url = 'http://github.com/leosartaj/PyChat',
-    packages= ['PyChat', 'PyChat/client', 'PyChat/client/protocol', 'PyChat/client/gui', 'PyChat/client/gui/helper', 'twisted.plugins', 'PyChat/server', 'PyChat/server/protocol'],
+    packages= ['PyChat', 'PyChat/info', 'PyChat/client', 'PyChat/client/protocol', 'PyChat/client/gui', 'PyChat/client/gui/helper', 'twisted.plugins', 'PyChat/server', 'PyChat/server/protocol'],
     scripts=['bin/pychat'],
     package_data = {'PyChat/client/gui': ['*.glade']},
     install_requires = ['Twisted'],

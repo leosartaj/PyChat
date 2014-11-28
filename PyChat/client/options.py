@@ -15,6 +15,11 @@ Contains helper functions for parsing arguments
 import optparse # parsing the options
 from getpass import getuser
 
+try:
+    from PyChat import __desc__ # try to get version number
+except ImportError:
+    __desc__ = 'UNKNOWN'
+
 def parse_args():
     """
     Parses the arguments
@@ -25,7 +30,7 @@ def parse_args():
     pychat -h/--help
     For help
 """
-    parser = optparse.OptionParser(usage)
+    parser = optparse.OptionParser(usage, version=__desc__)
 
     help = "The port to listen/connect on."
     parser.add_option('--port', '-p', type='int', help=help, default=None)

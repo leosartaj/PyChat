@@ -5,11 +5,16 @@ setup shortcuts
 remove/add unncecessary/ncecessary tooltips
 Allow commandline arguments for automatic connection
 
+Auto complete commandline options
+version option
+
 Make client class for each established protocol, get it working for single client
 Then, Tabbed Chatting
 Also, Correct updating colors array
 
+emoticons # maybe
+
 Docs
 rc file, for default configuration  #maybe
-FTP
+FTP # separate module
 Secure connection
