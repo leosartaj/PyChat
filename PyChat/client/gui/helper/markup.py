@@ -85,3 +85,14 @@ def remove_color(colors, name):
     Remove color of the disconnected user
     """
     del colors[name]
+
+def basic_markup(textview, userview):
+    """
+    set the appearances, 'cause appearances are good
+    """
+    background(textview, '#002b36') # set the background
+    textcolor(textview, 'white') # set the textcolor 
+
+    background(userview, '#002b36') # set the background
+    textcolor(userview, 'white') # set the textcolor 
+    userview.get_buffer().set_text('Not connected\n') # setup connected user panel board

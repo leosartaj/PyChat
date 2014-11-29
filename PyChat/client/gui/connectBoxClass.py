@@ -21,7 +21,7 @@ class connectBoxClass:
 
         self.parent = parent # save the parent caller
 
-        self.builder = hf.load_interface(__file__, 'connectBox.glade') # load the interface
+        self.builder = hf.load_interface(__file__, 'glade/connectBox.glade') # load the interface
         self.save_objects() # save objects
         self.builder.connect_signals(self.setup_signals()) # setup signals
 

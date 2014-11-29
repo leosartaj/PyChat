@@ -38,19 +38,21 @@ class clientGUIClass:
 
         self.name = name # save the client name
 
-        self.builder = hf.load_interface(__file__, 'clientGUI.glade') # load the interface
+        self.builder = hf.load_interface(__file__, 'glade/clientGUI.glade') # load the interface
 
         self.save_objects() # save objects
         self.builder.connect_signals(self.setup_signals()) # setup signals
-        self.window.show_all() # display widgets
 
-        self.basic_markup() # setup appearances
         self.chatbox.grab_focus() # focus here
-        self.scrollusers.hide() # hide users panel by default
+
+        self.setup_page()
+        notebook.show_tabs(self.notebook) # toggle tabs visibility
 
         self.stack = stack() # for upper key and lower key functionality
-
         self.objects = [] # list of active connections
+        self.showusers = False
+
+        self.window.show_all() # display widgets
 
     def setup_signals(self):
         """
@@ -71,44 +73,41 @@ class clientGUIClass:
         Get the required objects
         """
         self.window = self.builder.get_object('MainWindow')
-
-        # Notebook
         self.notebook = self.builder.get_object('notebook')
-
-        # main chat area
-        self.textview = self.builder.get_object('textview') 
-        self.scroll = self.builder.get_object('scrolledwindow')
-
-        # Connected Users board
-        self.userview = self.builder.get_object('userview') 
-        self.scrollusers = self.builder.get_object('scrolledwindow1')
-
         self.chatbox = self.builder.get_object('chatbox') 
 
-        self.widgets = [self, self.textview, self.scroll, self.scrollusers, self.userview] # hack for arguments for client object
-
-    def basic_markup(self):
+    def setup_page(self):
         """
-        set the appearances, 'cause appearances are good
+        sets up a new notebook page
+        returns the loaded widgets
         """
-        markup.background(self.textview, '#002b36') # set the background
-        markup.textcolor(self.textview, 'white') # set the textcolor 
+        builder = hf.load_interface(__file__, 'glade/chatarea.glade')
+        widgets = hf.load_chatarea_widgets(self, builder) # get the widgets
 
-        markup.background(self.userview, '#002b36') # set the background
-        markup.textcolor(self.userview, 'white') # set the textcolor 
-        self.userview.get_buffer().set_text('Not connected\n') # setup connected user panel board
+        notebook.add_page(self.notebook, widgets[1], None)
+        notebook.show_tabs(self.notebook) # toggle tabs visibility
+
+        markup.basic_markup(widgets[3], widgets[5]) # set the colors
+
+        return widgets
 
     def toggleUsersPanel(self, widget):
         """
         Toggles the connected users panel
         """
-        userPanel = self.scrollusers
-        if userPanel.get_property('visible'):
-            userPanel.hide()
+        if self.showusers:
+            self.showusers = False
         else:
-            userPanel.show()
-            if len(self.objects) != 0:
-                self.objects[0].updateConnUsers('me') # hack improve it
+            self.showusers = True
+
+        # improve for dummy page
+        for obj in self.objects:
+            userPanel = obj.scrollusers
+            if self.showusers:
+                userPanel.show()
+                obj.updateConnUsers('me')
+            else:
+                userPanel.hide()
 
     def set_connect_box(self, menuitem):
         """
@@ -118,13 +117,17 @@ class clientGUIClass:
 
     def connect(self, host, port):
         """
+        Loads the chatarea
+        makes a new notebook page
         Makes a new client object
         saves refrence to the object
         and invokes its connect method
         """
-        clientobj = clientClass(self.name, self.widgets)
-        self.objects.append(clientobj)
+        widgets = self.setup_page()
+        clientobj = clientClass(self.name, widgets)
         clientobj.connect(host, port)
+
+        self.objects.append(clientobj) # save a reference finally
 
     def connectionLost(self, clientobj):
         """

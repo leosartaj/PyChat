@@ -30,10 +30,11 @@ class clientClass:
         Save refrences to important widgets
         """
         self.parent = widgets[0]
-        self.textview = widgets[1]
+        self.hpane = widgets[1]
         self.scroll = widgets[2]
-        self.scrollusers = widgets[3]
-        self.userview = widgets[4]
+        self.textview = widgets[3]
+        self.scrollusers = widgets[4]
+        self.userview = widgets[5]
 
     def send(self, text):
         """

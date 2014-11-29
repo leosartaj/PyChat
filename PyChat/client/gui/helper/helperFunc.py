@@ -33,6 +33,14 @@ def load_interface(dire, fName):
     builder.add_from_file(fName)
     return builder
 
+def load_chatarea_widgets(parent, builder):
+    hpane = builder.get_object('hpaned1')
+    scroll = builder.get_object('scrolledwindow')
+    scrollusers = builder.get_object('scrolledwindow1')
+    textview = builder.get_object('textview')
+    userview = builder.get_object('userview')
+    return [parent, hpane, scroll, textview, scrollusers, userview]
+
 def center(widget, parent):
     """
     Centers the window to the
@@ -41,3 +49,10 @@ def center(widget, parent):
     """
     widget.set_transient_for(parent) # set parent
     widget.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
+
+def label(labeltext):
+    """
+    Make a new gtk
+    label with labeltext
+    """
+    #return gtk.label_new(labeltext)
