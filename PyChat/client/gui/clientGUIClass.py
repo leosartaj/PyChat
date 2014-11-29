@@ -7,6 +7,10 @@
 # Licensed under the MIT license.
 ##
 
+"""
+Contains the main GUI Class
+"""
+
 # system imports
 from random import choice
 
@@ -17,15 +21,14 @@ from twisted.python import log
 import gtk
 from connectBoxClass import connectBoxClass
 
-# helper modules
-import helper.markup as markup # functions for formatting text
-import helper.notebook as notebook # functions for handling notebook
-import helper.textview as textview # functions for handling textview
+# Connections
+from clientClass import clientClass
 
-# other imports
-from connect import setup_factory
+# helper modules
 from helper import helperFunc as hf
 from helper.stack import stack
+from helper import markup # functions for formatting text
+from helper import notebook # functions for handling notebook
 
 class clientGUIClass:
     """ 
@@ -44,13 +47,10 @@ class clientGUIClass:
         self.basic_markup() # setup appearances
         self.chatbox.grab_focus() # focus here
         self.scrollusers.hide() # hide users panel by default
-        self.updateView('server', 'Not Connected') # Tell users if not connected
 
         self.stack = stack() # for upper key and lower key functionality
 
-        # variables
-        self.protocol = None # when connected has the refrence to protocol
-        self.connected = False
+        self.objects = [] # list of active connections
 
     def setup_signals(self):
         """
@@ -65,7 +65,6 @@ class clientGUIClass:
               , 'on_key_press'              : self.handleKeys }
 
         return sig
-
 
     def save_objects(self):
         """
@@ -86,39 +85,18 @@ class clientGUIClass:
 
         self.chatbox = self.builder.get_object('chatbox') 
 
+        self.widgets = [self, self.textview, self.scroll, self.scrollusers, self.userview] # hack for arguments for client object
+
     def basic_markup(self):
         """
         set the appearances, 'cause appearances are good
         """
-
-        self.colors = self.reset_color()
-
         markup.background(self.textview, '#002b36') # set the background
         markup.textcolor(self.textview, 'white') # set the textcolor 
 
         markup.background(self.userview, '#002b36') # set the background
         markup.textcolor(self.userview, 'white') # set the textcolor 
         self.userview.get_buffer().set_text('Not connected\n') # setup connected user panel board
-
-    def reset_color(self, color={}):
-        """
-        Resets the color dict to default
-        """
-        colors = {'me': 'white', 'server': 'white'} # client colors
-        return colors
-
-    def register_color(self, name):
-        """
-        Register color of the user
-        """
-        key = choice(markup.color_dict.keys()) # select a random color
-        self.colors[name] = markup.color_dict[key] # save the color
-
-    def remove_color(self, name):
-        """
-        Remove color of the disconnected user
-        """
-        del self.colors[name]
 
     def toggleUsersPanel(self, widget):
         """
@@ -129,35 +107,8 @@ class clientGUIClass:
             userPanel.hide()
         else:
             userPanel.show()
-            self.updateConnUsers('me')
-
-    def updateConnUsers(self, name):
-        """
-        Updates the connected users panel
-        """
-        if not name in self.colors:
-            self.register_color(name) # register user color
-
-        if not self.scrollusers.get_property('visible'): # do not update if not visible
-            return
-
-        # reset the view
-        userview = self.userview
-        buf = userview.get_buffer()
-        if self.connected:
-            buf.set_text('Connected Users\n')
-        else:
-            buf.set_text('Not Connected\n') # tell if not connected
-            return
-
-        if not self.protocol:
-            return
-
-        # updated connected users
-        users = self.protocol.users
-        for user, ip in users:
-            buf.insert(buf.get_end_iter(), user + '\n')
-            markup.color_text(buf, self.colors[user]) # color the line
+            if len(self.objects) != 0:
+                self.objects[0].updateConnUsers('me') # hack improve it
 
     def set_connect_box(self, menuitem):
         """
@@ -167,31 +118,20 @@ class clientGUIClass:
 
     def connect(self, host, port):
         """
-        handles connection to the server
+        Makes a new client object
+        saves refrence to the object
+        and invokes its connect method
         """
-        if self.connected: # hack for now
-            self.protocol.transport.loseConnection()
-        self.connected = True
-        setup_factory(self, host, port, self.name) # connect
-        self.updateConnUsers('me') # update the connected users panel
+        clientobj = clientClass(self.name, self.widgets)
+        self.objects.append(clientobj)
+        clientobj.connect(host, port)
 
-    def connectionLost(self, msg):
+    def connectionLost(self, clientobj):
         """
-        Handles when connection is lost
-        or failed
+        Removes the refrence of the disconnected clientobj
         """
-        self.connected = False
-        self.protocol = None # reset to refrence to None
-        self.colors = self.reset_color(self.colors)
-        self.updateView('server', msg)
-        self.updateConnUsers('me') # update the connected users panel
-
-    def updateView(self, name, text):
-        """
-        Wrapper for updating textview
-        """
-        textview.updateTextView(self.textview, self.colors, name, text)
-        textview.autoScroll(self.scroll) # Scroll Please
+        del self.objects[self.objects.index(clientobj)]
+        del clientobj
 
     def sendButton(self, button):
         """
@@ -200,10 +140,9 @@ class clientGUIClass:
         text = self.chatbox.get_text()
         if text:
             self.stack.push(text) # push the text on stack
-            self.chatbox.set_text('') # clear the textbox
-            self.updateView('me', text)
-            if self.connected:
-                self.protocol.send(text) # logs and sends the message
+            if len(self.objects) != 0:
+                self.chatbox.set_text('') # clear the textbox
+                self.objects[0].send(text)
         self.chatbox.grab_focus() # focus the textbox
 
     def handleKeys(self, widget, key):

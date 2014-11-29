@@ -22,8 +22,8 @@ class ChatClientProtocol(basic.LineReceiver):
     from os import linesep as delimiter # set delimiter
 
     def connectionMade(self):
-        self.gui = self.factory.gui # refrence to the gui
-        self.gui.protocol = self # give your refrence the gui
+        self.clientobj = self.factory.clientobj # refrence to the client object
+        self.clientobj.protocol = self # give your refrence to the client object
 
         self.peer = self.transport.getPeer()
         self.users = [] # list of connnected users
@@ -51,7 +51,7 @@ class ChatClientProtocol(basic.LineReceiver):
         """
         Stores useful information about new connected user
         adds a tuple of name and ip address of user
-        updates the gui
+        updates the client object
         """
         lineArr = line.split(' ')
         line = lineArr[1] + ' has '
@@ -64,7 +64,7 @@ class ChatClientProtocol(basic.LineReceiver):
             del self.users[self.users.index((lineArr[1], ip))]
             line += 'disconnected'
 
-        self.gui.updateConnUsers(lineArr[1])
+        self.clientobj.updateConnUsers(lineArr[1])
 
         return line
 
@@ -77,4 +77,4 @@ class ChatClientProtocol(basic.LineReceiver):
         name = line[0]
         msg = ' '.join(line[1:])
 
-        self.gui.updateView(name, msg)
+        self.clientobj.updateView(name, msg)

@@ -11,8 +11,9 @@
 Helper functions for formatting text
 """
 
+#import pango for someday
 import gtk
-import pango
+import random 
 
 """
     SOLARIZED HEX     
@@ -63,3 +64,24 @@ def color_text(buf, color):
     end = buf.get_iter_at_line(lines)
 
     buf.apply_tag(tag, start, end) # color the region
+
+def default_colors():
+    """
+    Gives the default color scheme
+    returns a dictionary
+    """
+    colors = {'me': 'white', 'server': 'white'} # client colors
+    return colors
+
+def register_color(colors, name):
+    """
+    Register color of the user
+    """
+    key = random.choice(color_dict.keys()) # select a random color
+    colors[name] = color_dict[key] # save the color
+
+def remove_color(colors, name):
+    """
+    Remove color of the disconnected user
+    """
+    del colors[name]
