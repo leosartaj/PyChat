@@ -50,9 +50,11 @@ def center(widget, parent):
     widget.set_transient_for(parent) # set parent
     widget.set_position(gtk.WIN_POS_CENTER_ON_PARENT)
 
-def label(labeltext):
+def label(labeltext=None):
     """
     Make a new gtk
     label with labeltext
     """
-    #return gtk.label_new(labeltext)
+    label = gtk.Label()
+    label.set_text(labeltext)
+    return label

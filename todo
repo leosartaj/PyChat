@@ -10,7 +10,7 @@ version option
 
 Make client class for each established protocol, get it working for single client
 Then, Tabbed Chatting
-Also, Correct updating colors array
+unique colors for new user, even if two have same name
 
 emoticons # maybe
 

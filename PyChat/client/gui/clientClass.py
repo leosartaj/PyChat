@@ -2,8 +2,7 @@
 
 ##
 # PyChat
-# https://github.com/leosartaj/PyChat.git
-# Copyright (c) 2014 Sartaj Singh
+# https://github.com/leosartaj/PyChat.git # Copyright (c) 2014 Sartaj Singh
 # Licensed under the MIT license.
 ##
 
@@ -20,8 +19,10 @@ class clientClass:
     Class for defining a client
     """
     def __init__(self, client, widgets):
-        self.client = client # name of the client
-        self.protocol = None # protocol instance
+        self.client = client # name of the client self.protocol = None # protocol instance
+        self.host = None
+        self.port = None
+
         self.parse_widgets(widgets)
         self.colors = markup.default_colors()
 
@@ -30,11 +31,24 @@ class clientClass:
         Save refrences to important widgets
         """
         self.parent = widgets[0]
-        self.hpane = widgets[1]
-        self.scroll = widgets[2]
-        self.textview = widgets[3]
-        self.scrollusers = widgets[4]
-        self.userview = widgets[5]
+        self.page = widgets[1]
+        self.hpane = widgets[2]
+        self.scroll = widgets[3]
+        self.textview = widgets[4]
+        self.scrollusers = widgets[5]
+        self.userview = widgets[6]
+
+    def get_host(self):
+        """
+        Returns the host address
+        """
+        return self.host
+
+    def get_port(self):
+        """
+        Returns the connection port 
+        """
+        return self.port
 
     def send(self, text):
         """
@@ -48,6 +62,9 @@ class clientClass:
         """
         handles connection to the server
         """
+        self.host = host
+        self.port = port
+
         setup_factory(self, host, port, self.client) # connect
         self.updateConnUsers('me') # update the connected users panel
 
@@ -59,6 +76,14 @@ class clientClass:
         self.updateView('server', msg)
         self.updateConnUsers('me') # update the connected users panel
         self.parent.connectionLost(self)
+
+    def loseConnection(self):
+        """
+        Loses connection with the server
+        """
+        if self.protocol:
+            self.protocol.transport.loseConnection()
+            self.protocol = None
 
     def updateView(self, name, text):
         """
@@ -93,4 +118,4 @@ class clientClass:
         users = self.protocol.users
         for user, ip in users:
             buf.insert(buf.get_end_iter(), user + '\n')
-            markup.color_text(buf, self.colors[user]) # color the line
+            markup.color_text(buf, self.colors[name]) # color the line

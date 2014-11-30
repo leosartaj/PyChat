@@ -19,11 +19,17 @@ def show_tabs(notebook, num=1):
     """
     tabs = notebook.get_n_pages()
     state = notebook.get_show_tabs()
-
     if tabs > num and not state:
         notebook.set_show_tabs(True)
     elif tabs <= num and state:
         notebook.set_show_tabs(False)
+
+def find_page(notebook, child):
+    """
+    Find a page based on its child
+    """
+    pagenum = notebook.page_num(child)
+    return pagenum
 
 def add_page(notebook, child, label=None, position=-1):
     """
@@ -32,16 +38,16 @@ def add_page(notebook, child, label=None, position=-1):
     can add page to any given position
     by default appends the page
     """
-    if position != -1:
+    if position == -1:
         pages = notebook.get_n_pages()
-        notebook.insert_page(child, label, position)
-    else:
-        notebook.append_page(child, label)
+        position = pages - 1
+    notebook.insert_page(child, label, position)
     notebook.set_current_page(position) # focus on the new page
+    return find_page(notebook, child)
     
 def remove_page(notebook, child):
     """
     finds the page number and deletes the page
     """
-    pagenum = notebook.page_num(child)
+    pagenum = find_page(notebook, child)
     notebook.remove_page(pagenum)
