@@ -22,7 +22,7 @@ pip uninstall PyChat
 
 ## Dependencies
 
-PyChat is based on Python 2.7. PyGP uses Twisted Framework.
+PyChat is based on Python 2.7. PyChat uses Twisted Framework.
 
 ## Documentation
 
