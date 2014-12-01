@@ -186,14 +186,17 @@ class clientGUIClass:
             gtk.idle_add(self.notebook.set_current_page, current)
         gtk.idle_add(self.chatbox.grab_focus) # grab focus after page change
 
-    def toggleUsersPanel(self, widget):
+    def toggleUsersPanel(self, widget=None):
         """
         Toggles the connected users panel
+        if widget is None, reloads
+        otherwise reloads and toggles
         """
-        if self.showusers:
-            self.showusers = False
-        else:
-            self.showusers = True
+        if widget:
+            if self.showusers:
+                self.showusers = False
+            else:
+                self.showusers = True
 
         def toggle(userPanel):
             """
@@ -233,6 +236,9 @@ class clientGUIClass:
         clientobj.connect(host, port)
 
         self.objects[self.notebook.current_page()] = clientobj # save a reference finally
+
+        # restore state of users panel
+        self.toggleUsersPanel()
 
     def find_clientobj(self):
         """

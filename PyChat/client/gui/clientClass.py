@@ -12,7 +12,10 @@ Contains the class for defining a client
 
 from helper import textview # helper modules
 from helper import markup # helper modules
-from connect import setup_factory
+try:
+    from connect import setup_factory
+except ImportError:
+    from PyChat.client.connect import setup_factory
 
 class clientClass:
     """

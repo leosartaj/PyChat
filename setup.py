@@ -46,7 +46,7 @@ setup(
     url = 'http://github.com/leosartaj/PyChat',
     packages= ['PyChat', 'PyChat/info', 'PyChat/client', 'PyChat/client/protocol', 'PyChat/client/gui', 'PyChat/client/gui/helper', 'twisted.plugins', 'PyChat/server', 'PyChat/server/protocol'],
     scripts=['bin/pychat'],
-    package_data = {'PyChat/client/gui': ['*.glade']},
+    package_data = {'PyChat/client/gui': ['glade/*.glade']},
     install_requires = ['Twisted'],
     classifiers=[
         'Development Status :: 3 - Alpha',
