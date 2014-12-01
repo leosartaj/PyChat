@@ -8,9 +8,12 @@ FOR 2.0 RELEASE
 #Then, Tabbed Chatting
 #Improve add tab button
 #Do not activate add tab when clicked
+#close tab
+wire close tab button
 
 1.4.0
 setup shortcuts
+study and use accel
 change name in gui
 remove/add unncecessary/ncecessary tooltips
 Docs

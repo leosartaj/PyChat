@@ -11,6 +11,8 @@
 Handles functionality of notebook widget
 """
 
+import helperFunc as hf
+
 def show_tabs(notebook, num=1):
     """
     Shows or hides tabs in a notebook
@@ -45,10 +47,3 @@ def add_page(notebook, child, label=None, position=-1):
     notebook.set_tab_reorderable(child, True) # let the tab be reorderable
     notebook.set_current_page(position) # focus on the new page
     return find_page(notebook, child)
-    
-def remove_page(notebook, child):
-    """
-    finds the page number and deletes the page
-    """
-    pagenum = find_page(notebook, child)
-    notebook.remove_page(pagenum)

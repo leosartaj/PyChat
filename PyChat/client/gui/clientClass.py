@@ -19,7 +19,8 @@ class clientClass:
     Class for defining a client
     """
     def __init__(self, client, widgets):
-        self.client = client # name of the client self.protocol = None # protocol instance
+        self.client = client # name of the client 
+        self.protocol = None # protocol instance
         self.host = None
         self.port = None
 
@@ -56,7 +57,8 @@ class clientClass:
         the gui
         """
         self.updateView('me', text)
-        self.protocol.send(text) # logs and sends the message
+        if self.protocol:
+            self.protocol.send(text) # logs and sends the message
 
     def connect(self, host, port):
         """
@@ -75,7 +77,6 @@ class clientClass:
         """
         self.updateView('server', msg)
         self.updateConnUsers('me') # update the connected users panel
-        self.parent.connectionLost(self)
 
     def loseConnection(self):
         """

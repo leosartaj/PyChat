@@ -85,6 +85,7 @@ class clientGUIClass:
         self.dummypage = True # dummy page
         self.showusers = False
         self.control = False # True if control pressed
+        self.buttons = {} # dictionary of button and pages
 
     def setup_page(self):
         """
@@ -96,16 +97,84 @@ class clientGUIClass:
 
         pages = self.notebook.get_n_pages()
         labeltext = 'Tab ' + str(pages)
-        label = hf.label(labeltext) # generate a label
+        button, label = self.tab_label(labeltext) # generate a label
 
         page = notebook.add_page(self.notebook, widgets[1], label)
-        notebook.show_tabs(self.notebook) # toggle tabs visibility
+        self.buttons[button] = page
 
         markup.basic_markup(widgets[3], widgets[5]) # set the colors
 
         widgets.insert(1, page)
 
         return widgets
+
+    def tab_label(self, labeltext):
+        """
+        Generates Custom label for Notebook pages
+        Loads the label(hbox with label and a button)
+        connects signals
+        returns the button and the hbox
+        """
+        builder = hf.load_interface(__file__, 'glade/tablabel.glade')
+
+        # save objects
+        hbox = builder.get_object('hbox')
+        cross = builder.get_object('cross')
+        label = builder.get_object('label')
+        label.set_text(labeltext) # set desired text
+
+        sig = {'on_cross_clicked' : self.close_tab}
+        builder.connect_signals(sig) # setup signals
+
+        return cross, hbox
+
+    def close_tab(self, button):
+        """
+        Closes the connection if any
+        Closes the tab safely
+        buggy when removed 
+        objects dict not working well
+        need other way around
+        """
+        # find the page and the object
+        page = self.buttons[button]
+        if not self.dummypage:
+            clientobj = self.objects[page]
+            clientobj.loseConnection() # be free now
+        else:
+            self.dummypage = False # its gone now
+
+        # delete the page and the refrences
+        self.notebook.remove_page(page)
+        del self.buttons[button] 
+
+        # update the dictionaries
+        self.objects, self.buttons = self.update_dict(page, self.objects, self.buttons)
+
+    def update_dict(self, delpage, objects, buttons):
+        """
+        Updates the refrence dictionaries
+        when a page is deleted
+        """
+        copy = {}
+        # update objects keys
+        for key in objects:
+            if key > delpage:
+                copy[key - 1] = objects[key]
+                objects[key].page -= 1
+            elif key == delpage:
+                pass
+            else:
+                copy[key] = objects[key]
+        objects, copy = copy, {}
+        # update buttons values
+        for key in buttons:
+            if buttons[key] > delpage:
+                copy[key] = buttons[key] - 1
+            else:
+                copy[key] = buttons[key]
+        buttons = copy
+        return objects, buttons
 
     def switch_page(self, book, gpointer, page):
         """
@@ -157,19 +226,13 @@ class clientGUIClass:
         """
         if self.dummypage:
             self.notebook.remove_page(0) # delete the dummy page
+            self.buttons, self.objects = {}, {}
             self.dummypage = False 
         widgets = self.setup_page() # setup a new page
         clientobj = clientClass(self.name, widgets)
         clientobj.connect(host, port)
 
         self.objects[self.notebook.current_page()] = clientobj # save a reference finally
-
-    def connectionLost(self, clientobj):
-        """
-        Removes the refrence of the disconnected clientobj
-        """
-        del self.objects[clientobj.page]
-        del clientobj
 
     def find_clientobj(self):
         """
@@ -187,7 +250,7 @@ class clientGUIClass:
             self.stack.push(text) # push the text on stack
             if len(self.objects) != 0:
                 self.chatbox.set_text('') # clear the textbox
-                obj = self.find_clientobj() # current cliient object
+                obj = self.find_clientobj() # current client object
                 obj.send(text)
         self.chatbox.grab_focus() # focus the textbox
 
@@ -199,14 +262,16 @@ class clientGUIClass:
         cycles up the stack when down key is pressed
         """
         keyname = gtk.gdk.keyval_name(key.keyval)
-
         text = None
+
         if keyname == 'Control_R' or keyname == 'Control_L':
             self.control = True
         elif keyname == 'Left' and self.control:
             self.notebook.prev_page()
         elif keyname == 'Right' and self.control:
             self.notebook.next_page()
+        elif keyname == 't':
+            self.set_connect_box()
         else:
             self.control = False
             if keyname == 'Up':
