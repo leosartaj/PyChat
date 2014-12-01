@@ -44,11 +44,10 @@ class clientGUIClass:
         self.builder.connect_signals(self.setup_signals()) # setup signals
 
         self.chatbox.grab_focus() # focus here
-        self.dummypage = True # dummy page
+        self.init_variables()
         self.setup_page()
         self.stack = stack() # for upper key and lower key functionality
         self.objects = {} # list of active connections
-        self.showusers = False
 
         self.window.show_all() # display widgets
 
@@ -63,9 +62,11 @@ class clientGUIClass:
               , 'on_connectedusers_toggled' : self.toggleUsersPanel
               , 'on_connect_activate'       : self.set_connect_box
               , 'on_addtab_clicked'         : self.set_connect_box
-              , 'on_key_press'              : self.handleKeys }
+              , 'on_key_press'              : self.handleKeys 
+              , 'on_switch_page'            : self.switch_page }
 
         return sig
+
 
     def save_objects(self):
         """
@@ -74,6 +75,14 @@ class clientGUIClass:
         self.window = self.builder.get_object('MainWindow')
         self.notebook = self.builder.get_object('notebook')
         self.chatbox = self.builder.get_object('chatbox') 
+
+    def init_variables(self):
+        """
+        initializes various variables
+        """
+        self.dummypage = True # dummy page
+        self.showusers = False
+        self.control = False # True if control pressed
 
     def setup_page(self):
         """
@@ -95,6 +104,12 @@ class clientGUIClass:
         widgets.insert(1, page)
 
         return widgets
+
+    def switch_page(self, *args):
+        """
+        Focus chatbox when page changed
+        """
+        gtk.idle_add(self.chatbox.grab_focus) # grab focus after page change
 
     def toggleUsersPanel(self, widget):
         """
@@ -120,7 +135,7 @@ class clientGUIClass:
             obj = self.objects[keys]
             toggle(obj.scrollusers)
 
-    def set_connect_box(self, menuitem):
+    def set_connect_box(self, *args):
         """
         sets up the connection box
         """
@@ -180,12 +195,20 @@ class clientGUIClass:
         keyname = gtk.gdk.keyval_name(key.keyval)
 
         text = None
-        if keyname == 'Up':
-            text = self.stack.pop()
-        elif keyname == 'Down':
-            text = self.stack.up()
+        if keyname == 'Control_R' or keyname == 'Control_L':
+            self.control = True
+        elif keyname == 'Left' and self.control:
+            self.notebook.prev_page()
+        elif keyname == 'Right' and self.control:
+            self.notebook.next_page()
         else:
-            self.stack.reset_point() # reset the pointer
+            self.control = False
+            if keyname == 'Up':
+                text = self.stack.pop()
+            elif keyname == 'Down':
+                text = self.stack.up()
+            else:
+                self.stack.reset_point() # reset the pointer
 
         if text != None:
             self.chatbox.set_text(text)

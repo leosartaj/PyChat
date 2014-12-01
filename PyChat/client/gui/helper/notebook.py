@@ -42,6 +42,7 @@ def add_page(notebook, child, label=None, position=-1):
         pages = notebook.get_n_pages()
         position = pages - 1
     notebook.insert_page(child, label, position)
+    notebook.set_tab_reorderable(child, True) # let the tab be reorderable
     notebook.set_current_page(position) # focus on the new page
     return find_page(notebook, child)
     

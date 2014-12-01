@@ -1,20 +1,28 @@
 FOR 2.0 RELEASE
 
-Fine tune connect box
-setup shortcuts
-remove/add unncecessary/ncecessary tooltips
-Allow commandline arguments for automatic connection
-
-Auto complete commandline options
-version option
-
-Make client class for each established protocol, get it working for single client
-Then, Tabbed Chatting
+1.3.0
+#version option
+#Fine tune connect box
+#Allow commandline arguments for automatic connection
+#Make client class for each established protocol, get it working for single client
+#Then, Tabbed Chatting
+#Improve add tab button
+Do not activate add tab when clicked
 unique colors for new user, even if two have same name
 
-emoticons # maybe
-
+1.4.0
+setup shortcuts
+change name in gui
+remove/add unncecessary/ncecessary tooltips
 Docs
-rc file, for default configuration  #maybe
-FTP # separate module
+
+1.5.0
+FTP 
+
+1.6.0
 Secure connection
+
+Not Decided
+Auto complete commandline options
+rc file, for default configuration 
+emoticons
