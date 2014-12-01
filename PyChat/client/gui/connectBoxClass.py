@@ -57,19 +57,16 @@ class connectBoxClass:
         entry = self.entry
         buf = entry.get_buffer()
         host = buf.get_text()
-        if not host:
+        if not host or not hf.validate_host(host):
             entry.grab_focus()
             return
         spin = self.spinbutton
         buf_spin = spin.get_buffer()
-        try:
-            port = buf_spin.get_text()
-            if not port:
-                raise ValueError
-            port = int(port)
-        except ValueError:
+        port = buf_spin.get_text()
+        if not port:
             spin.grab_focus()
             return
+        port = int(port)
         self.parent.connect(host, port) # try to connect
         self.close() # close the window
 

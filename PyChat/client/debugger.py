@@ -26,6 +26,7 @@ from twisted.python import log
 
 # Other imports
 from gui.clientGUIClass import clientGUIClass # get the main gui class
+from gui.helper import helperFunc as hf
 from options import parse_args
 
 if __name__ == '__main__':
@@ -36,7 +37,8 @@ if __name__ == '__main__':
     gui = clientGUIClass(options.client) # start the gui
 
     if host != None and options.port != None: # allow deafult connecting
-        gui.connect(host, options.port)
+        if hf.validate_host(host):
+            gui.connect(host, options.port)
 
     reactor.run()
 

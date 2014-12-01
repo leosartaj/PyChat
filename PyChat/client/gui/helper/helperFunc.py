@@ -14,6 +14,24 @@ Contains Helper functions
 import os
 import gtk
 
+def validate_host(host):
+    """
+    Checks the hostname
+    four chunks separated by 3 dots
+    each a valid integer(0 - 255)
+    """
+    bits = host.split('.')
+    try:
+        if len(bits) != 4:
+            raise ValueError
+        for bit in bits:
+            num = int(bit)
+            if num > 255 or num < 0:
+                raise ValueError
+    except ValueError:
+        return False
+    return True
+
 def find_file(dire, fName):
     """
     Finds file in the given directory
