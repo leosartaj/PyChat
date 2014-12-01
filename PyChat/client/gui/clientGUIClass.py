@@ -43,6 +43,7 @@ class clientGUIClass:
         self.save_objects() # save objects
         self.builder.connect_signals(self.setup_signals()) # setup signals
 
+        markup.background(self.addview, '#002b36') # paint addview also
         self.chatbox.grab_focus() # focus here
         self.init_variables()
         self.setup_page()
@@ -75,6 +76,7 @@ class clientGUIClass:
         self.window = self.builder.get_object('MainWindow')
         self.notebook = self.builder.get_object('notebook')
         self.chatbox = self.builder.get_object('chatbox') 
+        self.addview = self.builder.get_object('addview')
 
     def init_variables(self):
         """
@@ -105,10 +107,14 @@ class clientGUIClass:
 
         return widgets
 
-    def switch_page(self, *args):
+    def switch_page(self, book, gpointer, page):
         """
         Focus chatbox when page changed
         """
+        pagenum = notebook.find_page(self.notebook, self.addview)
+        if page == pagenum: # if switching to addition tab switch back
+            current = self.notebook.get_current_page()
+            gtk.idle_add(self.notebook.set_current_page, current)
         gtk.idle_add(self.chatbox.grab_focus) # grab focus after page change
 
     def toggleUsersPanel(self, widget):

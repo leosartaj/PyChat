@@ -7,8 +7,7 @@ FOR 2.0 RELEASE
 #Make client class for each established protocol, get it working for single client
 #Then, Tabbed Chatting
 #Improve add tab button
-Do not activate add tab when clicked
-unique colors for new user, even if two have same name
+#Do not activate add tab when clicked
 
 1.4.0
 setup shortcuts
