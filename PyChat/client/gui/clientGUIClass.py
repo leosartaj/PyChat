@@ -46,7 +46,6 @@ class clientGUIClass:
         markup.background(self.addview, '#002b36') # paint addview also
         self.chatbox.grab_focus() # focus here
         self.init_variables()
-        self.setup_page()
         self.stack = stack() # for upper key and lower key functionality
         self.objects = {} # list of active connections
 
@@ -82,7 +81,6 @@ class clientGUIClass:
         """
         initializes various variables
         """
-        self.dummypage = True # dummy page
         self.showusers = False
         self.control = False # True if control pressed
         self.buttons = {} # dictionary of button and pages
@@ -138,11 +136,8 @@ class clientGUIClass:
         """
         # find the page and the object
         page = self.buttons[button]
-        if not self.dummypage:
-            clientobj = self.objects[page]
-            clientobj.loseConnection() # be free now
-        else:
-            self.dummypage = False # its gone now
+        clientobj = self.objects[page]
+        clientobj.loseConnection() # be free now
 
         # delete the page and the refrences
         self.notebook.remove_page(page)
@@ -227,10 +222,6 @@ class clientGUIClass:
         saves refrence to the object
         and invokes its connect method
         """
-        if self.dummypage:
-            self.notebook.remove_page(0) # delete the dummy page
-            self.buttons, self.objects = {}, {}
-            self.dummypage = False 
         widgets = self.setup_page() # setup a new page
         clientobj = clientClass(self.name, widgets)
         clientobj.connect(host, port)

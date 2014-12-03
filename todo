@@ -12,11 +12,12 @@ FOR 2.0 RELEASE
 #wire close tab button
 
 1.4.0
+#.travis file
+#No dummy page
 setup shortcuts
 study and use accel
 change name in gui
 remove/add unncecessary/ncecessary tooltips
-.travis file
 Docs
 
 1.5.0
