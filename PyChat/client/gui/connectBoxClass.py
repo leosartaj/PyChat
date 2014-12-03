@@ -37,6 +37,7 @@ class connectBoxClass:
         """
         sig = { 'on_mainwindow_destroy': self.close
               , 'on_entry_activate'    : self.connect
+              , 'on_spinbutton_activate': self.connect
               , 'on_connect_clicked'   : self.connect
               , 'on_cancel_clicked'    : self.close }
 

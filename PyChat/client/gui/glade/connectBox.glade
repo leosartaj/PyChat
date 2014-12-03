@@ -65,6 +65,7 @@
                         <property name="secondary_icon_sensitive">True</property>
                         <property name="adjustment">adjustment</property>
                         <property name="numeric">True</property>
+                        <signal name="activate" handler="on_spinbutton_activate" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">True</property>
