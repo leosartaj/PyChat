@@ -12,18 +12,23 @@ FOR 2.0 RELEASE
 #wire close tab button
 
 1.4.0
-#.travis file
+#.travis.yml file
 #No dummy page
-setup shortcuts
-study and use accel
+setup shortcuts, study and use accel
 change name in gui
 remove/add unncecessary/ncecessary tooltips
 Docs
 
 1.5.0
-FTP 
+tests
 
 1.6.0
+server, client application same
+
+1.7.0
+FTP 
+
+1.8.0
 Secure connection
 
 Not Decided
