@@ -40,7 +40,7 @@ setup(
     author = 'Sartaj Singh',
     author_email = 'singhsartaj94@gmail.com',
     description = ('Asynchronous Chat Client'),
-    long_description = readFile('README.md'),
+    long_description = readFile('README.rst'),
     license = 'MIT',
     keywords = 'chat client server',
     url = 'http://github.com/leosartaj/PyChat',
