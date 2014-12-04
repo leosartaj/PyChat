@@ -23,6 +23,7 @@ Secure connection
 
 Not Decided
 ===========
-Auto complete commandline options
-rc file, for default configuration 
-emoticons
+* Auto complete 
+* commandline options
+* rc file
+* emoticons
