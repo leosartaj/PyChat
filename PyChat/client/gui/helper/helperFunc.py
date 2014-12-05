@@ -52,6 +52,10 @@ def load_interface(dire, fName):
     return builder
 
 def load_chatarea_widgets(parent, builder):
+    """
+    saves objects from the builder
+    returns a list of objects
+    """
     hpane = builder.get_object('hpaned1')
     scroll = builder.get_object('scrolledwindow')
     scrollusers = builder.get_object('scrolledwindow1')
