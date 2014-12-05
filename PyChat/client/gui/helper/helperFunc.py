@@ -34,7 +34,7 @@ def validate_host(host):
 
 def find_file(dire, fName):
     """
-    Finds file in the given directory
+    Generates the complete path of a file
     returns the complete path
     """
     path = os.path.join(os.path.dirname(dire), fName)

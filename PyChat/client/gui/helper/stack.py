@@ -35,6 +35,7 @@ class stack:
         textList = self.textList
         textList.append(text)
         self.reset_point()
+        return textList # only for testing purposes
 
     def pop(self):
         """
