@@ -17,27 +17,30 @@ PyChat can be uninstalled using pip
 
 Dependencies
 ============
-PyChat is based on Python 2.7. PyChat uses Twisted Framework.
+PyChat is based on Python 2.7. PyChat uses Twisted and PyGTK.
 
 Documentation
 =============
 
-Starting a server
------------------
-Clients connect to a server. Server uses twisted's plugin system, twistd. To start a server run the following commands.
+Starting the application
+------------------------
+To start the application run the following command
 ::
 
-    # Runs the server
+    # Runs the application
+    pychat [options]
+
+* Run pychat -h/--help for various options.
+
+In order to connect to a client, a server should be created. Server can be created inside the application or by starting a daemon server.
+
+Starting a daemon server
+------------------------
+Clients connect to a server. Daemonized Server uses twisted's plugin system, twistd. To start a daemon server run the following commands.
+::
+
+    # Runs the daemon server
     twistd PyChat [options]
 
-Run twistd PyChat --help for various options
+* Run twistd PyChat --help for various options
 
-Starting a client
------------------
-Clients connect to a server. To connect to a server run the following commands.
-::
-
-    # Runs the client
-    pychat [interface] [options]
-
-Run pychat -h/--help for various options

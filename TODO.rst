@@ -12,6 +12,8 @@ Future Plans
 Not Decided when
 ================
 * Docs
+* Better systematic logging
+* Retrieve history
 * Change name from gui
 * Auto complete 
 * commandline options
