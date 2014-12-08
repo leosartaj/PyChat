@@ -10,6 +10,7 @@
 
 from twisted.python import log
 from twisted.internet.protocol import ClientFactory
+from error import __connfail__, __connlost__
 
 class ChatClientFactory(ClientFactory):
     """
@@ -26,11 +27,11 @@ class ChatClientFactory(ClientFactory):
 
     def clientConnectionFailed(self, connector, reason):
         log.err(reason.getErrorMessage())
-        self._notify('Could Not Connect to Server')
+        self._notify(__connfail__)
 
     def clientConnectionLost(self, connector, reason):
         log.err(reason.getErrorMessage())
-        self._notify('Connection to server has been lost')
+        self._notify(__connlost__)
 
     def _notify(self, msg):
         """

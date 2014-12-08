@@ -12,6 +12,8 @@ import gtk
 
 # other imports
 from helper import helperFunc as hf
+from server import start_server
+from error import __servfail__
 
 class connectBoxClass:
     """ 
@@ -50,6 +52,7 @@ class connectBoxClass:
         self.window = self.builder.get_object('mainwindow')
         self.entry = self.builder.get_object('entry')
         self.spinbutton = self.builder.get_object('spinbutton')
+        self.check = self.builder.get_object('checkbutton')
 
     def connect(self, button):
         """
@@ -68,7 +71,16 @@ class connectBoxClass:
             spin.grab_focus()
             return
         port = int(port)
-        self.parent.connect(host, port) # try to connect
+        
+        obj, result = self.parent.get_clientobj(), True
+        if self.check.get_active():
+            result = start_server.listen(host, port)
+
+        if result: # if everything goes well
+            self.parent.connect(host, port, obj) # try to connect
+        else: # incase server couldnt get started
+            obj.updateView('server', __servfail__)
+
         self.close() # close the window
 
     def close(self, *args):

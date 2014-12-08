@@ -241,22 +241,29 @@ class clientGUIClass:
         """
         connectBoxClass(self)
 
-    def connect(self, host, port):
+    def get_clientobj(self):
+        """
+        Generates a new clientobj
+        returns the obj
+        """
+        widgets = self.setup_page() # setup a new page
+        clientobj = clientClass(self.name, widgets)
+        self.objects[self.notebook.current_page()] = clientobj # save a reference finally
+        return clientobj
+
+    def connect(self, host, port, clientobj=None):
         """
         Loads the chatarea
         makes a new notebook page
         Makes a new client object
         saves refrence to the object
         and invokes its connect method
+        returns the clientobj
         """
-        widgets = self.setup_page() # setup a new page
-        clientobj = clientClass(self.name, widgets)
+        if clientobj == None:
+            clientobj = self.get_clientobj() # gen an object
         clientobj.connect(host, port)
-
-        self.objects[self.notebook.current_page()] = clientobj # save a reference finally
-
-        # restore state of users panel
-        self.toggleUsersPanel()
+        self.toggleUsersPanel() # restore state of users panel
 
     def find_clientobj(self):
         """
