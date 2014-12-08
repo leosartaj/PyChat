@@ -112,6 +112,7 @@ class clientGUIClass:
         """
         self.showusers = False
         self.control = False # True if control pressed
+        self.tabid = 0
         self.buttons = {} # dictionary of button and pages
 
     def setup_page(self):
@@ -121,9 +122,9 @@ class clientGUIClass:
         """
         builder = hf.load_interface(__file__, 'glade/chatarea.glade')
         widgets = hf.load_chatarea_widgets(self, builder) # get the widgets
-
-        pages = self.notebook.get_n_pages()
-        labeltext = 'Tab ' + str(pages)
+        
+        self.tabid += 1
+        labeltext = 'Tab ' + str(self.tabid)
         button, label = self.tab_label(labeltext) # generate a label
 
         page = notebook.add_page(self.notebook, widgets[1], label)
