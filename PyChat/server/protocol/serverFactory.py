@@ -42,6 +42,13 @@ class serverFactory(ServerFactory):
         """
         return self.users
 
+    def disconnect(self):
+        """
+        Disconnects from all the clients
+        """
+        for client in self.clients:
+            client.transport.loseConnection()
+
     def removeUsers(self, name, ip):
         """
         returns list of tuples of name and ip of connected clients

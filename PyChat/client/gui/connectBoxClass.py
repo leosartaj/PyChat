@@ -74,11 +74,14 @@ class connectBoxClass:
             return
         port = int(port)
         
-        obj, result = self.parent.get_clientobj(), True
+        obj = self.parent.get_clientobj()
+        result, factory = True, None
         if self.check.get_active():
-            result = start_server.listen(host, port)
+            result, lisport, factory = start_server.listen(host, port)
 
         if result: # if everything goes well
+            if factory: # also starts a server
+                obj.set_factory(lisport, factory)
             self.parent.connect(host, port, obj) # try to connect
         else: # incase server couldnt get started
             obj.updateView('server', __servfail__)

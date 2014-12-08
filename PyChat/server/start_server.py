@@ -30,7 +30,7 @@ def listen(host, port):
     factory = serverFactory() # initialize factory
     factory.protocol = serverProtocol 
     try:
-        reactor.listenTCP(port, factory, interface=host)
+        listener = reactor.listenTCP(port, factory, interface=host)
     except CannotListenError:
-        return False # could not start
-    return True
+        return False, None, None # could not start
+    return True, listener, factory

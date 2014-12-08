@@ -27,6 +27,7 @@ class clientClass:
     def __init__(self, client, widgets):
         self.client = client # name of the client 
         self.protocol = None # protocol instance
+        self.server = [False, None, None] # if it creates a server
         self.host = None
         self.port = None
 
@@ -44,6 +45,15 @@ class clientClass:
         self.textview = widgets[4]
         self.scrollusers = widgets[5]
         self.userview = widgets[6]
+
+    def set_factory(self, lisport, factory):
+        """
+        saves the factory
+        saves the lisport
+        and makes it
+        the server creating class
+        """
+        self.server = [True, lisport, factory]
 
     def get_host(self):
         """
@@ -81,6 +91,7 @@ class clientClass:
         Handles when connection is lost
         or failed
         """
+        self.stop_server_factory()
         self.updateView('server', msg)
         self.updateConnUsers('me') # update the connected users panel
 
@@ -91,6 +102,18 @@ class clientClass:
         if self.protocol:
             self.protocol.transport.loseConnection()
             self.protocol = None
+        self.stop_server_factory()
+
+    def stop_server_factory(self):
+        """
+        If server class
+        then stops the server factory
+        else does nothing at all
+        """
+        if self.server[0]:
+            self.server[1].stopListening()
+            self.server[2].disconnect() # close all connections
+            self.server = [False, None, None]
 
     def updateView(self, name, text):
         """

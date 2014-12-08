@@ -72,4 +72,3 @@ try:
 except Exception, e:
     log.warn("*** Failed to update Twisted plugin cache. ***")
     log.warn(str(e))
-print str(find_packages()) + 'yes'
