@@ -42,6 +42,7 @@ class clientGUIClass:
         self.builder = hf.load_interface(__file__, 'glade/clientGUI.glade') # load the interface
         self.save_objects() # save objects
         self.builder.connect_signals(self.setup_signals()) # setup signals
+        self.setup_shortcuts()
 
         markup.background(self.addview, '#002b36') # paint addview also
         self.chatbox.grab_focus() # focus here
@@ -67,7 +68,6 @@ class clientGUIClass:
 
         return sig
 
-
     def save_objects(self):
         """
         Get the required objects
@@ -76,6 +76,33 @@ class clientGUIClass:
         self.notebook = self.builder.get_object('notebook')
         self.chatbox = self.builder.get_object('chatbox') 
         self.addview = self.builder.get_object('addview')
+
+        # buttons
+        self.addbut = self.builder.get_object('addtab')
+
+        # Menu Items
+        self.connusers = self.builder.get_object('connectedusers')
+
+    def setup_shortcuts(self):
+        """
+        Sets up all the desired shortcuts
+        """
+        # Generate and add an accel group
+        self.my_accelerators = gtk.AccelGroup()
+        self.window.add_accel_group(self.my_accelerators)
+
+        self.add_accelerator(self.addbut, "<Control>t") # new tab when Ctrl-t pressed
+
+        # Menu shortcuts
+        self.add_accelerator(self.connusers, "<Control>u") # toggle users pannel
+
+    def add_accelerator(self, widget, accelerator, signal="activate"):
+        """
+        Adds a keyboard shortcut
+        to a widget
+        """
+        key, mod = gtk.accelerator_parse(accelerator)
+        widget.add_accelerator(signal, self.my_accelerators, key, mod, gtk.ACCEL_VISIBLE)
 
     def init_variables(self):
         """
@@ -267,8 +294,6 @@ class clientGUIClass:
             self.notebook.prev_page()
         elif keyname == 'Right' and self.control:
             self.notebook.next_page()
-        elif keyname == 't':
-            self.set_connect_box()
         else:
             self.control = False
             if keyname == 'Up':
@@ -281,6 +306,7 @@ class clientGUIClass:
         if text != None:
             self.chatbox.set_text(text)
             self.chatbox.set_position(len(text)) # set the cursor position
+
 
     def close(self, *args):
         """
