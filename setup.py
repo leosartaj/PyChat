@@ -1,5 +1,5 @@
 from distutils import log
-from setuptools import setup
+from setuptools import setup, find_packages
 from PyChat import __version__
 
 try:
@@ -26,27 +26,19 @@ else:
 
     egg_info.write_toplevel_names = _hacked_write_toplevel_names
 
-def readFile(fName):
-    """
-    Reads a given file
-    """
-    with open(fName) as f:
-        lines = f.read()
-    return lines
-
 setup(
     name = 'PyChat',
     version = __version__,
     author = 'Sartaj Singh',
     author_email = 'singhsartaj94@gmail.com',
     description = ('Asynchronous Chat Client'),
-    long_description = readFile('README.rst'),
+    long_description = open('README.rst').read() + '\n\n' + open('CHANGELOG.rst').read(),
     license = 'MIT',
     keywords = 'chat client server',
     url = 'http://github.com/leosartaj/PyChat',
-    packages= ['PyChat', 'PyChat/info', 'PyChat/client', 'PyChat/client/protocol', 'PyChat/client/gui', 'PyChat/client/gui/helper', 'twisted.plugins', 'PyChat/server', 'PyChat/server/protocol'],
+    packages=find_packages(),
+    package_data = {'PyChat.client.gui.glade': ['*.glade']},
     scripts=['bin/pychat'],
-    package_data = {'PyChat/client/gui': ['glade/*.glade']},
     install_requires = ['Twisted'],
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -70,3 +62,4 @@ try:
 except Exception, e:
     log.warn("*** Failed to update Twisted plugin cache. ***")
     log.warn(str(e))
+print str(find_packages()) + 'yes'

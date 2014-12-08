@@ -25,21 +25,21 @@ from PyChat.client.gui.helper import helperFunc as hf
 from PyChat.client.options import parse_args
 
 if __name__ == '__main__':
-    options, host = parse_args() # parse the arguments
+    args = parse_args() # parse the arguments
 
     try:
         # Start Logging
         # Logs in pwd as pychat.log by default
-        log.startLogging(open(options.log , 'a'))
+        log.startLogging(open(args.log , 'a'))
     except Exception, e:
         print 'Cannot Start PyChat'
         print e
         sys.exit(1) # end program if invalid log file
 
-    gui = clientGUIClass(options.client) # start the gui
+    gui = clientGUIClass(args.client) # start the gui
 
-    if host != None and options.port != None: # allow deafult connecting
-        if hf.validate_host(host):
-            gui.connect(host, options.port)
+    if args.iface != None: # allow deafult connecting
+        if hf.validate_host(args.iface):
+            gui.connect(args.iface, args.port)
 
     reactor.run()

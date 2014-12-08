@@ -2,7 +2,7 @@ import unittest
 import os
 from PyChat.client.gui.helper.stack import stack
 
-class TestValidateHost(unittest.TestCase):
+class TestStack(unittest.TestCase):
     """
     tests the stack class in stack module
     """

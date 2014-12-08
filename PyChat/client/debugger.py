@@ -30,15 +30,15 @@ from gui.helper import helperFunc as hf
 from options import parse_args
 
 if __name__ == '__main__':
-    options, host = parse_args() # parse the arguments
+    args = parse_args() # parse the arguments
 
     log.startLogging(sys.stdout)
 
-    gui = clientGUIClass(options.client) # start the gui
+    gui = clientGUIClass(args.client) # start the gui
 
-    if host != None and options.port != None: # allow deafult connecting
-        if hf.validate_host(host):
-            gui.connect(host, options.port)
+    if args.iface != None: # allow deafult connecting
+        if hf.validate_host(args.iface):
+            gui.connect(args.iface, args.port)
 
     reactor.run()
 

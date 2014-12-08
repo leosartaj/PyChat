@@ -14,4 +14,4 @@ Define description variable
 
 from version import __version__
 
-__desc__ = 'PyChat(Asynchronous Chat Client) ' + __version__
+__desc__ = 'PyChat ' + __version__

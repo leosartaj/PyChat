@@ -3,23 +3,23 @@ Future Plans
 
 1.4.0
 =====
-tests
-Docs
+* tests
+* port from optparse to argparse
+* Shortcuts
+* Change name from gui
+* Server can be started from gui
 
 1.5.0
 =====
-Server can be started from gui
+* FTP 
 
 1.6.0
 =====
-FTP 
+* Secure connection
 
-1.7.0
-=====
-Secure connection
-
-Not Decided
-===========
+Not Decided when
+================
+* Docs
 * Auto complete 
 * commandline options
 * rc file

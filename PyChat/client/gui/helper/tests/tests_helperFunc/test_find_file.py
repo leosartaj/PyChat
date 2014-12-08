@@ -2,7 +2,7 @@ import unittest
 import os
 from PyChat.client.gui.helper.helperFunc import find_file
 
-class TestValidateHost(unittest.TestCase):
+class TestfindFile(unittest.TestCase):
     """
     tests the find_file function in helperFunc module
     """

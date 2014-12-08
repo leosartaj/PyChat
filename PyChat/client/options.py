@@ -12,7 +12,7 @@
 Contains helper functions for parsing arguments
 """
 
-import optparse # parsing the options
+import argparse # parsing the options
 from getpass import getuser
 
 try:
@@ -24,30 +24,23 @@ def parse_args():
     """
     Parses the arguments
     """
-    usage = """usage: %prog [host] [options]
+    parser = argparse.ArgumentParser(description='Asynchronous Chat Client based on Twisted and gtk')
 
-    Run 
-    pychat -h/--help
-    For help
-"""
-    parser = optparse.OptionParser(usage, version=__desc__)
+    help = "Current version of PyChat"
+    parser.add_argument('--version', '-v',  action='version', help=help, version=__desc__)
+
+    help = "The Interface to bind on."
+    parser.add_argument('--iface', help=help, default=None)
 
     help = "The port to listen/connect on."
-    parser.add_option('--port', '-p', type='int', help=help, default=None)
+    parser.add_argument('--port', '-p', type=int, help=help, default=8001)
 
     help = "The name of client. Defaults to username."
-    parser.add_option('--client', '-c', type='str', help=help, default=getuser())
+    parser.add_argument('--client', '-c', type=str, help=help, default=getuser())
 
     help = "The name of log file. Defaults to pychat.log in cwd."
-    parser.add_option('--log', '-l', help=help, default='pychat.log')
+    parser.add_argument('--log', '-l', help=help, default='pychat.log')
 
-    options, args = parser.parse_args()
+    args = parser.parse_args()
 
-    if len(args) == 1:
-        HOST = args[0]
-    elif len(args) == 0:
-        HOST = None
-    else:
-        parser.error('Invalid number of arguments, got ' + str(len(args)) + ' args expecting 0/1')
-
-    return options, HOST
+    return args
