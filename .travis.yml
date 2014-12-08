@@ -29,4 +29,4 @@ install:
 
 # testing program
 script:
-  py.test
+  py.test PyChat
