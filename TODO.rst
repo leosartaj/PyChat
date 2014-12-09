@@ -15,7 +15,6 @@ Not Decided when
 * Better systematic logging
 * Retrieve history
 * Change name from gui
-* Auto complete 
-* commandline options
+* Auto complete commandline options
 * rc file
 * emoticons

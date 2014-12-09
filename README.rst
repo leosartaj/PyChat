@@ -44,3 +44,8 @@ Clients connect to a server. Daemonized Server uses twisted's plugin system, twi
 
 * Run twistd PyChat --help for various options
 
+Bugs
+====
+.. |issues| replace:: https://github.com/leosartaj/PyChat/issues
+
+For filing bugs raise an issue at |issues|

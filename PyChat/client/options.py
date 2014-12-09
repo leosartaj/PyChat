@@ -38,6 +38,9 @@ def parse_args():
     help = "The name of client. Defaults to username."
     parser.add_argument('--client', '-c', type=str, help=help, default=getuser())
 
+    help = "to also start a server. Works only when iface options is set. Defaults to false."
+    parser.add_argument('--server', '-s',  action='store_true', help=help, dest='server')
+
     help = "The name of log file. Defaults to pychat.log in cwd."
     parser.add_argument('--log', '-l', help=help, default='pychat.log')
 

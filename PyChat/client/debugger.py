@@ -25,9 +25,14 @@ from twisted.internet import reactor
 from twisted.python import log
 
 # Other imports
+from error import __servfail__
 from gui.clientGUIClass import clientGUIClass # get the main gui class
 from gui.helper import helperFunc as hf
 from options import parse_args
+
+# access to server package
+sys.path.append(os.path.dirname(os.path.realpath(__file__)) + '/..')
+from server import start_server
 
 if __name__ == '__main__':
     args = parse_args() # parse the arguments
@@ -36,9 +41,17 @@ if __name__ == '__main__':
 
     gui = clientGUIClass(args.client) # start the gui
 
-    if args.iface != None: # allow deafult connecting
-        if hf.validate_host(args.iface):
-            gui.connect(args.iface, args.port)
+    host, port = args.iface, args.port
+    if host != None and hf.validate_host(host): # allow deafult connecting
+        obj = gui.get_clientobj() # generate object
+        result, factory = True, None
+        if args.server:
+            result, lisport, factory = start_server.listen(host, port)
+        if result: # if everything goes well
+            if factory: 
+                obj.set_factory(lisport, factory)
+            gui.connect(host, port, obj) # try to connect
+        else: # incase server couldnt get started
+            obj.updateView('server', __servfail__)
 
     reactor.run()
-
