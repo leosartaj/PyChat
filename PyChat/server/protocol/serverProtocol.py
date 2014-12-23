@@ -19,6 +19,7 @@ class serverProtocol(basic.LineReceiver):
 
     def connectionMade(self):
         self.peer = self.transport.getPeer()
+        self.peername = 'unregistered'
         self.factory.updateClients(self)
         self.connectedUsers()
         log.msg('Connected to %s' %(self.peer))
@@ -27,14 +28,32 @@ class serverProtocol(basic.LineReceiver):
         """
         Handle recived lines
         """
-        if line[0:3] == 'c$~':
-            self.peername = line[3:]
+        if not self._parse(line):
+            log.msg('Received %s from %s' %(line, self.peername))
+            self.relay(line, self.peername)
+
+    def _parse(self, line):
+        """
+        Parse line for commands
+        returns True if line contains a command
+        and calls the command
+        otherwise simply returns False
+        """
+        if line[0:3] != 'c$~':
+            return False
+        line = line[3:]
+        index = line.index('~')
+        cmd, value = line[:index], line[index + 1:]
+        if cmd == 'reg':
+            self.peername = value
             log.msg('PeerName of %s is %s' %(self.peer, self.peername))
             self.factory.updateUsers(self.peername, self.peer) # register name and ip with factory
             self.relay(str(self.peer), self.peername, 's$~add ')
+        elif cmd == 'file':
+            self.relay(value, self.peername)
         else:
-            log.msg('Received %s from %s' %(line, self.peername))
-            self.relay(line, self.peername)
+            return False
+        return True
 
     def relay(self, line, name='', prefix=''):
         """

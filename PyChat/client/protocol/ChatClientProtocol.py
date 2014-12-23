@@ -31,7 +31,7 @@ class ChatClientProtocol(basic.LineReceiver):
         log.msg('Connected to server at %s' % (self.peer)) # logs the connection
         self.update('server Connected')
 
-        setName = 'c$~' + self.factory.name
+        setName = 'c$~reg~' + self.factory.name
         self.sendLine(setName) # register with server
 
     def send(self, text):
@@ -40,6 +40,13 @@ class ChatClientProtocol(basic.LineReceiver):
         """
         log.msg('me %s' % (text))
         self.sendLine(text)
+
+    def sendFile(self, fName):
+        log.msg('me sending %s' % (fName))
+        with open(fName) as f:
+            for line in f:
+                fileLine = 'c$~file~fName:' + line.strip('\n')
+                self.sendLine(fileLine)
 
     def lineReceived(self, line):
         if line[0:3] == 's$~':

@@ -285,7 +285,10 @@ class clientGUIClass:
             if len(self.objects) != 0:
                 self.chatbox.set_text('') # clear the textbox
                 obj = self.find_clientobj() # current client object
-                obj.send(text)
+                if text[:5] == 'file:':
+                    obj.sendFile(text[5:])
+                else:
+                    obj.send(text)
         self.chatbox.grab_focus() # focus the textbox
 
     def handleKeys(self, widget, key):

@@ -15,6 +15,7 @@ Contains the class for defining a client
 
 from helper import textview # helper modules
 from helper import markup # helper modules
+import error
 try:
     from connect import setup_factory
 except ImportError:
@@ -75,6 +76,18 @@ class clientClass:
         self.updateView('me', text)
         if self.protocol:
             self.protocol.send(text) # logs and sends the message
+
+    def sendFile(self, fName):
+        """
+        Sends file over the network and updates
+        the gui
+        """
+        if self.protocol:
+            text = 'sending ' + fName
+            self.updateView('me', text)
+            self.protocol.sendFile(fName) # logs and sends the message
+        else:
+            self.updateView('me', error.__filefail__)
 
     def connect(self, host, port):
         """
