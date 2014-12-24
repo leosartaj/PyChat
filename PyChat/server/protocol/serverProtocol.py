@@ -48,9 +48,11 @@ class serverProtocol(basic.LineReceiver):
             self.peername = value
             log.msg('PeerName of %s is %s' %(self.peer, self.peername))
             self.factory.updateUsers(self.peername, self.peer) # register name and ip with factory
-            self.relay(str(self.peer), self.peername, 's$~add ')
+            self.relay(str(self.peer), self.peername, 's$~add~')
         elif cmd == 'file':
-            self.relay(value, self.peername)
+            self.relay(value, self.peername, 's$~file~')
+        elif cmd == 'eof':
+            self.relay(value, self.peername, 's$~eof~')
         else:
             return False
         return True
@@ -69,7 +71,7 @@ class serverProtocol(basic.LineReceiver):
         Tells the client about already connected users
         """
         for name, ip in self.factory.getUsers():
-            line = 's$~add ' + name + ' ' + str(ip)
+            line = 's$~add~' + name + ' ' + str(ip)
             self.sendLine(line)
 
     def connectionLost(self, reason):
@@ -78,7 +80,7 @@ class serverProtocol(basic.LineReceiver):
         """
         self.factory.removeClients(self)
         self.factory.removeUsers(self.peername, self.peer)
-        self.relay(str(self.peer), self.peername, 's$~rem ')
+        self.relay(str(self.peer), self.peername, 's$~rem~')
         self._logConnectionLost(reason)
 
     def _logConnectionLost(self, reason):

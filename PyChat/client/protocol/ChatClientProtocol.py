@@ -10,6 +10,7 @@
 
 # system import
 import sys
+import os
 
 # twisted imports
 from twisted.python import log
@@ -27,6 +28,7 @@ class ChatClientProtocol(basic.LineReceiver):
 
         self.peer = self.transport.getPeer()
         self.users = [] # list of connnected users
+        self.rfiles = {} # list of files being recieved
 
         log.msg('Connected to server at %s' % (self.peer)) # logs the connection
         self.update('server Connected')
@@ -44,34 +46,101 @@ class ChatClientProtocol(basic.LineReceiver):
     def sendFile(self, fName):
         log.msg('me sending %s' % (fName))
         with open(fName) as f:
+            filename = os.path.basename(fName)
             for line in f:
-                fileLine = 'c$~file~fName:' + line.strip('\n')
-                self.sendLine(fileLine)
+                fileLine = 'c$~file~' + filename + ':' + line.rstrip('\n')
+                self.sendLine(fileLine) # send file line step by step
+            lastline = 'c$~eof~' + filename # file sending complete
+            self.sendLine(lastline)
 
     def lineReceived(self, line):
-        if line[0:3] == 's$~':
-            line = self.handleUser(line[3:])
-        log.msg('%s' % (line))
-        self.update(line)
+        line = self._parse(line)
+        if line != None:
+            log.msg('%s' % (line))
+            self.update(line)
 
-    def handleUser(self, line):
+    def _parse(self, line):
+        """
+        Parse line for commands
+        returns string to be logged 
+        otherwise simply returns line without change
+        """
+        if line[0:3] != 's$~':
+            return line
+        newline = line[3:]
+        index = newline.index('~')
+        cmd, value = newline[:index], newline[index + 1:]
+        if cmd == 'add' or cmd == 'rem':
+            value = self._handleUser(value, cmd)
+        elif cmd == 'file':
+            value = self._saveFile(value)
+        elif cmd == 'eof':
+            value = self._closeFile(value)
+        else:
+            return line
+        return value
+
+    def _saveFile(self, value):
+        """
+        Parses the line
+        saves the line in the file
+        returns the result string
+        """
+        index = value.index(' ')
+        peername, nameline = value[:index], value[index + 1:]
+        index = nameline.index(':')
+        fName, fline = nameline[:index], nameline[index + 1:]
+        if not self.rfiles.has_key(fName):
+            handler = self._initFile(fName)
+            self.rfiles[fName] = handler
+            value = peername + ' Recieving: ' + fName
+        else:
+            handler = self.rfiles[fName]
+            value = None
+        handler.write(fline + '\n')
+        return value
+
+    def _closeFile(self, value):
+        """
+        safely closes the file
+        cleans up rfiles dict
+        returns the result
+        """
+        index = value.index(' ')
+        peername, fName = value[:index], value[index + 1:]
+        handler = self.rfiles[fName]
+        handler.close()
+        del self.rfiles[fName]
+        value = peername + ' Recieved: ' + fName
+        return value
+
+    def _initFile(self, fName='unnamed', dire=os.getcwd(), prefix='pychat_'):
+        """
+        opens a file
+        returns the handler
+        """
+        path = os.path.join(dire, prefix + fName)
+        handler = open(path, 'w')
+        return handler
+
+    def _handleUser(self, line, cmd=None):
         """
         Stores useful information about new connected user
         adds a tuple of name and ip address of user
         updates the client object
         """
         lineArr = line.split(' ')
-        line = lineArr[1] + ' has '
-        ip = ' '.join(lineArr[2:])
+        line = lineArr[0] + ' has '
+        ip = ' '.join(lineArr[1:])
 
-        if lineArr[0] == 'add':
-            self.users.append((lineArr[1], ip))
+        if cmd == 'add':
+            self.users.append((lineArr[0], ip))
             line += 'joined'
-        elif lineArr[0] == 'rem':
-            del self.users[self.users.index((lineArr[1], ip))]
+        elif cmd == 'rem':
+            del self.users[self.users.index((lineArr[0], ip))]
             line += 'disconnected'
 
-        self.clientobj.updateConnUsers(lineArr[1])
+        self.clientobj.updateConnUsers(lineArr[0])
 
         return line
 
