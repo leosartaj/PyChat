@@ -14,7 +14,10 @@ import os
 
 # twisted imports
 from twisted.python import log
-from twisted.protocols import basic 
+from twisted.protocols import basic
+
+# user imports
+from FileClientProtocol import FileClientProtocol
 
 class ChatClientProtocol(basic.LineReceiver):
     """
@@ -44,16 +47,44 @@ class ChatClientProtocol(basic.LineReceiver):
         self.sendLine(text)
 
     def sendFile(self, fName):
+        """
+        Sends file to the server
+        """
         log.msg('me sending %s' % (fName))
-        with open(fName) as f:
-            filename = os.path.basename(fName)
-            for line in f:
-                fileLine = 'c$~file~' + filename + ':' + line.rstrip('\n')
-                self.sendLine(fileLine) # send file line step by step
-            lastline = 'c$~eof~' + filename # file sending complete
-            self.sendLine(lastline)
+        handler = open(fName)
+        self.filename = fName
+        fileprotocol = FileClientProtocol()
+        sendfile = fileprotocol.beginFileTransfer(handler, self.transport, self.transform)
+        sendfile.addBoth(self._endTransfer, self._sendingFailed)
+
+    def transform(self, line):
+        """
+        Transforms a line to be saved in a file
+        """
+        lineArr = line.split('\n')
+        for index, item in enumerate(lineArr):
+            if not item.startswith('c$~eof~'):
+                item = 'c$~file~' + self.filename + ':' + item
+                lineArr[index] = item
+        fileLine = '\n'.join(lineArr)
+        return fileLine
+
+    def _endTransfer(self, *args):
+        """
+        End file transfer
+        """
+        lastline = 'c$~eof~' + self.filename # file sending complete
+        self.sendLine(lastline)
+
+    def _sendingFailed(self, exc):
+        log.msg(exc)
+        msg = 'me File Sending failed'
+        self.update(msg)
 
     def lineReceived(self, line):
+        """
+        Handles recieved line
+        """
         line = self._parse(line)
         if line != None:
             log.msg('%s' % (line))
@@ -106,6 +137,7 @@ class ChatClientProtocol(basic.LineReceiver):
         cleans up rfiles dict
         returns the result
         """
+        print 'called'
         index = value.index(' ')
         peername, fName = value[:index], value[index + 1:]
         handler = self.rfiles[fName]
