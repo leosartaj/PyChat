@@ -8,70 +8,136 @@
 # Licensed under the MIT license.
 ##
 
+# system import
+import os
+
+# twisted imports
+from twisted.python import log
 from twisted.protocols import basic
-from twisted.internet import defer, interfaces
-from zope.interface import implements, implementer
-import time
 
-def filterArgs(func):
+# user import
+from FileSender import FileSender
+
+class FileClientProtocol(basic.LineReceiver):
     """
-    Decorator to call only call function with the first argument passed
+    Implements file transfer protocol
     """
-    def _wrapper(*args, **kwargs):
-        func(args[0])
-    return _wrapper
+    from os import linesep as delimiter # set delimiter
 
-class FileClientProtocol(object):
-    implements(interfaces.IPushProducer)
+    def connectionMade(self, chatproto):
+        self.chatproto = self.factory.chatproto
+        self.receiving = False
+        self.sending = False
+        self.file = [None, None]
 
-    CHUNK_SIZE = 2 ** 14
+    def lineReceived(self, line):
+        """
+        Handles recieved file lines
+        """
+        line = self._parse(line)
+        if line:
+            log.msg('%s' % (line))
+            self.chatproto.update(line)
 
-    lastSent = ''
-    deferred = None
+    def _parse(self, line):
+        """
+        Parse line for commands
+        returns string to be logged 
+        otherwise simply returns line without change
+        """
+        if line[0:3] != 's$~':
+            return line
+        newline = line[3:]
+        index = newline.index('~')
+        cmd, value = newline[:index], newline[index + 1:]
+        if cmd == 'file':
+            value = self._saveFile(value)
+        elif cmd == 'eof':
+            value = self._closeFile(value)
+        else:
+            return line
+        return value
 
-    def beginFileTransfer(self, file, consumer, transform=None):
-        self.file = file
-        self.consumer = consumer
-        self.transform = transform
+    def sendFile(self, fName):
+        """
+        Sends file to the server
+        """
+        log.msg('me sending %s' % (fName))
+        handler = open(fName)
+        self.sending = True
+        fileprotocol = FileSender()
+        sendfile, startsend = fileprotocol.beginFileTransfer(handler, self.transport, self.transform)
+        sendfile.addCallback(self._endTransfer)
+        sendfile.addErrback(self._sendingFailed)
+        startsend.callback(1)
 
-        self._paused = False
-        self.deferred = defer.Deferred()
-        self.consumer.registerProducer(self, streaming=True)
-        self.resume = defer.Deferred()
-        self.resume.addCallback(self.resumeProducing)
-        self.resume.callback(1)
-        return self.deferred
+    def transform(self, line):
+        """
+        Transforms a line to be saved in a file
+        """
+        lineArr = line.split('\n')
+        for index, item in enumerate(lineArr):
+            item = 'c$~file~' + self.file[0] + ':' + item
+            lineArr[index] = item
+        fileLine = '\n'.join(lineArr)
+        return fileLine
 
-    @filterArgs
-    def resumeProducing(self):
-        self._paused = False
-        chunk = ''
-        if self.file:
-            chunk = self.file.read(self.CHUNK_SIZE)
-        if not chunk:
-            #print 'done'
-            self._complete()
+    def _endTransfer(self, *args):
+        """
+        End file transfer
+        """
+        lastline = 'c$~eof~' + self.file[0] # file sending complete
+        self.sendLine(lastline)
+
+    def _sendingFailed(self, exc):
+        log.msg(exc)
+        msg = 'me File Sending failed'
+        self.chatproto.update(msg)
+
+    def _initFile(self, fName='unnamed', dire=os.getcwd(), prefix='pychat_'):
+        """
+        opens a file
+        returns the handler
+        """
+        path = os.path.join(dire, prefix + fName)
+        handler = open(path, 'w')
+        return handler
+
+    def _saveFile(self, value):
+        """
+        Parses the line
+        saves the line in the file
+        returns the result string
+        """
+        index = value.index(' ')
+        peername, nameline = value[:index], value[index + 1:]
+        index = nameline.index(':')
+        fName, fline = nameline[:index], nameline[index + 1:]
+        if not self.receiving:
+            handler = self._initFile(fName)
+            self.file = [fName, handler]
+            value = peername + ' Recieving: ' + fName
+            self.receiving = True
+        elif fName == self.file[0]:
+            handler = self.file[1]
+            value = None
+        else:
+            print 'no'
             return
-        if self.transform:
-            chunk = self.transform(chunk)
-        self.consumer.write(chunk)
-        self.lastSent = chunk[-1:]
-        if not self._paused:
-            self.resume.addCallback(self.resumeProducing)
-        #print 'sent'
+        handler.write(fline + '\n')
+        return value
 
-    def _complete(self):
-        self.file = None
-        self.consumer.unregisterProducer()
-        if self.deferred:
-            self.deferred.callback(self.lastSent)
-            self.deferred = None
-
-    def pauseProducing(self):
-        #print 'paused'
-        self._paused = True
-
-    def stopProducing(self):
-        if self.deferred:
-            self.deferred.errback(Exception("File transfer stopped"))
-            self.deferred = None
+    def _closeFile(self, value):
+        """
+        safely closes the file
+        cleans up rfiles dict
+        returns the result
+        """
+        index = value.index(' ')
+        peername, fName = value[:index], value[index + 1:]
+        handler = self.file[1]
+        handler.close()
+        self.file = [None, None]
+        self.receiving = False
+        value = peername + ' Recieved: ' + fName
+        return value

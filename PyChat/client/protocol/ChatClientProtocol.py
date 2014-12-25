@@ -9,14 +9,15 @@
 ##
 
 # system import
-import sys
 import os
 
 # twisted imports
+from twisted.internet import reactor
 from twisted.python import log
 from twisted.protocols import basic
 
 # user imports
+from FileClientFactory import FileClientFactory
 from FileClientProtocol import FileClientProtocol
 
 class ChatClientProtocol(basic.LineReceiver):
@@ -31,7 +32,6 @@ class ChatClientProtocol(basic.LineReceiver):
 
         self.peer = self.transport.getPeer()
         self.users = [] # list of connnected users
-        self.rfiles = {} # list of files being recieved
 
         log.msg('Connected to server at %s' % (self.peer)) # logs the connection
         self.update('server Connected')
@@ -39,47 +39,20 @@ class ChatClientProtocol(basic.LineReceiver):
         setName = 'c$~reg~' + self.factory.name
         self.sendLine(setName) # register with server
 
+    def startFtp(self):
+        """
+        Open up file transfer connection with server
+        """
+        factory = FileClientFactory(self) # setting up the factory
+        factory.protocol = FileClientProtocol
+        reactor.connectTCP(host, 6969, factory)
+
     def send(self, text):
         """
         Logs and sends the messages
         """
         log.msg('me %s' % (text))
         self.sendLine(text)
-
-    def sendFile(self, fName):
-        """
-        Sends file to the server
-        """
-        log.msg('me sending %s' % (fName))
-        handler = open(fName)
-        self.filename = fName
-        fileprotocol = FileClientProtocol()
-        sendfile = fileprotocol.beginFileTransfer(handler, self.transport, self.transform)
-        sendfile.addBoth(self._endTransfer, self._sendingFailed)
-
-    def transform(self, line):
-        """
-        Transforms a line to be saved in a file
-        """
-        lineArr = line.split('\n')
-        for index, item in enumerate(lineArr):
-            if not item.startswith('c$~eof~'):
-                item = 'c$~file~' + self.filename + ':' + item
-                lineArr[index] = item
-        fileLine = '\n'.join(lineArr)
-        return fileLine
-
-    def _endTransfer(self, *args):
-        """
-        End file transfer
-        """
-        lastline = 'c$~eof~' + self.filename # file sending complete
-        self.sendLine(lastline)
-
-    def _sendingFailed(self, exc):
-        log.msg(exc)
-        msg = 'me File Sending failed'
-        self.update(msg)
 
     def lineReceived(self, line):
         """
@@ -103,57 +76,9 @@ class ChatClientProtocol(basic.LineReceiver):
         cmd, value = newline[:index], newline[index + 1:]
         if cmd == 'add' or cmd == 'rem':
             value = self._handleUser(value, cmd)
-        elif cmd == 'file':
-            value = self._saveFile(value)
-        elif cmd == 'eof':
-            value = self._closeFile(value)
         else:
             return line
         return value
-
-    def _saveFile(self, value):
-        """
-        Parses the line
-        saves the line in the file
-        returns the result string
-        """
-        index = value.index(' ')
-        peername, nameline = value[:index], value[index + 1:]
-        index = nameline.index(':')
-        fName, fline = nameline[:index], nameline[index + 1:]
-        if not self.rfiles.has_key(fName):
-            handler = self._initFile(fName)
-            self.rfiles[fName] = handler
-            value = peername + ' Recieving: ' + fName
-        else:
-            handler = self.rfiles[fName]
-            value = None
-        handler.write(fline + '\n')
-        return value
-
-    def _closeFile(self, value):
-        """
-        safely closes the file
-        cleans up rfiles dict
-        returns the result
-        """
-        print 'called'
-        index = value.index(' ')
-        peername, fName = value[:index], value[index + 1:]
-        handler = self.rfiles[fName]
-        handler.close()
-        del self.rfiles[fName]
-        value = peername + ' Recieved: ' + fName
-        return value
-
-    def _initFile(self, fName='unnamed', dire=os.getcwd(), prefix='pychat_'):
-        """
-        opens a file
-        returns the handler
-        """
-        path = os.path.join(dire, prefix + fName)
-        handler = open(path, 'w')
-        return handler
 
     def _handleUser(self, line, cmd=None):
         """
