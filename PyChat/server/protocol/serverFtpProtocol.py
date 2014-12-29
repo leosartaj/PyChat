@@ -18,8 +18,8 @@ class serverFtpProtocol(basic.LineReceiver):
     from os import linesep as delimiter # os supported delimiter
 
     def connectionMade(self):
-        self.factory.updateClients(self)
         self.peer = self.transport.getPeer()
+        self.factory.updateClients(self)
 
     def lineReceived(self, line):
         """
@@ -41,10 +41,9 @@ class serverFtpProtocol(basic.LineReceiver):
         cmd, value = line[:index], line[index + 1:]
         if cmd == 'reg':
             self.peername = value
-        elif cmd == 'file':
-            self.relay(value, self.peername, 's$~file~')
-        elif cmd == 'eof':
-            self.relay(value, self.peername, 's$~eof~')
+        elif cmd == 'file' or cmd == 'eof' or cmd == 'fail':
+            prefix = 's$~' + cmd + '~'
+            self.relay(value, self.peername, prefix)
         else:
             return False
         return True

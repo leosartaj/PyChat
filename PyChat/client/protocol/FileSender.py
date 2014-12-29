@@ -47,7 +47,7 @@ class FileSender(object):
         if self.file:
             chunk = self.file.read(self.CHUNK_SIZE)
         if not chunk:
-            #print 'done'
+            self._cleanup
             self._complete()
             return
         if self.transform:
@@ -56,20 +56,23 @@ class FileSender(object):
         self.lastSent = chunk[-1:]
         if not self._paused:
             self.resume.addCallback(self.resumeProducing)
-        #print 'sent'
 
-    def _complete(self):
+    def _cleanup(self):
+        if self.file:
+            self.file.close()
         self.file = None
         self.consumer.unregisterProducer()
+
+    def _complete(self):
         if self.deferred:
-            self.deferred.callback(self.lastSent)
-            self.deferred = None
+            deferred, self.deferred = self.deferred, None
+            deferred.callback(self.lastSent)
 
     def pauseProducing(self):
-        #print 'paused'
         self._paused = True
 
     def stopProducing(self):
+        self._cleanup()
         if self.deferred:
             self.deferred.errback(Exception("File transfer stopped"))
             self.deferred = None

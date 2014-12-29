@@ -30,7 +30,7 @@ class FileClientProtocol(basic.LineReceiver):
         self.receiving = False
         self.sending = False
         self.sfile = [None, None]
-        self.rfile = [None, None]
+        self.rfile = {}
 
     def register(self):
         """
@@ -66,6 +66,8 @@ class FileClientProtocol(basic.LineReceiver):
             value = self._saveFile(value)
         elif cmd == 'eof':
             value = self._closeFile(value)
+        elif cmd == 'fail':
+            value = self._closeFile(value, False)
         else:
             return line
         return value
@@ -81,12 +83,14 @@ class FileClientProtocol(basic.LineReceiver):
         sendfile, startsend = fileprotocol.beginFileTransfer(handler, self.transport, self.transform)
         sendfile.addCallback(self._endTransfer)
         sendfile.addErrback(self._sendingFailed)
+        sendfile.addBoth(self._reset)
         startsend.callback(1)
 
     def transform(self, line):
         """
         Transforms a line to be saved in a file
         """
+        line = line.strip('\n')
         lineArr = line.split('\n')
         for index, item in enumerate(lineArr):
             item = 'c$~file~' + self.sfile[0] + ':' + item
@@ -98,13 +102,26 @@ class FileClientProtocol(basic.LineReceiver):
         """
         End file transfer
         """
-        lastline = 'c$~eof~' + self.sfile[0] # file sending complete
+        # Buggy
+        # dont know why the lastline goes through the transform function
+        lastline = 'c$~eof~' + self.sfile[0] + ':' # file sending complete
+        self.sendLine('')
         self.sendLine(lastline)
 
     def _sendingFailed(self, exc):
         log.msg(exc)
         msg = 'me File Sending failed'
         self.chatproto.update(msg)
+        self.sendLine('')
+        failed = 'c$~fail~' + self.sfile[0] + ':'
+        self.sendLine(failed)
+
+    def _reset(self, *args):
+        """
+        Reset the variables
+        """
+        self.sending = False
+        self.sfile = [None, None]
 
     def _initFile(self, fName='unnamed', dire=os.getcwd(), prefix='pychat_'):
         """
@@ -115,41 +132,53 @@ class FileClientProtocol(basic.LineReceiver):
         handler = open(path, 'w')
         return handler
 
+    def _parseFileline(self, fline):
+        """
+        Parses the fline
+        extracts information
+        """
+        parsed = {}
+        index = fline.index(' ')
+        parsed['peername'], nameline = fline[:index], fline[index + 1:]
+        index = nameline.index(':')
+        parsed['fName'], parsed['fline'] = nameline[:index], nameline[index + 1:]
+        return parsed
+
     def _saveFile(self, value):
         """
         Parses the line
         saves the line in the file
         returns the result string
         """
-        index = value.index(' ')
-        peername, nameline = value[:index], value[index + 1:]
-        index = nameline.index(':')
-        fName, fline = nameline[:index], nameline[index + 1:]
+        parsed = self._parseFileline(value)
+        peername, fName, fline = parsed['peername'], parsed['fName'], parsed['fline']
         if not self.receiving:
             handler = self._initFile(fName)
-            self.rfile = [fName, handler]
+            self.rfile[fName] = handler
             value = peername + ' Recieving: ' + fName
             self.receiving = True
-        elif fName == self.rfile[0]:
-            handler = self.rfile[1]
+        elif self.rfile.has_key(fName):
+            handler = self.rfile[fName]
             value = None
         else:
-            print 'no'
             return
         handler.write(fline + '\n')
         return value
 
-    def _closeFile(self, value):
+    def _closeFile(self, parsed, status=True):
         """
         safely closes the file
         cleans up rfiles dict
         returns the result
         """
-        index = value.index(' ')
-        peername, fName = value[:index], value[index + 1:]
-        handler = self.rfile[1]
-        handler.close()
-        self.rfile = [None, None]
         self.receiving = False
-        value = peername + ' Recieved: ' + fName
+        parsed = self._parseFileline(parsed)
+        peername, fName = parsed['peername'], parsed['fName']
+        handler = self.rfile[fName]
+        handler.close()
+        del self.rfile[fName]
+        if status:
+            value = peername + ' Recieved: ' + fName
+        else:
+            value = peername + ' File could not be received: ' + fName
         return value
