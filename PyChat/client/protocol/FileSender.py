@@ -45,9 +45,10 @@ class FileSender(object):
         self._paused = False
         chunk = ''
         if self.file:
-            chunk = self.file.read(self.CHUNK_SIZE)
+            #chunk = self.file.read(self.CHUNK_SIZE)
+            chunk = self.file.readline()
         if not chunk:
-            self._cleanup
+            self._cleanup()
             self._complete()
             return
         if self.transform:

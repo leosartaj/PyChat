@@ -64,15 +64,30 @@ class ChatClientProtocol(basic.LineReceiver):
         """
         Instructs the ftp protocol to send file
         """
-        log.msg('me sending %s' % (fName))
-        self.ftp.sendFile(fName)
+        if not self.ftp.status():
+            log.msg('sending %s' % (fName))
+            self.ftp.sendFile(fName)
+        else:
+            msg = 'Already sending file. Cannot send %s' %(fName)
+            log.msg(msg)
+            self.update('me ' + msg)
 
     def send(self, text):
         """
         Logs and sends the messages
         """
+        text = self._escape(text)
         log.msg('me %s' % (text))
         self.sendLine(text)
+
+    def _escape(self, text):
+        """
+        Escapes commands that user may enter
+        accidentally or not
+        """
+        if text.startswith('c$~'):
+            text = '\\' + text
+        return text
 
     def lineReceived(self, line):
         """

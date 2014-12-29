@@ -26,13 +26,12 @@ class FileClientProtocol(basic.LineReceiver):
 
     def connectionMade(self):
         self.chatproto = self.factory.chatproto
-        self.register()
-        self.receiving = False
+        self._register()
         self.sending = False
         self.sfile = [None, None]
         self.rfile = {}
 
-    def register(self):
+    def _register(self):
         """
         Register with the ftp server
         send the refrence to the chatproto
@@ -51,6 +50,14 @@ class FileClientProtocol(basic.LineReceiver):
             log.msg('%s' % (line))
             self.chatproto.update(line)
 
+    def _getcmd(self, line):
+        """
+        returns the command and the value
+        """
+        index = line.index('~')
+        cmd, value = line[:index], line[index + 1:]
+        return cmd, value
+
     def _parse(self, line):
         """
         Parse line for commands
@@ -59,9 +66,8 @@ class FileClientProtocol(basic.LineReceiver):
         """
         if line[0:3] != 's$~':
             return line
-        newline = line[3:]
-        index = newline.index('~')
-        cmd, value = newline[:index], newline[index + 1:]
+        line = line[3:]
+        cmd, value = self._getcmd(line)
         if cmd == 'file':
             value = self._saveFile(value)
         elif cmd == 'eof':
@@ -72,11 +78,18 @@ class FileClientProtocol(basic.LineReceiver):
             return line
         return value
 
+    def status(self):
+        """
+        gives the status of sending and receiving
+        returns a tuple sending(bool)
+        """
+        return self.sending
+
     def sendFile(self, fName):
         """
         Sends file to the server
         """
-        handler = open(fName)
+        handler = open(fName, 'rb')
         self.sending = True
         self.sfile = [fName, handler]
         fileprotocol = FileSender()
@@ -90,22 +103,24 @@ class FileClientProtocol(basic.LineReceiver):
         """
         Transforms a line to be saved in a file
         """
-        line = line.strip('\n')
-        lineArr = line.split('\n')
-        for index, item in enumerate(lineArr):
-            item = 'c$~file~' + self.sfile[0] + ':' + item
-            lineArr[index] = item
-        fileLine = '\n'.join(lineArr)
+        #line = line.strip('\n')
+        #lineArr = line.split('\n')
+        #for index, item in enumerate(lineArr):
+            #item = 'c$~file~' + self.sfile[0] + ':' + item
+            #lineArr[index] = item
+        #fileLine = '\n'.join(lineArr)
+        fileLine = 'c$~file~' + self.sfile[0] + ':' + line
         return fileLine
 
     def _endTransfer(self, *args):
         """
         End file transfer
         """
-        # Buggy
-        # dont know why the lastline goes through the transform function
+        msg = 'File sent: %s' %(self.sfile[0])
+        log.msg(msg)
+        self.chatproto.update('me ' + msg)
         lastline = 'c$~eof~' + self.sfile[0] + ':' # file sending complete
-        self.sendLine('')
+        self.sendLine('') # hack
         self.sendLine(lastline)
 
     def _sendingFailed(self, exc):
@@ -152,11 +167,10 @@ class FileClientProtocol(basic.LineReceiver):
         """
         parsed = self._parseFileline(value)
         peername, fName, fline = parsed['peername'], parsed['fName'], parsed['fline']
-        if not self.receiving:
+        if not self.rfile.has_key(fName):
             handler = self._initFile(fName)
             self.rfile[fName] = handler
             value = peername + ' Recieving: ' + fName
-            self.receiving = True
         elif self.rfile.has_key(fName):
             handler = self.rfile[fName]
             value = None
@@ -171,7 +185,6 @@ class FileClientProtocol(basic.LineReceiver):
         cleans up rfiles dict
         returns the result
         """
-        self.receiving = False
         parsed = self._parseFileline(parsed)
         peername, fName = parsed['peername'], parsed['fName']
         handler = self.rfile[fName]
