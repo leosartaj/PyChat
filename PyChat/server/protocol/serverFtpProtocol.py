@@ -11,27 +11,21 @@
 from twisted.protocols import basic
 from twisted.python import log
 
-
-class serverProtocol(basic.LineReceiver):
+class serverFtpProtocol(basic.LineReceiver):
     """
-    Implements the server interaction protocol
+    Implements the server ftp protocol
     """
     from os import linesep as delimiter # os supported delimiter
 
     def connectionMade(self):
-        self.peer = self.transport.getPeer()
-        self.peername = 'unregistered'
         self.factory.updateClients(self)
-        self.connectedUsers()
-        log.msg('Connected to %s' %(self.peer))
+        self.peer = self.transport.getPeer()
 
     def lineReceived(self, line):
         """
         Handle recived lines
         """
-        if not self._parse(line):
-            log.msg('Received %s from %s' %(line, self.peername))
-            self.relay(line, self.peername)
+        self._parse(line)
 
     def _parse(self, line):
         """
@@ -47,9 +41,6 @@ class serverProtocol(basic.LineReceiver):
         cmd, value = line[:index], line[index + 1:]
         if cmd == 'reg':
             self.peername = value
-            log.msg('PeerName of %s is %s' %(self.peer, self.peername))
-            self.factory.updateUsers(self.peername, self.peer) # register name and ip with factory
-            self.relay(str(self.peer), self.peername, 's$~add~')
         elif cmd == 'file':
             self.relay(value, self.peername, 's$~file~')
         elif cmd == 'eof':
@@ -67,27 +58,17 @@ class serverProtocol(basic.LineReceiver):
             if client != self:
                 client.sendLine(line)
 
-    def connectedUsers(self):
-        """
-        Tells the client about already connected users
-        """
-        for name, ip in self.factory.getUsers():
-            line = 's$~add~' + name + ' ' + str(ip)
-            self.sendLine(line)
-
     def connectionLost(self, reason):
         """
         safely disconnect user
         """
         self.factory.removeClients(self)
-        self.factory.removeUsers(self.peername, self.peer)
-        self.relay(str(self.peer), self.peername, 's$~rem~')
         self._logConnectionLost(reason)
 
     def _logConnectionLost(self, reason):
         """
         log when connection is lost
         """
-        line = 'Disconnected from %s' %(self.peer)
+        line = 'Disconnected ftp from %s' %(self.peer)
         log.msg(line)
         log.msg(reason.getErrorMessage())

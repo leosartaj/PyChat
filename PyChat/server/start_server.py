@@ -29,6 +29,7 @@ def listen(host, port):
     """
     factory = serverFactory() # initialize factory
     factory.protocol = serverProtocol 
+    factory.startFtp(host, 6969)
     try:
         listener = reactor.listenTCP(port, factory, interface=host)
     except CannotListenError:

@@ -8,7 +8,12 @@
 # Licensed under the MIT license.
 ##
 
+from twisted.internet import reactor
 from twisted.internet.protocol import ServerFactory
+from twisted.internet.error import CannotListenError
+
+from serverFtpFactory import serverFtpFactory
+from serverFtpProtocol import serverFtpProtocol
 
 class serverFactory(ServerFactory):
     """
@@ -17,6 +22,16 @@ class serverFactory(ServerFactory):
     def __init__(self):
         self.clients = [] # connected clients
         self.users = [] # name and ip of connected clients
+
+    def startFtp(self, host, port):
+        self.host, self.ftp_port = host, port
+        self.ftpfactory = factory = serverFtpFactory() # initialize factory
+        factory.protocol = serverFtpProtocol 
+        factory.server = self
+        try:
+            listener = reactor.listenTCP(port, factory, interface=host)
+        except CannotListenError:
+            log.msg('Ftp server failed to start')
 
     def updateClients(self, client):
         """
@@ -41,6 +56,12 @@ class serverFactory(ServerFactory):
         returns list of tuples of name and ip of connected clients
         """
         return self.users
+
+    def getPeername(self, ip):
+        for user in self.getUsers:
+            if user[1] == ip:
+                return user[0]
+        return None
 
     def disconnect(self):
         """

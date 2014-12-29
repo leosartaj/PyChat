@@ -12,7 +12,7 @@
 import os
 
 # twisted imports
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.python import log
 from twisted.protocols import basic
 
@@ -30,22 +30,42 @@ class ChatClientProtocol(basic.LineReceiver):
         self.clientobj = self.factory.clientobj # refrence to the client object
         self.clientobj.protocol = self # give your refrence to the client object
 
+        self.host = self.factory.host
+        self.port = self.factory.port
+        self.ftp = None
+
         self.peer = self.transport.getPeer()
         self.users = [] # list of connnected users
 
         log.msg('Connected to server at %s' % (self.peer)) # logs the connection
         self.update('server Connected')
 
-        setName = 'c$~reg~' + self.factory.name
+        self.setName = setName = 'c$~reg~' + self.factory.name
         self.sendLine(setName) # register with server
+        self.startFtp(self.host, 6969)
 
-    def startFtp(self):
+    def startFtp(self, host, port):
         """
         Open up file transfer connection with server
         """
         factory = FileClientFactory(self) # setting up the factory
         factory.protocol = FileClientProtocol
-        reactor.connectTCP(host, 6969, factory)
+        factory.deferred = defer.Deferred()
+        factory.deferred.addCallback(self.registerFtp)
+        reactor.connectTCP(host, port, factory)
+
+    def registerFtp(self, ftp):
+        """
+        Registers reference to the ftp protocol
+        """
+        self.ftp = ftp
+
+    def sendFile(self, fName):
+        """
+        Instructs the ftp protocol to send file
+        """
+        log.msg('me sending %s' % (fName))
+        self.ftp.sendFile(fName)
 
     def send(self, text):
         """

@@ -24,11 +24,23 @@ class FileClientProtocol(basic.LineReceiver):
     """
     from os import linesep as delimiter # set delimiter
 
-    def connectionMade(self, chatproto):
+    def connectionMade(self):
         self.chatproto = self.factory.chatproto
+        self.register()
         self.receiving = False
         self.sending = False
-        self.file = [None, None]
+        self.sfile = [None, None]
+        self.rfile = [None, None]
+
+    def register(self):
+        """
+        Register with the ftp server
+        send the refrence to the chatproto
+        """
+        self.sendLine(self.chatproto.setName)
+        if self.factory.deferred:
+            deferred, self.factory.deferred = self.factory.deferred, None
+            deferred.callback(self)
 
     def lineReceived(self, line):
         """
@@ -62,9 +74,9 @@ class FileClientProtocol(basic.LineReceiver):
         """
         Sends file to the server
         """
-        log.msg('me sending %s' % (fName))
         handler = open(fName)
         self.sending = True
+        self.sfile = [fName, handler]
         fileprotocol = FileSender()
         sendfile, startsend = fileprotocol.beginFileTransfer(handler, self.transport, self.transform)
         sendfile.addCallback(self._endTransfer)
@@ -77,7 +89,7 @@ class FileClientProtocol(basic.LineReceiver):
         """
         lineArr = line.split('\n')
         for index, item in enumerate(lineArr):
-            item = 'c$~file~' + self.file[0] + ':' + item
+            item = 'c$~file~' + self.sfile[0] + ':' + item
             lineArr[index] = item
         fileLine = '\n'.join(lineArr)
         return fileLine
@@ -86,7 +98,7 @@ class FileClientProtocol(basic.LineReceiver):
         """
         End file transfer
         """
-        lastline = 'c$~eof~' + self.file[0] # file sending complete
+        lastline = 'c$~eof~' + self.sfile[0] # file sending complete
         self.sendLine(lastline)
 
     def _sendingFailed(self, exc):
@@ -115,11 +127,11 @@ class FileClientProtocol(basic.LineReceiver):
         fName, fline = nameline[:index], nameline[index + 1:]
         if not self.receiving:
             handler = self._initFile(fName)
-            self.file = [fName, handler]
+            self.rfile = [fName, handler]
             value = peername + ' Recieving: ' + fName
             self.receiving = True
-        elif fName == self.file[0]:
-            handler = self.file[1]
+        elif fName == self.rfile[0]:
+            handler = self.rfile[1]
             value = None
         else:
             print 'no'
@@ -135,9 +147,9 @@ class FileClientProtocol(basic.LineReceiver):
         """
         index = value.index(' ')
         peername, fName = value[:index], value[index + 1:]
-        handler = self.file[1]
+        handler = self.rfile[1]
         handler.close()
-        self.file = [None, None]
+        self.rfile = [None, None]
         self.receiving = False
         value = peername + ' Recieved: ' + fName
         return value
