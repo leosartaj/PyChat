@@ -23,6 +23,7 @@ from random import choice
 # For the GUI
 import gtk
 from connectBoxClass import connectBoxClass
+from fileChooserClass import fileChooserClass
 
 # Connections
 from clientClass import clientClass
@@ -62,6 +63,7 @@ class clientGUIClass:
               , 'on_exit_button_press_event': self.close
               , 'on_chatbox_activate'       : self.sendButton
               , 'on_sendButton_clicked'     : self.sendButton 
+              , 'on_attach_clicked'         : self.load_filechooser
               , 'on_connectedusers_toggled' : self.toggleUsersPanel
               , 'on_connect_activate'       : self.set_connect_box
               , 'on_addtab_clicked'         : self.set_connect_box
@@ -268,12 +270,26 @@ class clientGUIClass:
         clientobj.connect(host, port)
         self.toggleUsersPanel() # restore state of users panel
 
+    def load_filechooser(self, *args):
+        """
+        loads up the file choosing dialogue box
+        """
+        if len(self.objects) != 0:
+            fileChooserClass(self)
+
     def find_clientobj(self):
         """
         Find The current client object
         """
         page = self.notebook.current_page()
         return self.objects[page]
+
+    def sendFile(self, fName):
+        """
+        Instructs the client to start sending the file
+        """
+        obj = self.find_clientobj() # current client object
+        obj.sendFile(fName)
 
     def sendButton(self, button):
         """
@@ -285,10 +301,7 @@ class clientGUIClass:
             if len(self.objects) != 0:
                 self.chatbox.set_text('') # clear the textbox
                 obj = self.find_clientobj() # current client object
-                if text[:5] == 'file:':
-                    obj.sendFile(text[5:])
-                else:
-                    obj.send(text)
+                obj.send(text)
         self.chatbox.grab_focus() # focus the textbox
 
     def handleKeys(self, widget, key):
@@ -319,7 +332,6 @@ class clientGUIClass:
         if text != None:
             self.chatbox.set_text(text)
             self.chatbox.set_position(len(text)) # set the cursor position
-
 
     def close(self, *args):
         """

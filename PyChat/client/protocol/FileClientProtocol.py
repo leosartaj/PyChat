@@ -138,15 +138,6 @@ class FileClientProtocol(basic.LineReceiver):
         self.sending = False
         self.sfile = [None, None]
 
-    def _initFile(self, fName='unnamed', dire=os.getcwd(), prefix='pychat_'):
-        """
-        opens a file
-        returns the handler
-        """
-        path = os.path.join(dire, prefix + fName)
-        handler = open(path, 'w')
-        return handler
-
     def _parseFileline(self, fline):
         """
         Parses the fline
@@ -158,6 +149,16 @@ class FileClientProtocol(basic.LineReceiver):
         index = nameline.index(':')
         parsed['fName'], parsed['fline'] = nameline[:index], nameline[index + 1:]
         return parsed
+
+    def _initFile(self, fName='unnamed', dire=os.getcwd(), prefix='pychat_'):
+        """
+        opens a file
+        returns the handler
+        """
+        filename = os.path.basename(fName)
+        path = os.path.join(dire, prefix + filename)
+        handler = open(path, 'w')
+        return handler
 
     def _saveFile(self, value):
         """
