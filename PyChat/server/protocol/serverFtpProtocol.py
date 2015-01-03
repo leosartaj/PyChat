@@ -11,21 +11,20 @@
 from twisted.protocols import basic
 from twisted.python import log
 
-class serverFtpProtocol(basic.LineReceiver):
+class serverFtpProtocol(basic.Int32StringReceiver):
     """
     Implements the server ftp protocol
     """
-    from os import linesep as delimiter # os supported delimiter
-
     def connectionMade(self):
         self.peer = self.transport.getPeer()
         self.factory.updateClients(self)
 
-    def lineReceived(self, line):
+    def stringReceived(self, line):
         """
-        Handle recived lines
+        Handle received messages
         """
-        self._parse(line)
+        if not self._parse(line):
+            self.relay(line, self.peername)
 
     def _parse(self, line):
         """
@@ -41,9 +40,6 @@ class serverFtpProtocol(basic.LineReceiver):
         cmd, value = line[:index], line[index + 1:]
         if cmd == 'reg':
             self.peername = value
-        elif cmd == 'file' or cmd == 'eof' or cmd == 'fail':
-            prefix = 's$~' + cmd + '~'
-            self.relay(value, self.peername, prefix)
         else:
             return False
         return True
@@ -55,7 +51,7 @@ class serverFtpProtocol(basic.LineReceiver):
         line = prefix + name + ' ' + line
         for client in self.factory.getClients():
             if client != self:
-                client.sendLine(line)
+                client.sendString(line)
 
     def connectionLost(self, reason):
         """

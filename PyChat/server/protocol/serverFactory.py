@@ -8,6 +8,7 @@
 # Licensed under the MIT license.
 ##
 
+from twisted.python import log
 from twisted.internet import reactor
 from twisted.internet.protocol import ServerFactory
 from twisted.internet.error import CannotListenError

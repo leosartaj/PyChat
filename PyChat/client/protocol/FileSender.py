@@ -10,7 +10,7 @@
 
 from twisted.protocols import basic
 from twisted.internet import defer, interfaces
-from zope.interface import implements, implementer
+from zope.interface import implements 
 
 def filterArgs(func):
     """
@@ -23,13 +23,13 @@ def filterArgs(func):
 class FileSender(object):
     implements(interfaces.IPushProducer)
 
-    CHUNK_SIZE = 2 ** 14
+    CHUNK_SIZE = 2 ** 14 - 384
 
     lastSent = ''
     deferred = None
 
-    def beginFileTransfer(self, file, consumer, transform=None):
-        self.file = file
+    def beginFileTransfer(self, fName, consumer, transform=None):
+        self.file = open(fName, 'rb')
         self.consumer = consumer
         self.transform = transform
 
@@ -38,15 +38,14 @@ class FileSender(object):
         self.resume = defer.Deferred()
         self.resume.addCallback(self.resumeProducing)
         self.deferred = defer.Deferred()
-        return self.deferred, self.resume
+        return (self.deferred, self.resume)
 
     @filterArgs
     def resumeProducing(self):
         self._paused = False
         chunk = ''
         if self.file:
-            #chunk = self.file.read(self.CHUNK_SIZE)
-            chunk = self.file.readline()
+            chunk = self.file.read(self.CHUNK_SIZE)
         if not chunk:
             self._cleanup()
             self._complete()
@@ -61,7 +60,7 @@ class FileSender(object):
     def _cleanup(self):
         if self.file:
             self.file.close()
-        self.file = None
+            self.file = None
         self.consumer.unregisterProducer()
 
     def _complete(self):

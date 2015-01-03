@@ -10,6 +10,8 @@
 
 # system import
 import os
+import struct
+import cPickle as pickle
 
 # twisted imports
 from twisted.python import log
@@ -18,12 +20,22 @@ from twisted.protocols import basic
 # user import
 from FileSender import FileSender
 
-class FileClientProtocol(basic.LineReceiver):
+def dict_to_pickle(pickle_dict):
+    """
+    convert from a dictionary to pickle
+    """
+    return pickle.dumps(pickle_dict)
+
+def pickle_to_dict(pickle_str):
+    """
+    convert from pickle to dictionary
+    """
+    return pickle.loads(pickle_str)
+
+class FileClientProtocol(basic.Int32StringReceiver):
     """
     Implements file transfer protocol
     """
-    from os import linesep as delimiter # set delimiter
-
     def connectionMade(self):
         self.chatproto = self.factory.chatproto
         self._register()
@@ -36,12 +48,12 @@ class FileClientProtocol(basic.LineReceiver):
         Register with the ftp server
         send the refrence to the chatproto
         """
-        self.sendLine(self.chatproto.setName)
+        self.sendString(self.chatproto.setName)
         if self.factory.deferred:
             deferred, self.factory.deferred = self.factory.deferred, None
             deferred.callback(self)
 
-    def lineReceived(self, line):
+    def stringReceived(self, line):
         """
         Handles recieved file lines
         """
@@ -50,13 +62,14 @@ class FileClientProtocol(basic.LineReceiver):
             log.msg('%s' % (line))
             self.chatproto.update(line)
 
-    def _getcmd(self, line):
+    def _parseline(self, fline):
         """
-        returns the command and the value
+        Parses the fline
+        extracts information
         """
-        index = line.index('~')
-        cmd, value = line[:index], line[index + 1:]
-        return cmd, value
+        index = fline.index(' ')
+        peername, pickle_str = fline[:index], fline[index + 1:]
+        return peername, pickle_str
 
     def _parse(self, line):
         """
@@ -64,18 +77,26 @@ class FileClientProtocol(basic.LineReceiver):
         returns string to be logged 
         otherwise simply returns line without change
         """
-        if line[0:3] != 's$~':
-            return line
-        line = line[3:]
-        cmd, value = self._getcmd(line)
-        if cmd == 'file':
-            value = self._saveFile(value)
-        elif cmd == 'eof':
-            value = self._closeFile(value)
-        elif cmd == 'fail':
-            value = self._closeFile(value, False)
+        peername, pickle_str = self._parseline(line)
+        pickle_dict = pickle_to_dict(pickle_str)
+        value = self._parseDict(peername, pickle_dict)
+        return value
+
+    def _parseDict(self, peername, pickle_dict):
+        """
+        Parses the pickle_dict
+        Takes measures on the files
+        """
+        fName = pickle_dict['filename']
+        if pickle_dict.has_key('eof'):
+            value = self._closeFile(peername, fName)
+        elif pickle_dict.has_key('fail'):
+            value = self._closeFile(peername, fName, False)
+        elif pickle_dict.has_key('line'):
+            saveline = pickle_dict['line']
+            value = self._saveFile(peername, fName, saveline)
         else:
-            return line
+            return None
         return value
 
     def status(self):
@@ -89,47 +110,56 @@ class FileClientProtocol(basic.LineReceiver):
         """
         Sends file to the server
         """
-        handler = open(fName, 'rb')
         self.sending = True
-        self.sfile = [fName, handler]
+        filename = os.path.basename(fName)
+        self.sfile = filename
         fileprotocol = FileSender()
-        sendfile, startsend = fileprotocol.beginFileTransfer(handler, self.transport, self.transform)
+        sendfile, startsend = fileprotocol.beginFileTransfer(fName, self.transport, self.transform)
         sendfile.addCallback(self._endTransfer)
         sendfile.addErrback(self._sendingFailed)
         sendfile.addBoth(self._reset)
         startsend.callback(1)
 
+    def _getDict(self):
+        """
+        Returns a dictionary
+        """
+        pickle_dict = {}
+        pickle_dict['filename'] = self.sfile
+        return pickle_dict
+
     def transform(self, line):
         """
         Transforms a line to be saved in a file
         """
-        #line = line.strip('\n')
-        #lineArr = line.split('\n')
-        #for index, item in enumerate(lineArr):
-            #item = 'c$~file~' + self.sfile[0] + ':' + item
-            #lineArr[index] = item
-        #fileLine = '\n'.join(lineArr)
-        fileLine = 'c$~file~' + self.sfile[0] + ':' + line
-        return fileLine
+        pickle_dict = self._getDict()
+        pickle_dict['line'] = line
+        pickle_str = dict_to_pickle(pickle_dict) 
+        # prefix, for the protocol as file sender does not use sendString
+        prefix = struct.pack(self.structFormat, len(pickle_str))
+        pickle_str = prefix + pickle_str
+        return pickle_str
 
     def _endTransfer(self, *args):
         """
         End file transfer
         """
-        msg = 'File sent: %s' %(self.sfile[0])
+        msg = 'File sent: %s' %(self.sfile)
         log.msg(msg)
         self.chatproto.update('me ' + msg)
-        lastline = 'c$~eof~' + self.sfile[0] + ':' # file sending complete
-        self.sendLine('') # hack
-        self.sendLine(lastline)
+        pickle_dict = self._getDict()
+        pickle_dict['eof'] = True
+        pickle_str = dict_to_pickle(pickle_dict)
+        self.sendString(pickle_str)
 
     def _sendingFailed(self, exc):
         log.msg(exc)
         msg = 'me File Sending failed'
         self.chatproto.update(msg)
-        self.sendLine('')
-        failed = 'c$~fail~' + self.sfile[0] + ':'
-        self.sendLine(failed)
+        pickle_dict = self._getDict()
+        pickle_dict['fail'] = True
+        pickle_str = dict_to_pickle(pickle_dict)
+        self.sendString(pickle_str)
 
     def _reset(self, *args):
         """
@@ -137,18 +167,6 @@ class FileClientProtocol(basic.LineReceiver):
         """
         self.sending = False
         self.sfile = [None, None]
-
-    def _parseFileline(self, fline):
-        """
-        Parses the fline
-        extracts information
-        """
-        parsed = {}
-        index = fline.index(' ')
-        parsed['peername'], nameline = fline[:index], fline[index + 1:]
-        index = nameline.index(':')
-        parsed['fName'], parsed['fline'] = nameline[:index], nameline[index + 1:]
-        return parsed
 
     def _initFile(self, fName='unnamed', dire=os.getcwd(), prefix='pychat_'):
         """
@@ -160,14 +178,12 @@ class FileClientProtocol(basic.LineReceiver):
         handler = open(path, 'w')
         return handler
 
-    def _saveFile(self, value):
+    def _saveFile(self, peername, fName, fline):
         """
         Parses the line
         saves the line in the file
         returns the result string
         """
-        parsed = self._parseFileline(value)
-        peername, fName, fline = parsed['peername'], parsed['fName'], parsed['fline']
         if not self.rfile.has_key(fName):
             handler = self._initFile(fName)
             self.rfile[fName] = handler
@@ -177,17 +193,15 @@ class FileClientProtocol(basic.LineReceiver):
             value = None
         else:
             return
-        handler.write(fline + '\n')
+        handler.write(fline)
         return value
 
-    def _closeFile(self, parsed, status=True):
+    def _closeFile(self, peername, fName, status=True):
         """
         safely closes the file
         cleans up rfiles dict
         returns the result
         """
-        parsed = self._parseFileline(parsed)
-        peername, fName = parsed['peername'], parsed['fName']
         handler = self.rfile[fName]
         handler.close()
         del self.rfile[fName]

@@ -13,6 +13,9 @@
 Contains the class for defining a client
 """
 
+# system imports
+import os
+
 from helper import textview # helper modules
 from helper import markup # helper modules
 import error
@@ -83,7 +86,7 @@ class clientClass:
         the gui
         """
         if self.protocol:
-            text = 'sending ' + fName
+            text = 'Sending File: ' + os.path.basename(fName)
             self.updateView('me', text)
             self.protocol.sendFile(fName) # logs and sends the message
         else:
