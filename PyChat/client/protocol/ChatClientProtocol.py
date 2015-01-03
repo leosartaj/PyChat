@@ -51,8 +51,14 @@ class ChatClientProtocol(basic.LineReceiver):
         factory = FileClientFactory(self) # setting up the factory
         factory.protocol = FileClientProtocol
         factory.deferred = defer.Deferred()
-        factory.deferred.addCallback(self.registerFtp)
+        factory.deferred.addCallback(self.registerFtp) # Called to register ftp refrence
         reactor.connectTCP(host, port, factory)
+
+    def forgetFtp(self):
+        """
+        Forgets ftp connection
+        """
+        self.ftp = None
 
     def registerFtp(self, ftp):
         """
@@ -64,11 +70,16 @@ class ChatClientProtocol(basic.LineReceiver):
         """
         Instructs the ftp protocol to send file
         """
-        if not self.ftp.status():
-            log.msg('sending %s' % (fName))
-            self.ftp.sendFile(fName)
+        if self.ftp:
+            if not self.ftp.status():
+                log.msg('sending %s' % (fName))
+                self.ftp.sendFile(fName)
+            else:
+                msg = 'Already sending file. Cannot send: %s' %(os.path.basename(fName))
+                log.msg(msg)
+                self.update('me ' + msg)
         else:
-            msg = 'Already sending file. Cannot send %s' %(fName)
+            msg = 'Cannot send: %s' %(os.path.basename(fName))
             log.msg(msg)
             self.update('me ' + msg)
 

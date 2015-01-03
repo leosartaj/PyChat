@@ -15,4 +15,6 @@ Contains the various error messages
 __connfail__ = 'Could Not Connect to Server' 
 __connlost__ = 'Connection to server has been lost'
 __servfail__ = 'Server could not be started'
+__ftpfail__ = 'Could not connect to ftp server'
+__ftplost__ = 'Connection to ftp server is lost'
 __filefail__ = 'File could not be sent'

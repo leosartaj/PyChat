@@ -21,6 +21,9 @@ def filterArgs(func):
     return _wrapper
 
 class FileSender(object):
+    """
+    Sends a file
+    """
     implements(interfaces.IPushProducer)
 
     CHUNK_SIZE = 2 ** 14 - 384
@@ -29,12 +32,14 @@ class FileSender(object):
     deferred = None
 
     def beginFileTransfer(self, fName, consumer, transform=None):
+        """
+        Starts file transfer of a file
+        """
         self.file = open(fName, 'rb')
         self.consumer = consumer
         self.transform = transform
-
         self._paused = False
-        self.consumer.registerProducer(self, streaming=True)
+        self.consumer.registerProducer(self, streaming=True) # register for streaming
         self.resume = defer.Deferred()
         self.resume.addCallback(self.resumeProducing)
         self.deferred = defer.Deferred()
@@ -42,6 +47,9 @@ class FileSender(object):
 
     @filterArgs
     def resumeProducing(self):
+        """
+        Sends a chunk to the server
+        """
         self._paused = False
         chunk = ''
         if self.file:
@@ -50,7 +58,7 @@ class FileSender(object):
             self._cleanup()
             self._complete()
             return
-        if self.transform:
+        if self.transform: # if transform function is defined
             chunk = self.transform(chunk)
         self.consumer.write(chunk)
         self.lastSent = chunk[-1:]
@@ -58,12 +66,18 @@ class FileSender(object):
             self.resume.addCallback(self.resumeProducing)
 
     def _cleanup(self):
+        """
+        Cleans up everything
+        """
         if self.file:
             self.file.close()
             self.file = None
         self.consumer.unregisterProducer()
 
     def _complete(self):
+        """
+        Completes the file transfer process
+        """
         if self.deferred:
             deferred, self.deferred = self.deferred, None
             deferred.callback(self.lastSent)

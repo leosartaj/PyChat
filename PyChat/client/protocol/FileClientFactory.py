@@ -10,6 +10,7 @@
 
 from twisted.python import log
 from twisted.internet.protocol import ClientFactory
+from error import __ftpfail__, __ftplost__
 
 class FileClientFactory(ClientFactory):
     """
@@ -24,6 +25,15 @@ class FileClientFactory(ClientFactory):
 
     def clientConnectionFailed(self, connector, reason):
         log.err(reason.getErrorMessage())
+        self._notify(__ftpfail__)
 
     def clientConnectionLost(self, connector, reason):
         log.err(reason.getErrorMessage())
+        self.chatproto.forgetFtp() # lose the refrence
+        self._notify(__ftplost__)
+
+    def _notify(self, msg):
+        """
+        notify
+        """
+        self.chatproto.update('server ' + msg)
