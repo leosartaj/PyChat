@@ -9,9 +9,8 @@
 ##
 
 """
-Define description variable
+Information Variables
 """
 
-from version import __version__
-
+__version__ = '1.4.0'
 __desc__ = 'PyChat ' + __version__
