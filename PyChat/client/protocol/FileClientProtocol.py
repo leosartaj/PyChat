@@ -151,6 +151,8 @@ class FileClientProtocol(basic.Int32StringReceiver):
         pickle_dict['eof'] = True
         pickle_str = dict_to_pickle(pickle_dict)
         self.sendString(pickle_str)
+        servercmd = 'c$~eof~' # tell server file sending complete
+        self.sendString(servercmd)
 
     def _sendingFailed(self, exc):
         log.msg(exc)

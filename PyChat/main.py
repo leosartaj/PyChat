@@ -8,6 +8,11 @@
 # Licensed under the MIT license.
 ##
 
+"""
+Main module
+Contains wrapper functions
+"""
+
 # system imports
 import sys
 
@@ -18,7 +23,7 @@ from twisted.python import log
 from client.error import __servfail__
 from client.gui.clientGUIClass import clientGUIClass # get the main gui class
 from client.gui.helper import helperFunc as hf
-from server import start_server
+from server import startserver
 
 def startGui(clientname):
     """
@@ -37,7 +42,7 @@ def connect(gui, host, port, server=False):
     obj = gui.get_clientobj() # generate object
     result, factory = True, None
     if server:
-        result, lisport, factory = start_server.listen(host, port)
+        result, lisport, factory = startserver.listen(host, port)
     if result: # if everything goes well
         if factory: 
             obj.set_factory(lisport, factory)

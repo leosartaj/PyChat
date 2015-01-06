@@ -17,6 +17,8 @@ class serverFtpProtocol(basic.Int32StringReceiver):
     """
     def connectionMade(self):
         self.peer = self.transport.getPeer()
+        self.recv = False # whether server is receiving a file
+        self.sending = [] # list of clients file is getting send to
         self.factory.updateClients(self)
 
     def stringReceived(self, line):
@@ -40,6 +42,9 @@ class serverFtpProtocol(basic.Int32StringReceiver):
         cmd, value = line[:index], line[index + 1:]
         if cmd == 'reg':
             self.peername = value
+        elif cmd == 'eof':
+            self.recv = False
+            self.sending = []
         else:
             return False
         return True
@@ -48,8 +53,12 @@ class serverFtpProtocol(basic.Int32StringReceiver):
         """
         relay the message to other clients
         """
+        if not self.recv:
+            self.recv = True
+            self.sending = list(self.factory.getClients())
+        print self.sending
         line = prefix + name + ' ' + line
-        for client in self.factory.getClients():
+        for client in self.sending:
             if client != self:
                 client.sendString(line)
 
