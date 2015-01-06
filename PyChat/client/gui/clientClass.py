@@ -8,7 +8,6 @@
 # Licensed under the MIT license.
 ##
 
-
 """
 Contains the class for defining a client
 """
@@ -86,8 +85,6 @@ class clientClass:
         the gui
         """
         if self.protocol:
-            text = 'Sending File: ' + os.path.basename(fName)
-            self.updateView('me', text)
             self.protocol.sendFile(fName) # logs and sends the message
         else:
             self.updateView('me', error.__filefail__)

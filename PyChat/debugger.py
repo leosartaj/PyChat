@@ -8,6 +8,12 @@
 # Licensed under the MIT license.
 ##
 
+"""
+Development script
+To run without actually installing
+Picks up local changes
+"""
+
 # system imports
 import sys
 
@@ -17,20 +23,19 @@ gtk2reactor.install() # install reactor for gui
 from twisted.internet import reactor
 
 # Other imports
-from PyChat import main
-from PyChat.client import options
+import main
+from client import options
 
 if __name__ == '__main__':
     args = options.parse_args() # parse the arguments
 
     addresses = []
-    log = open(args.log, 'a')
     client = args.client
     host, port, server = args.iface, args.port, args.server
     if host != None:
         addresses.append((host, port, server))
     try:
-        main.run(client, log, addresses)
+        main.run(client, sys.stdout, addresses)
     except Exception, e:
         print 'Cannot Start PyChat'
         print e

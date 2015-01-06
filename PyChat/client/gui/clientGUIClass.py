@@ -180,7 +180,7 @@ class clientGUIClass:
 
     def update_dict(self, delpage, objects, buttons):
         """
-        Updates the refrence dictionaries
+        Updates the reference dictionaries
         when a page is deleted
         """
         copy = {}

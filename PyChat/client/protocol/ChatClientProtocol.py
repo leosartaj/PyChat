@@ -30,9 +30,10 @@ class ChatClientProtocol(basic.LineReceiver):
         self.clientobj = self.factory.clientobj # refrence to the client object
         self.clientobj.protocol = self # give your refrence to the client object
 
-        self.host = self.factory.host
+        # ip address and port connection
+        self.host = self.factory.host 
         self.port = self.factory.port
-        self.ftp = None
+        self.ftp = None # refrence of the ftp protocol
 
         self.peer = self.transport.getPeer()
         self.users = [] # list of connnected users
@@ -48,7 +49,7 @@ class ChatClientProtocol(basic.LineReceiver):
         """
         Open up file transfer connection with server
         """
-        factory = FileClientFactory(self) # setting up the factory
+        self.ftpfactory = factory = FileClientFactory(self) # setting up the factory
         factory.protocol = FileClientProtocol
         factory.deferred = defer.Deferred()
         factory.deferred.addCallback(self.registerFtp) # Called to register ftp refrence
@@ -72,16 +73,18 @@ class ChatClientProtocol(basic.LineReceiver):
         """
         if self.ftp:
             if not self.ftp.status():
-                log.msg('sending %s' % (fName))
+                msg = 'Sending File: ' + os.path.basename(fName)
                 self.ftp.sendFile(fName)
             else:
                 msg = 'Already sending file. Cannot send: %s' %(os.path.basename(fName))
-                log.msg(msg)
                 self.update('me ' + msg)
         else:
             msg = 'Cannot send: %s' %(os.path.basename(fName))
-            log.msg(msg)
-            self.update('me ' + msg)
+            msg2 = 'Not connected to ftp server'
+            log.msg(msg2)
+            self.update('me ' + msg2)
+        log.msg(msg)
+        self.update('me ' + msg)
 
     def send(self, text):
         """

@@ -11,7 +11,6 @@
 from twisted.protocols import basic
 from twisted.python import log
 
-
 class serverProtocol(basic.LineReceiver):
     """
     Implements the server interaction protocol
