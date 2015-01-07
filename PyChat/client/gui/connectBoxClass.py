@@ -14,7 +14,7 @@ import gtk
 
 # other imports
 from helper import helperFunc as hf
-from server import start_server
+from server import startserver
 from error import __servfail__
 
 class connectBoxClass:
@@ -77,7 +77,7 @@ class connectBoxClass:
         obj = self.parent.get_clientobj()
         result, factory = True, None
         if self.check.get_active():
-            result, lisport, factory = start_server.listen(host, port)
+            result, lisport, factory = startserver.listen(host, port)
 
         if result: # if everything goes well
             if factory: # also starts a server
