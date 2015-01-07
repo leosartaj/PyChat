@@ -11,10 +11,6 @@
 from twisted.python import log
 from twisted.internet import reactor
 from twisted.internet.protocol import ServerFactory
-from twisted.internet.error import CannotListenError
-
-from serverFtpFactory import serverFtpFactory
-from serverFtpProtocol import serverFtpProtocol
 
 class serverFactory(ServerFactory):
     """
@@ -23,16 +19,6 @@ class serverFactory(ServerFactory):
     def __init__(self):
         self.clients = [] # connected clients
         self.users = [] # name and ip of connected clients
-
-    def startFtp(self, host, port):
-        self.host, self.ftp_port = host, port
-        self.ftpfactory = factory = serverFtpFactory() # initialize factory
-        factory.protocol = serverFtpProtocol 
-        factory.server = self
-        try:
-            listener = reactor.listenTCP(port, factory, interface=host)
-        except CannotListenError:
-            log.msg('Ftp server failed to start')
 
     def updateClients(self, client):
         """

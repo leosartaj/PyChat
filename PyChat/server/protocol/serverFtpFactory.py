@@ -16,7 +16,6 @@ class serverFtpFactory(ServerFactory):
     """
     def __init__(self):
         self.clients = []
-        self.users = []
 
     def updateClients(self, client):
         """

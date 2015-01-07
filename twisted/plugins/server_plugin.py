@@ -21,6 +21,8 @@ from twisted.application import internet, service
 from PyChat.server.protocol.serverFactory import serverFactory
 from PyChat.server.protocol.serverProtocol import serverProtocol
 from PyChat.server.options import Options # custom options
+from PyChat.server.protocol.serverFtpFactory import serverFtpFactory
+from PyChat.server.protocol.serverFtpProtocol import serverFtpProtocol
 
 class ChatServiceMaker(object):
     """
@@ -37,9 +39,13 @@ class ChatServiceMaker(object):
 
         factory = serverFactory() # initialize factory
         factory.protocol = serverProtocol 
-
         tcp_service = internet.TCPServer(int(options['port']), factory, interface=options['iface'])
         tcp_service.setServiceParent(top_service) # add the service
+
+        factory = serverFtpFactory() # initialize factory
+        factory.protocol = serverFtpProtocol 
+        ftp_service = internet.TCPServer(6969, factory, interface=options['iface'])
+        ftp_service.setServiceParent(top_service) # add the ftp service
 
         return top_service
 

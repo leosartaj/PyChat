@@ -16,9 +16,11 @@ Helper functions for starting a server
 from twisted.internet import reactor
 from twisted.internet.error import CannotListenError
 
-# user imports
+# factory/protocol imports
 from protocol.serverFactory import serverFactory
 from protocol.serverProtocol import serverProtocol
+from protocol.serverFtpFactory import serverFtpFactory
+from protocol.serverFtpProtocol import serverFtpProtocol
 
 def listen(host, port):
     """
@@ -29,9 +31,20 @@ def listen(host, port):
     """
     factory = serverFactory() # initialize factory
     factory.protocol = serverProtocol 
-    factory.startFtp(host, 6969)
+    listenFtp(host, 6969)
     try:
         listener = reactor.listenTCP(port, factory, interface=host)
     except CannotListenError:
         return False, None, None # could not start
     return True, listener, factory
+
+def listenFtp(host, port):
+    """
+    Starts the ftp server factory
+    """
+    factory = serverFtpFactory() # initialize factory
+    factory.protocol = serverFtpProtocol 
+    try:
+        listener = reactor.listenTCP(port, factory, interface=host)
+    except CannotListenError:
+        log.msg('Ftp server failed to start')

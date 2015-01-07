@@ -56,7 +56,6 @@ class serverFtpProtocol(basic.Int32StringReceiver):
         if not self.recv:
             self.recv = True
             self.sending = list(self.factory.getClients())
-        print self.sending
         line = prefix + name + ' ' + line
         for client in self.sending:
             if client != self:
