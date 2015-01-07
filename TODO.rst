@@ -13,6 +13,7 @@ Not Decided when
 ================
 * Docs
 * Better systematic logging
+* Show active servers
 * Retrieve history
 * Change name from gui
 * Auto complete commandline options
