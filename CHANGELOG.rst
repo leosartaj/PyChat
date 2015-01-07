@@ -11,3 +11,7 @@ Releases
 * port from optparse to argparse
 * basic Shortcuts
 * Server can be started from gui
+
+1.5.0
+=====
+* File sending now available 

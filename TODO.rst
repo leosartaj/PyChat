@@ -1,18 +1,11 @@
 Future Plans
 ************
 
-1.5.0
-=====
-* FTP 
-
-1.6.0
-=====
-* Secure connection
-
 Not Decided when
 ================
 * Docs
 * Better systematic logging
+* Secure connection
 * Show active servers
 * Retrieve history
 * Change name from gui
