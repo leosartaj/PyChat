@@ -36,6 +36,11 @@ else:
 
     egg_info.write_toplevel_names = _hacked_write_toplevel_names
 
+def packages():
+    pkg = find_packages()
+    pkg.append('twisted.plugins')
+    return pkg
+
 setup(
     name = 'PyChat',
     version = __version__,
@@ -46,7 +51,7 @@ setup(
     license = 'MIT',
     keywords = 'chat client server',
     url = 'http://github.com/leosartaj/PyChat',
-    packages=find_packages(),
+    packages=packages(),
     package_data = {'PyChat.client.gui.glade': ['*.glade']},
     scripts=['bin/pychat'],
     install_requires = ['Twisted'],
