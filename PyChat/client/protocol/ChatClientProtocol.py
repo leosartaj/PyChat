@@ -26,6 +26,8 @@ class ChatClientProtocol(basic.LineReceiver):
     """
     from os import linesep as delimiter # set delimiter
 
+    FTPPORTS = [port for port in range(6969, 6969 + 8)]
+
     def connectionMade(self):
         self.clientobj = self.factory.clientobj # refrence to the client object
         self.clientobj.protocol = self # give your refrence to the client object
@@ -33,7 +35,8 @@ class ChatClientProtocol(basic.LineReceiver):
         # ip address and port connection
         self.host = self.factory.host 
         self.port = self.factory.port
-        self.ftp = None # refrence of the ftp protocol
+        self.sendingfile = False
+        self.ftp = [] # refrence of the ftp protocol
 
         self.peer = self.transport.getPeer()
         self.users = [] # list of connnected users
@@ -43,38 +46,80 @@ class ChatClientProtocol(basic.LineReceiver):
 
         self.setName = setName = 'c$~reg~' + self.factory.name
         self.sendLine(setName) # register with server
-        self.startFtp(self.host, 6969)
+        self.startFtpConnections(self.host, self.FTPPORTS)
+
+    def startFtpConnections(self, host, ports):
+        """
+        Takes in a list of ports 
+        starts ftp connections for the port and host
+        """
+        for port in ports:
+            self.startFtp(host, port)
 
     def startFtp(self, host, port):
         """
         Open up file transfer connection with server
         """
         self.ftpfactory = factory = FileClientFactory(self) # setting up the factory
+        factory.port = port
         factory.protocol = FileClientProtocol
         factory.deferred = defer.Deferred()
         factory.deferred.addCallback(self.registerFtp) # Called to register ftp refrence
         reactor.connectTCP(host, port, factory)
 
-    def forgetFtp(self):
+    def forgetFtp(self, port):
         """
         Forgets ftp connection
         """
-        self.ftp = None
+        for index, ftp in enumerate(self.ftp):
+            if ftp[0] == port:
+                del self.ftp[index]
+                break
 
     def registerFtp(self, ftp):
         """
         Registers reference to the ftp protocol
         """
-        self.ftp = ftp
+        self.ftp.append(ftp)
+
+    def updateFileStatus(self):
+        """
+        Checks if a file is being sent
+        updates accordingly
+        """
+        for port, ftp in self.ftp:
+            if ftp.status():
+                self.sendingfile = True
+                return
+        self.sendingfile = False
+
+    def sendFileParts(self, fName):
+        """
+        Decides the byte ranges to send files
+        """
+        size = os.path.getsize(fName)
+        num_bytes = size / len(self.ftp)
+        start = 0
+        end = start + num_bytes
+        i = 1
+        for port, ftp in self.ftp[:-1]:
+            #print 'startend', start, end
+            ftp.sendFile(fName, str(i) + '.split', start, end)
+            i += 1
+            start = end
+            end += num_bytes
+        lastftp = self.ftp[-1][1]
+        lastftp.sendFile(fName, str(i) + '.split', start, size)
 
     def sendFile(self, fName):
         """
         Instructs the ftp protocol to send file
         """
-        if self.ftp:
-            if not self.ftp.status():
+        if len(self.ftp):
+            self.updateFileStatus()
+            if not self.sendingfile:
+                self.sendFileParts(fName)
                 msg = 'Sending File: ' + os.path.basename(fName)
-                self.ftp.sendFile(fName)
             else:
                 msg = 'Already sending file. Cannot send: %s' %(os.path.basename(fName))
                 self.update('me ' + msg)

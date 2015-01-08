@@ -29,7 +29,7 @@ class FileClientFactory(ClientFactory):
 
     def clientConnectionLost(self, connector, reason):
         log.err(reason.getErrorMessage())
-        self.chatproto.forgetFtp() # lose the reference
+        self.chatproto.forgetFtp(self.port) # lose the reference
         self._notify(__ftplost__)
 
     def _notify(self, msg):

@@ -22,6 +22,8 @@ from protocol.serverProtocol import serverProtocol
 from protocol.serverFtpFactory import serverFtpFactory
 from protocol.serverFtpProtocol import serverFtpProtocol
 
+FTPPORTS = [port for port in range(6969, 6969 + 8)]
+
 def listen(host, port):
     """
     Starts the server listening
@@ -31,12 +33,20 @@ def listen(host, port):
     """
     factory = serverFactory() # initialize factory
     factory.protocol = serverProtocol 
-    listenFtp(host, 6969)
+    listenFtpConnections(host, FTPPORTS)
     try:
         listener = reactor.listenTCP(port, factory, interface=host)
     except CannotListenError:
         return False, None, None # could not start
     return True, listener, factory
+
+def listenFtpConnections(host, ports):
+    """
+    Takes in a list of ports 
+    starts ftp connections for the port and host
+    """
+    for port in ports:
+        listenFtp(host, port)
 
 def listenFtp(host, port):
     """

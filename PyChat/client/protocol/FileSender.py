@@ -30,12 +30,17 @@ class FileSender(object):
 
     lastSent = ''
     deferred = None
+    start, end = None, None
 
-    def beginFileTransfer(self, fName, consumer, transform=None):
+    def beginFileTransfer(self, fName, consumer, transform=None, start=None, end=None):
         """
         Starts file transfer of a file
         """
+        self.start = start
+        self.end = end
         self.file = open(fName, 'rb')
+        if start:
+            self.file.seek(start)
         self.consumer = consumer
         self.transform = transform
         self._paused = False
@@ -53,7 +58,8 @@ class FileSender(object):
         self._paused = False
         chunk = ''
         if self.file:
-            chunk = self.file.read(self.CHUNK_SIZE)
+            #chunk = self.file.read(self.CHUNK_SIZE)
+            chunk = self.readChunk()
         if not chunk:
             self._cleanup()
             self._complete()
@@ -64,6 +70,24 @@ class FileSender(object):
         self.lastSent = chunk[-1:]
         if not self._paused:
             self.resume.addCallback(self.resumeProducing)
+
+    def readChunk(self):
+        """
+        Reads the chunk from a file
+        """
+        size = self.CHUNK_SIZE
+        if self.start == None or self.end == None:
+            chunk = self.file.read(size)
+            return chunk
+        limit = self.end - self.start
+        if limit <= 0:
+            return ''
+        if size <= limit:
+            chunk = self.file.read(size)
+        else:
+            chunk = self.file.read(limit)
+        self.start += size
+        return chunk
 
     def _cleanup(self):
         """

@@ -66,7 +66,7 @@ class serverFactory(ServerFactory):
 
     def removeClients(self, client):
         """
-        removes protocol instances of connected clients
+        removes protocol instances of disconnected clients
         """
         index = self.clients.index(client)
         del self.clients[index]

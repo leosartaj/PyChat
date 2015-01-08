@@ -51,7 +51,7 @@ class FileClientProtocol(basic.Int32StringReceiver):
         self.sendString(self.chatproto.setName)
         if self.factory.deferred:
             deferred, self.factory.deferred = self.factory.deferred, None
-            deferred.callback(self)
+            deferred.callback((self.factory.port, self))
 
     def stringReceived(self, line):
         """
@@ -106,15 +106,17 @@ class FileClientProtocol(basic.Int32StringReceiver):
         """
         return self.sending
 
-    def sendFile(self, fName):
+    def sendFile(self, fName, filename, start=None, end=None):
         """
         Sends file to the server
+        fName is the path of the file to send
+        filename is the name which file is to be saved on client side
+        start is the starting byte and end is the last byte to send
         """
         self.sending = True
-        filename = os.path.basename(fName)
         self.sfile = filename
         fileprotocol = FileSender()
-        sendfile, startsend = fileprotocol.beginFileTransfer(fName, self.transport, self.transform)
+        sendfile, startsend = fileprotocol.beginFileTransfer(fName, self.transport, self.transform, start, end)
         sendfile.addCallback(self._endTransfer)
         sendfile.addErrback(self._sendingFailed)
         sendfile.addBoth(self._reset)
@@ -187,7 +189,7 @@ class FileClientProtocol(basic.Int32StringReceiver):
         returns the result string
         """
         if not self.rfile.has_key(fName):
-            handler = self._initFile(fName)
+            handler = self._initFile(fName, prefix='')
             self.rfile[fName] = handler
             value = peername + ' Recieving: ' + fName
         elif self.rfile.has_key(fName):
