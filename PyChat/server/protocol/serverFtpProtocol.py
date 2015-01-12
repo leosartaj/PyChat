@@ -43,12 +43,13 @@ class serverFtpProtocol(basic.Int32StringReceiver):
         comd, value = cmd.parse(line, CLIENT_PREFIX)
         if comd == 'reg':
             self.peername = value
-        elif comd == 'eof' or cmd == 'fail':
-            self.recv = False
-            self.sendingto = []
+        elif comd == 'eof':
+            self._reset()
             msg = cmd.clientcmd(comd, value)
             msg = cmd.addFirst(msg, self.peername)
             self.sendString(msg)
+        elif comd = 'fail':
+            self._reset()
         else:
             return False
         return True
@@ -63,6 +64,13 @@ class serverFtpProtocol(basic.Int32StringReceiver):
         for client in self.sendingto:
             if client != self:
                 client.sendString(line)
+
+    def _reset(self):
+        """
+        Reset variables
+        """
+        self.recv = False
+        self.sendingto = []
 
     def connectionLost(self, reason):
         """
