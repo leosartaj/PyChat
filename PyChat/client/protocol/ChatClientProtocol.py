@@ -19,6 +19,11 @@ from twisted.protocols import basic
 # user imports
 from FileClientFactory import FileClientFactory
 from FileClientProtocol import FileClientProtocol
+import command as cmd
+
+# prefixes for commands
+SERVER_PREFIX = cmd.SERVER_PREFIX
+CLIENT_PREFIX = cmd.CLIENT_PREFIX
 
 class ChatClientProtocol(basic.LineReceiver):
     """
@@ -39,9 +44,9 @@ class ChatClientProtocol(basic.LineReceiver):
         self.users = [] # list of connnected users
 
         log.msg('Connected to server at %s' % (self.peer)) # logs the connection
-        self.update('server Connected')
+        self.update('server', 'Connected')
 
-        self.setName = setName = 'c$~reg~' + self.factory.name
+        self.setName = setName = cmd.servercmd('reg', self.factory.name)
         self.sendLine(setName) # register with server
         self.startFtp(self.host, 6969)
 
@@ -77,14 +82,14 @@ class ChatClientProtocol(basic.LineReceiver):
                 self.ftp.sendFile(fName)
             else:
                 msg = 'Already sending file. Cannot send: %s' %(os.path.basename(fName))
-                self.update('me ' + msg)
+                self.update('me', msg)
         else:
             msg = 'Cannot send: %s' %(os.path.basename(fName))
             msg2 = 'Not connected to ftp server'
             log.msg(msg2)
-            self.update('me ' + msg2)
+            self.update('me', msg2)
         log.msg(msg)
-        self.update('me ' + msg)
+        self.update('me', msg)
 
     def send(self, text):
         """
@@ -99,7 +104,7 @@ class ChatClientProtocol(basic.LineReceiver):
         Escapes commands that user may enter
         accidentally or not
         """
-        if text.startswith('c$~'):
+        if text.startswith(CLIENT_PREFIX):
             text = '\\' + text
         return text
 
@@ -107,10 +112,10 @@ class ChatClientProtocol(basic.LineReceiver):
         """
         Handles recieved line
         """
-        line = self._parse(line)
+        peername, line = self._parse(line)
         if line != None:
-            log.msg('%s' % (line))
-            self.update(line)
+            log.msg('%s %s' % (peername, line))
+            self.update(peername, line)
 
     def _parse(self, line):
         """
@@ -118,45 +123,37 @@ class ChatClientProtocol(basic.LineReceiver):
         returns string to be logged 
         otherwise simply returns line without change
         """
-        if line[0:3] != 's$~':
-            return line
-        newline = line[3:]
-        index = newline.index('~')
-        cmd, value = newline[:index], newline[index + 1:]
-        if cmd == 'add' or cmd == 'rem':
-            value = self._handleUser(value, cmd)
+        peername, line = cmd.extractFirst(line)
+        comd, value = cmd.parse(line, SERVER_PREFIX)
+        if comd == 'add' or comd == 'rem':
+            value = self._handleUser(peername, value, comd)
         else:
-            return line
-        return value
+            return peername, line
+        return peername, value
 
-    def _handleUser(self, line, cmd=None):
+    def _handleUser(self, peername, line, comd=None):
         """
         Stores useful information about new connected user
         adds a tuple of name and ip address of user
         updates the client object
         """
         lineArr = line.split(' ')
-        line = lineArr[0] + ' has '
-        ip = ' '.join(lineArr[1:])
+        ip = ' '.join(lineArr)
+        line = 'has '
 
-        if cmd == 'add':
-            self.users.append((lineArr[0], ip))
+        if comd == 'add':
+            self.users.append((peername, ip))
             line += 'joined'
-        elif cmd == 'rem':
-            del self.users[self.users.index((lineArr[0], ip))]
+        elif comd == 'rem':
+            del self.users[self.users.index((peername, ip))]
             line += 'disconnected'
 
-        self.clientobj.updateConnUsers(lineArr[0])
+        self.clientobj.updateConnUsers(peername)
 
         return line
 
-    def update(self, line):
+    def update(self, name, msg):
         """
-        Extracts name and message
         updates on the big screen
         """
-        line = line.split(' ')
-        name = line[0]
-        msg = ' '.join(line[1:])
-
         self.clientobj.updateView(name, msg)

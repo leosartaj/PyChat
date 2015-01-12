@@ -36,4 +36,4 @@ class FileClientFactory(ClientFactory):
         """
         notify
         """
-        self.chatproto.update('server ' + msg)
+        self.chatproto.update('server', msg)

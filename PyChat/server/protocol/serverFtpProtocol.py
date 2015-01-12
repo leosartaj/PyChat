@@ -48,7 +48,7 @@ class serverFtpProtocol(basic.Int32StringReceiver):
             msg = cmd.clientcmd(comd, value)
             msg = cmd.addFirst(msg, self.peername)
             self.sendString(msg)
-        elif comd = 'fail':
+        elif comd == 'fail':
             self._reset()
         else:
             return False

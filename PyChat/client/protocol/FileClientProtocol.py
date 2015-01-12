@@ -61,9 +61,9 @@ class FileClientProtocol(basic.Int32StringReceiver):
         """
         Handles recieved file lines
         """
-        line = self._parse(line)
+        peername, line = self._parse(line)
         if line:
-            self.update(line)
+            self.update(peername, line)
 
     def _parse(self, line):
         """
@@ -74,36 +74,37 @@ class FileClientProtocol(basic.Int32StringReceiver):
         peername, line = cmd.extractFirst(line)
         comd, val = cmd.parse(line, SERVER_PREFIX)
         if comd == 'eof':
-            value = 'me File sent: %s' %(self.sfile)
+            value = 'File sent: %s' %(self.sfile)
+            peername = 'me'
             self._reset()
         else:
             pickle_dict = pickle_to_dict(val)
-            value = self._parseDict(peername, pickle_dict)
-        return value
+            value = self._parseDict(pickle_dict)
+        return peername, value
 
-    def _parseDict(self, peername, pickle_dict):
+    def _parseDict(self, pickle_dict):
         """
         Parses the pickle_dict
         Takes measures on the files
         """
         fName = pickle_dict['filename']
         if pickle_dict.has_key('eof'):
-            value = self._closeFile(peername, fName)
+            value = self._closeFile(fName)
         elif pickle_dict.has_key('fail'):
-            value = self._closeFile(peername, fName, False)
+            value = self._closeFile(fName, False)
         elif pickle_dict.has_key('line'):
             saveline = pickle_dict['line']
-            value = self._saveFile(peername, fName, saveline)
+            value = self._saveFile(fName, saveline)
         else:
             return None
         return value
 
-    def update(self, msg, logit=True):
+    def update(self, name, msg, logit=True):
         """
         Updates the gui
         logs the messages if logit set to true
         """
-        self.chatproto.update(msg)
+        self.chatproto.update(name, msg)
         if logit:
             log.msg(msg)
 
@@ -160,7 +161,7 @@ class FileClientProtocol(basic.Int32StringReceiver):
     def _sendingFailed(self, exc):
         log.msg(exc)
         msg = 'File Sending failed'
-        self.update('me ' + msg)
+        self.update('me', msg)
         pickle_dict = self._getDict()
         pickle_dict['fail'] = True
         pickle_str = dict_to_pickle(pickle_dict)
@@ -184,7 +185,7 @@ class FileClientProtocol(basic.Int32StringReceiver):
         handler = open(path, 'w')
         return handler
 
-    def _saveFile(self, peername, fName, fline):
+    def _saveFile(self, fName, fline):
         """
         Parses the line
         saves the line in the file
@@ -193,7 +194,7 @@ class FileClientProtocol(basic.Int32StringReceiver):
         if not self.rfile.has_key(fName):
             handler = self._initFile(fName)
             self.rfile[fName] = handler
-            value = peername + ' Recieving: ' + fName
+            value = 'Recieving: ' + fName
         elif self.rfile.has_key(fName):
             handler = self.rfile[fName]
             value = None
@@ -202,7 +203,7 @@ class FileClientProtocol(basic.Int32StringReceiver):
         handler.write(fline)
         return value
 
-    def _closeFile(self, peername, fName, status=True):
+    def _closeFile(self, fName, status=True):
         """
         safely closes the file
         cleans up rfiles dict
@@ -212,7 +213,7 @@ class FileClientProtocol(basic.Int32StringReceiver):
         handler.close()
         del self.rfile[fName]
         if status:
-            value = peername + ' Recieved: ' + fName
+            value = 'Recieved: ' + fName
         else:
-            value = peername + ' File could not be received: ' + fName
+            value = 'File could not be received: ' + fName
         return value

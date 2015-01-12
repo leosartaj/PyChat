@@ -8,8 +8,15 @@
 # Licensed under the MIT license.
 ##
 
+# twisted imports
 from twisted.protocols import basic
 from twisted.python import log
+
+# user imports
+import command as cmd
+
+# prefixes for commands
+CLIENT_PREFIX = cmd.CLIENT_PREFIX
 
 class serverProtocol(basic.LineReceiver):
     """
@@ -30,7 +37,8 @@ class serverProtocol(basic.LineReceiver):
         """
         if not self._parse(line):
             log.msg('Received %s from %s' %(line, self.peername))
-            self.relay(line, self.peername)
+            msg = cmd.addFirst(line, self.peername)
+            self.relay(msg)
 
     def _parse(self, line):
         """
@@ -39,25 +47,22 @@ class serverProtocol(basic.LineReceiver):
         and calls the command
         otherwise simply returns False
         """
-        if line[0:3] != 'c$~':
-            return False
-        line = line[3:]
-        index = line.index('~')
-        cmd, value = line[:index], line[index + 1:]
-        if cmd == 'reg':
+        comd, value = cmd.parse(line, CLIENT_PREFIX)
+        if comd == 'reg':
             self.peername = value
             log.msg('PeerName of %s is %s' %(self.peer, self.peername))
             self.factory.updateUsers(self.peername, self.peer) # register name and ip with factory
-            self.relay(str(self.peer), self.peername, 's$~add~')
+            msg = cmd.addFirst(cmd.clientcmd('add', str(self.peer)), self.peername)
+            self.relay(msg)
         else:
             return False
         return True
 
-    def relay(self, line, name='', prefix=''):
+    def relay(self, line):
         """
         relay the message to other clients
         """
-        line = prefix + name + ' ' + line
+        #line = prefix + name + ' ' + line
         for client in self.factory.getClients():
             if client != self:
                 client.sendLine(line)
@@ -67,7 +72,8 @@ class serverProtocol(basic.LineReceiver):
         Tells the client about already connected users
         """
         for name, ip in self.factory.getUsers():
-            line = 's$~add~' + name + ' ' + str(ip)
+            line = cmd.addFirst(cmd.clientcmd('add', str(ip)), name)
+            print line
             self.sendLine(line)
 
     def connectionLost(self, reason):
@@ -76,7 +82,8 @@ class serverProtocol(basic.LineReceiver):
         """
         self.factory.removeClients(self)
         self.factory.removeUsers(self.peername, self.peer)
-        self.relay(str(self.peer), self.peername, 's$~rem~')
+        msg = cmd.addFirst(cmd.clientcmd('rem', str(self.peer)), self.peername)
+        self.relay(msg)
         self._logConnectionLost(reason)
 
     def _logConnectionLost(self, reason):
