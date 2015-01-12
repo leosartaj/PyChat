@@ -49,10 +49,6 @@ class serverProtocol(basic.LineReceiver):
             log.msg('PeerName of %s is %s' %(self.peer, self.peername))
             self.factory.updateUsers(self.peername, self.peer) # register name and ip with factory
             self.relay(str(self.peer), self.peername, 's$~add~')
-        elif cmd == 'file':
-            self.relay(value, self.peername, 's$~file~')
-        elif cmd == 'eof':
-            self.relay(value, self.peername, 's$~eof~')
         else:
             return False
         return True

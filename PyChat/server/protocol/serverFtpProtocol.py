@@ -10,6 +10,10 @@
 
 from twisted.protocols import basic
 from twisted.python import log
+import command as cmd
+
+# prefix for commands
+CLIENT_PREFIX = cmd.CLIENT_PREFIX
 
 class serverFtpProtocol(basic.Int32StringReceiver):
     """
@@ -18,7 +22,7 @@ class serverFtpProtocol(basic.Int32StringReceiver):
     def connectionMade(self):
         self.peer = self.transport.getPeer()
         self.recv = False # whether server is receiving a file
-        self.sending = [] # list of clients file is getting send to
+        self.sendingto = [] # list of clients file is getting send to
         self.factory.updateClients(self)
 
     def stringReceived(self, line):
@@ -26,7 +30,8 @@ class serverFtpProtocol(basic.Int32StringReceiver):
         Handle received messages
         """
         if not self._parse(line):
-            self.relay(line, self.peername)
+            tosend = cmd.addFirst(line, self.peername)
+            self.relay(tosend)
 
     def _parse(self, line):
         """
@@ -35,29 +40,27 @@ class serverFtpProtocol(basic.Int32StringReceiver):
         and calls the command
         otherwise simply returns False
         """
-        if line[0:3] != 'c$~':
-            return False
-        line = line[3:]
-        index = line.index('~')
-        cmd, value = line[:index], line[index + 1:]
-        if cmd == 'reg':
+        comd, value = cmd.parse(line, CLIENT_PREFIX)
+        if comd == 'reg':
             self.peername = value
-        elif cmd == 'eof':
+        elif comd == 'eof' or cmd == 'fail':
             self.recv = False
-            self.sending = []
+            self.sendingto = []
+            msg = cmd.clientcmd(comd, value)
+            msg = cmd.addFirst(msg, self.peername)
+            self.sendString(msg)
         else:
             return False
         return True
 
-    def relay(self, line, name='', prefix=''):
+    def relay(self, line):
         """
         relay the message to other clients
         """
         if not self.recv:
             self.recv = True
-            self.sending = list(self.factory.getClients())
-        line = prefix + name + ' ' + line
-        for client in self.sending:
+            self.sendingto = list(self.factory.getClients())
+        for client in self.sendingto:
             if client != self:
                 client.sendString(line)
 

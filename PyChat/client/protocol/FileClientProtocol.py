@@ -19,6 +19,10 @@ from twisted.protocols import basic
 
 # user import
 from FileSender import FileSender
+import command as cmd
+
+# prefix for commands
+SERVER_PREFIX = cmd.SERVER_PREFIX
 
 def dict_to_pickle(pickle_dict):
     """
@@ -59,17 +63,7 @@ class FileClientProtocol(basic.Int32StringReceiver):
         """
         line = self._parse(line)
         if line:
-            log.msg('%s' % (line))
-            self.chatproto.update(line)
-
-    def _parseline(self, fline):
-        """
-        Parses the fline
-        extracts information
-        """
-        index = fline.index(' ')
-        peername, pickle_str = fline[:index], fline[index + 1:]
-        return peername, pickle_str
+            self.update(line)
 
     def _parse(self, line):
         """
@@ -77,9 +71,14 @@ class FileClientProtocol(basic.Int32StringReceiver):
         returns string to be logged 
         otherwise simply returns line without change
         """
-        peername, pickle_str = self._parseline(line)
-        pickle_dict = pickle_to_dict(pickle_str)
-        value = self._parseDict(peername, pickle_dict)
+        peername, line = cmd.extractFirst(line)
+        comd, val = cmd.parse(line, SERVER_PREFIX)
+        if comd == 'eof':
+            value = 'me File sent: %s' %(self.sfile)
+            self._reset()
+        else:
+            pickle_dict = pickle_to_dict(val)
+            value = self._parseDict(peername, pickle_dict)
         return value
 
     def _parseDict(self, peername, pickle_dict):
@@ -99,6 +98,15 @@ class FileClientProtocol(basic.Int32StringReceiver):
             return None
         return value
 
+    def update(self, msg, logit=True):
+        """
+        Updates the gui
+        logs the messages if logit set to true
+        """
+        self.chatproto.update(msg)
+        if logit:
+            log.msg(msg)
+
     def status(self):
         """
         gives the status of sending and receiving
@@ -117,7 +125,6 @@ class FileClientProtocol(basic.Int32StringReceiver):
         sendfile, startsend = fileprotocol.beginFileTransfer(fName, self.transport, self.transform)
         sendfile.addCallback(self._endTransfer)
         sendfile.addErrback(self._sendingFailed)
-        sendfile.addBoth(self._reset)
         startsend.callback(1)
 
     def _getDict(self):
@@ -144,26 +151,23 @@ class FileClientProtocol(basic.Int32StringReceiver):
         """
         End file transfer
         """
-        msg = 'File sent: %s' %(self.sfile)
-        log.msg(msg)
-        self.chatproto.update('me ' + msg)
         pickle_dict = self._getDict()
         pickle_dict['eof'] = True
         pickle_str = dict_to_pickle(pickle_dict)
         self.sendString(pickle_str)
-        servercmd = 'c$~eof~' # tell server file sending complete
-        self.sendString(servercmd)
+        self.sendString(cmd.servercmd('eof', self.sfile))
 
     def _sendingFailed(self, exc):
         log.msg(exc)
-        msg = 'me File Sending failed'
-        self.chatproto.update(msg)
+        msg = 'File Sending failed'
+        self.update('me ' + msg)
         pickle_dict = self._getDict()
         pickle_dict['fail'] = True
         pickle_str = dict_to_pickle(pickle_dict)
         self.sendString(pickle_str)
+        self.sendString(cmd.servercmd('fail', self.sfile))
 
-    def _reset(self, *args):
+    def _reset(self):
         """
         Reset the variables
         """
