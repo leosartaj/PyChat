@@ -41,8 +41,11 @@ def parse_args():
     help = "to also start a server. Works only when iface options is set. Defaults to false."
     parser.add_argument('--server', '-s',  action='store_true', help=help, dest='server')
 
+    help = "Setting this options, disables logging"
+    parser.add_argument('--nolog', help=help, action='store_true', dest='nolog')
+
     help = "The name of log file. Defaults to pychat.log in cwd."
-    parser.add_argument('--log', '-l', help=help, default='pychat.log')
+    parser.add_argument('--logfile', '-l', help=help, default='pychat.log')
 
     args = parser.parse_args()
 

@@ -35,7 +35,10 @@ if __name__ == '__main__':
     if host != None:
         addresses.append((host, port, server))
     try:
-        main.run(client, sys.stdout, addresses)
+        if args.nolog:
+            main.run(client, None, addresses)
+        else:
+            main.run(client, sys.stdout, addresses)
     except Exception, e:
         print 'Cannot Start PyChat'
         print e

@@ -24,7 +24,10 @@ if __name__ == '__main__':
     args = options.parse_args() # parse the arguments
 
     addresses = []
-    log = open(args.log, 'a')
+    if args.nolog:
+        log = None
+    else:
+        log = open(args.logfile, 'a')
     client = args.client
     host, port, server = args.iface, args.port, args.server
     if host != None:

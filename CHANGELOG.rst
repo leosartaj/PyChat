@@ -1,9 +1,9 @@
 Releases
 ********
 
-1.3.0
+1.5.0
 =====
-* Tabbed Chatting
+* File sending now available 
 
 1.4.0
 =====
@@ -12,6 +12,6 @@ Releases
 * basic Shortcuts
 * Server can be started from gui
 
-1.5.0
+1.3.0
 =====
-* File sending now available 
+* Tabbed Chatting

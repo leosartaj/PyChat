@@ -56,14 +56,15 @@ def startLog(handle):
     """
     log.startLogging(handle)
 
-def run(clientname, handle=sys.stdout, addresses=[]):
+def run(clientname, handle=None, addresses=[]):
     """
     Runs the Gui
     address is a list of tuples(host, port, server)
     host:port is the ip:port to connect to
     server is a boolean definig whether to start a server or not
     """
-    startLog(handle)
+    if handle:
+        startLog(handle)
     gui = startGui(clientname)
     for host, port, server in addresses:
         connect(gui, host, port, server)
