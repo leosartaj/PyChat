@@ -17,7 +17,7 @@ import os
 
 from helper import textview # helper modules
 from helper import markup # helper modules
-import error
+from PyChat.client import error
 try:
     from connect import setup_factory
 except ImportError:

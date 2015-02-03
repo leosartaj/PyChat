@@ -19,7 +19,7 @@ from twisted.protocols import basic
 # user imports
 from FileClientFactory import FileClientFactory
 from FileClientProtocol import FileClientProtocol
-import command as cmd
+from PyChat import command as cmd
 
 # prefixes for commands
 SERVER_PREFIX = cmd.SERVER_PREFIX

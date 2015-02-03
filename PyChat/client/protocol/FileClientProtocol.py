@@ -19,7 +19,7 @@ from twisted.protocols import basic
 
 # user import
 from FileSender import FileSender
-import command as cmd
+from PyChat import command as cmd
 
 # prefix for commands
 SERVER_PREFIX = cmd.SERVER_PREFIX

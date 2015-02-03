@@ -13,7 +13,7 @@ from twisted.protocols import basic
 from twisted.python import log
 
 # user imports
-import command as cmd
+from PyChat import command as cmd
 
 # prefixes for commands
 CLIENT_PREFIX = cmd.CLIENT_PREFIX

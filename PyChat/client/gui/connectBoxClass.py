@@ -14,8 +14,8 @@ import gtk
 
 # other imports
 from helper import helperFunc as hf
-from server import startserver
-from error import __servfail__
+from PyChat.server import startserver
+from PyChat.client.error import __servfail__
 
 class connectBoxClass:
     """ 

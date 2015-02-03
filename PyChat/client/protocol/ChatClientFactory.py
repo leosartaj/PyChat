@@ -10,7 +10,7 @@
 
 from twisted.python import log
 from twisted.internet.protocol import ClientFactory
-from error import __connfail__, __connlost__
+from Pychat.client.error import __connfail__, __connlost__
 
 class ChatClientFactory(ClientFactory):
     """

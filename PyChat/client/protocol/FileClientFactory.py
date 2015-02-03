@@ -10,7 +10,7 @@
 
 from twisted.python import log
 from twisted.internet.protocol import ClientFactory
-from error import __ftpfail__, __ftplost__
+from PyChat.client.error import __ftpfail__, __ftplost__
 
 class FileClientFactory(ClientFactory):
     """
