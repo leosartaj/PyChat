@@ -12,5 +12,5 @@
 Information Variables
 """
 
-__version__ = '1.5.0'
+__version__ = '1.5.0-beta'
 __desc__ = 'PyChat ' + __version__
